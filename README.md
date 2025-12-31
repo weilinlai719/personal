@@ -29,3 +29,4 @@
 
 ---
 由 [weilinlai719](https://github.com/weilinlai719) 製作。
+由於目前能力不足，內容大多是 vibe coding 的
