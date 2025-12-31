@@ -5,8 +5,7 @@
 
 ## 🌐 專案預覽
 你可以透過 GitHub Pages 直接觀看本專案：
-👉 [點此開啟網頁](https://weilinlai719.github.io/你的儲存庫名稱/) 
-*(請記得將上面的網址改為你實際的 GitHub Pages 連結)*
+👉 [點此開啟網頁](https://weilinlai719.github.io/fireworks/) 
 
 ## ✨ 核心功能
 - **互動式煙火系統**：使用 JavaScript 粒子物理模擬，點擊畫面任何空白處即可施放煙火。
