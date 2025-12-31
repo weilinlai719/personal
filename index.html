@@ -65,7 +65,7 @@
 <div class="overlay">
     <div class="glass-header">
         <h1>weilin's website</h1>
-        <h2>Current Time</h2>
+        <h2>2026 倒數>2>2h
         <div class="stats" id="clock">00:00:00</div>
     </div>
 
@@ -97,7 +97,36 @@
         document.getElementById('clock').innerText = now.toLocaleTimeString('zh-TW', {hour12: false});
     }
     setInterval(updateClock, 1000);
+    // 元旦倒數功能
+function updateCountdown() {
+    const now = new Date();
+    // 設定目標時間：2026年1月1日 00:00:00
+    const target = new Date("January 1, 2026 00:00:00");
+    const diff = target - now; // 剩餘毫秒數
 
+    if (diff <= 0) {
+        document.getElementById('clock').innerText = "Happy New Year 2026!";
+        return;
+    }
+
+    // 計算 時、分、秒
+    // 這裡我們只顯示小時以內的倒數（適合跨年當天），如果要包含天數可以再加上天數計算
+    const hours = Math.floor((diff / (1000 * 60 * 60)));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    // 格式化數字，保持兩位數 (例如 05:09:01)
+    const hDisplay = hours.toString().padStart(2, '0');
+    const mDisplay = minutes.toString().padStart(2, '0');
+    const sDisplay = seconds.toString().padStart(2, '0');
+
+    document.getElementById('clock').innerText = `${hDisplay}:${mDisplay}:${sDisplay}`;
+}
+
+// 每一秒更新一次
+setInterval(updateCountdown, 1000);
+// 網頁開啟後立刻執行一次，避免出現 00:00:00 的空白感
+updateCountdown();
     class Particle {
         constructor(x, y, color) {
             this.x = x; this.y = y; this.color = color;
@@ -153,6 +182,7 @@
 </script>
 </body>
 </html>
+
 
 
 
