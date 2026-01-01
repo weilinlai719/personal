@@ -50,7 +50,19 @@
             transition: 0.3s;
         }
         .leg a:hover { background: rgba(77, 238, 234, 0.2); box-shadow: 0 0 15px rgba(77, 238, 234, 0.5); }
-
+        .legger{     
+            position: absolute; 
+            top: 60%; left: 50%; /* 放在畫面正中央 */
+            transform: translate(-50%, -50%); /* 精確位移到中心點 */
+            pointer-events: auto; 
+            z-index: 11;}
+         .legger a {
+            color: #4deeea; text-decoration: none; font-weight: bold;
+            background: rgba(77, 238, 234, 0.1); padding: 12px 24px;
+            border-radius: 12px; border: 1px solid rgba(77, 238, 234, 0.4);
+            transition: 0.3s;
+        }
+        .legger a:hover { background: rgba(77, 238, 234, 0.2); box-shadow: 0 0 15px rgba(77, 238, 234, 0.5); }
         /* 底部按鈕 */
         .footer { pointer-events: auto; margin-bottom: 80px; }
         .github-btn { 
@@ -73,7 +85,8 @@
     <div class="leg">
         <a href="https://weilinlai719.github.io/personal/Taipei101.html" target="_blank">🏮 開啟 Taipei 101 Fireworks</a>
     </div>
-
+    <div class="legger">
+        <a href="https://weilinlai719.github.io/personal/tetris" target="_blank">開啟 tetris 遊戲 </a>
     <div class="footer">
         <a href="https://github.com/weilinlai719" class="github-btn">View on GitHub</a>
     </div>
@@ -153,6 +166,7 @@
 </script>
 </body>
 </html>
+
 
 
 
