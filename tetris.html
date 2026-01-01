@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Tetris</title>
+    <style>
+    body { 
+        background: #202028; 
+        color: #fff; 
+        text-align: center; 
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0px;
+    }
+
+    /* 主容器：使用 Flexbox 並排 */
+    .main-container {
+        display: flex;
+        justify-content: center; /* 整體水平置中 */
+        align-items: flex-start; /* 讓內容對齊頂部 */
+        gap: 40px;               /* 說明欄與遊戲之間的間距 */
+        max-width: 1000px;
+        margin: 0 auto;          /* 讓整個容器在頁面置中 */
+        padding-top: 10px;
+    }
+
+    /* 說明欄位 */
+    .readme { 
+        text-align: left; 
+        width: 300px; /* 固定寬度，避免跑掉 */
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .readme h2 { margin-top: 0; color: #4CAF50; }
+
+    /* 分數顯示 */
+    #score {
+        font-size: 24px;
+        margin: 20px 0;
+        font-weight: bold;
+        color: #c5ea21;
+    }
+
+    /* 遊戲畫布 */
+    canvas { 
+        border: solid 4px #fff; 
+        background-color: #000; 
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    /* 按鈕樣式 */
+    .start-button {
+        background-color: #4CAF50; 
+        border: none; 
+        color: white; 
+        padding: 15px 30px; 
+        font-size: 16px; 
+        cursor: pointer; 
+        border-radius: 12px;
+        transition: 0.3s;
+        width: 100%; /* 讓按鈕填滿說明欄寬度 */
+    }
+
+    .start-button:hover {
+        background-color: #45a049;
+        transform: scale(1.05);
+    }
+</style>
+</head>
+<body>
+    <h1>俄羅斯方塊</h1>
+    
+    <div class="main-container">
+        <div class="readme">
+            <h2>說明</h2>
+            <p>使用方向鍵控制方塊移動和旋轉。</p>
+            <ul>
+                <li>左箭頭：向左移動</li>
+                <li>右箭頭：向右移動</li>
+                <li>上箭頭：旋轉方塊</li>
+                <li>下箭頭：加速下落</li>
+            </ul>
+            <p>當一行被填滿時，該行會被消除並獲得分數。</p>
+            <div id="score">分數：0</div>
+            <div id="level">等級：1</div>
+            <canvas id="next" width="120" height="120" style="background:
+             #000; border: 2px solid #fff; margin-bottom: 10px;"></canvas>
+            <button class="start-button" id="startButton">開始遊戲</button>
+        </div>
+
+        <div class="game-area">
+            <canvas id="tetris" width="360" height="600"></canvas>
+        </div>
+    </div>
+
+    <script src="tetris.js"></script>
+</body>
+</html>
