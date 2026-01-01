@@ -97,7 +97,7 @@
         document.getElementById('clock').innerText = now.toLocaleTimeString('zh-TW', {hour12: false});
     }
     setInterval(updateClock, 1000);
-   
+   updateClock();
      class Particle {
         constructor(x, y, color) {
             this.x = x; this.y = y; this.color = color;
@@ -152,6 +152,7 @@
 </script>
 </body>
 </html>
+
 
 
 
