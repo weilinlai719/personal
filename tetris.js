@@ -222,7 +222,7 @@ let level = 1;
 let totalLines = 0;
 
 let moveCounter = 0;
-const moveInterval = 100; // 每 0.1 秒移動一格，可以按喜好調整
+const moveInterval = 50; // 每 0.1 秒移動一格，可以按喜好調整
 
 function update(time = 0) {
     const deltaTime = time - lastTime;
@@ -312,5 +312,6 @@ const startBtn = document.getElementById('startButton');
 if (startBtn) {
     startBtn.addEventListener('click', startGame);
 }
+
 
 
