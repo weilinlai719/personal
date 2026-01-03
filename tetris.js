@@ -109,6 +109,25 @@ function playerRotate(dir) {
         }
     }
 }
+// 封裝一個簡單的功能綁定函式
+function bindBtn(id, action) {
+    const btn = document.getElementById(id);
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // 防止觸發捲動或其他手勢
+        action();
+        
+        // 加入震動回饋
+        if (window.navigator.vibrate) window.navigator.vibrate(20);
+    }, { passive: false });
+}
+
+// 綁定按鍵與對應函式
+bindBtn('btnLeft', () => playerMove(-1));
+bindBtn('btnRight', () => playerMove(1));
+bindBtn('btnDown', () => playerDrop());
+bindBtn('btnRotate', () => playerRotate(1));
+bindBtn('btnHardDrop', () => playerHardDrop());
+
 
 // 6. 消除與動作
 function arenaSweep() {
