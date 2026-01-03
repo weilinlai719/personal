@@ -135,7 +135,7 @@ function arenaSweep() {
         if (newLevel > level) {
             level = newLevel;
             // 速度加快：每次升級減少 100ms，最低極限 100ms
-            dropInterval = Math.max(100, 1000 - (level - 1) * 90);
+            dropInterval = Math.max(100, 800 - (level - 1) * 90);
         }
          updateScore();
     }
@@ -261,3 +261,4 @@ const startBtn = document.getElementById('startButton');
 if (startBtn) {
     startBtn.addEventListener('click', startGame);
 }
+
