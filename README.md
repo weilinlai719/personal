@@ -1,4 +1,4 @@
-# fireworks
+# personal
 # 🎆 Weilin's Interactive Fireworks Website
 
 這是一個個人專案展示網頁，結合了 **HTML5 Canvas** 動態效果與現代化的 **Web UI 設計**。網頁背景會隨機綻放煙火，並支援滑鼠點擊互動，讓使用者在瀏覽時擁有沉浸式的慶典體驗。
