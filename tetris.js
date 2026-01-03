@@ -24,7 +24,7 @@ function createPiece(type) {
     if (type === 'O') return [[7, 7], [7, 7]];
 }
 function drawGrid() {
-    context.strokeStyle = 'rgba(255, 255, 255, 0.2)'; // 設定線條顏色為半透明白色
+    context.strokeStyle = 'rgba(255, 255, 255, 0.15)'; // 設定線條顏色為半透明白色
     context.lineWidth = 0.05; // 因為我們用了 context.scale(30)，所以線條要設得很細
 
     // 畫垂直線
@@ -141,7 +141,21 @@ function arenaSweep() {
     }
    
 }
-
+function playerHardDrop() {
+    // 當沒有碰撞時，一直往下移
+    while (!collide(arena, player)) {
+        player.pos.y++;
+    }
+    // 因為迴圈停止是因為發生了碰撞，所以要往回退一格
+    player.pos.y--;
+    
+    // 立即固定方塊（這通常在你原本 playerDrop 的碰撞邏輯裡）
+    // 這裡調用你原本處理「落地」的邏輯，例如：
+    merge(arena, player);
+    playerReset();
+    arenaSweep();
+    updateScore();
+}
 function playerDrop() {
     player.pos.y++;
     if (collide(arena, player)) {
@@ -208,6 +222,8 @@ document.addEventListener('keydown', event => {
     else if (event.keyCode === 39) playerMove(1);   // 右
     else if (event.keyCode === 40) playerDrop();    // 下
     else if (event.keyCode === 38) playerRotate(1); // 上 (旋轉)
+    else if (event.keyCode === 32)  playerHardDrop();// 空白鍵 (硬降)
+    
 });
 function drawNext() {
     // 清空小畫布
