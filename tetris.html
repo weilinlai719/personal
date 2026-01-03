@@ -66,6 +66,42 @@
         background-color: #45a049;
         transform: scale(1.05);
     }
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    user-select: none; /* 防止文字被選取 */
+}
+
+.control-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.ctrl-btn {
+    width: 70px;
+    height: 70px;
+    margin: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid #fff;
+    color: white;
+    border-radius: 50%; /* 圓形按鈕 */
+    font-size: 14px;
+    touch-action: manipulation; /* 優化點擊延遲 */
+    -webkit-tap-highlight-color: transparent; /* 移除點擊高亮 */
+}
+
+.ctrl-btn:active {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.ctrl-btn.wide {
+    width: 200px;
+    border-radius: 35px;
+}
+
 </style>
 </head>
 <body>
@@ -86,7 +122,20 @@
             <div id="score">分數：0</div>
             <div id="level">等級：1</div>
             <canvas id="next" width="120" height="120" style="background:
-             #000; border: 2px solid #fff; margin-bottom: 10px;"></canvas>
+             #000; border: 2px solid #fff; margin-bottom: 10px;"></canvas><div class="controls">
+    <div class="control-row">
+        <button id="btnRotate" class="ctrl-btn">旋轉 (Rotate)</button>
+    </div>
+    <div class="control-row">
+        <button id="btnLeft" class="ctrl-btn">← 左</button>
+        <button id="btnDown" class="ctrl-btn">↓ 下</button>
+        <button id="btnRight" class="ctrl-btn">右 →</button>
+    </div>
+    <div class="control-row">
+        <button id="btnHardDrop" class="ctrl-btn wide">快速下落 (Hard Drop)</button>
+    </div>
+</div>
+
             <button class="start-button" id="startButton">開始遊戲</button>
         </div>
 
