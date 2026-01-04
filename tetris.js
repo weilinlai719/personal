@@ -205,7 +205,7 @@ function arenaSweep() {
         player.totalLines += rowCount;
         player.score += rowCount * 10 * player.level;
         player.level = Math.floor(player.totalLines / 10) + 1;
-        dropInterval = Math.max(100, 1000 - (player.level - 1) * 100);
+        dropInterval = Math.max(50, 800 - (player.level - 1) * 90);
     }
 }
 
@@ -317,6 +317,7 @@ if (startBtn) {
         }
     });
 }
+
 
 
 
