@@ -17,7 +17,7 @@ let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
 let moveCounter = 0;
-const moveInterval = 80; // 連續移動速度 (ms)
+let moveInterval = 60; // 連續移動速度 (ms)
 let requestID;
 let isGameStarted = false;
 
@@ -205,7 +205,7 @@ function arenaSweep() {
         player.totalLines += rowCount;
         player.score += rowCount * 10 * player.level;
         player.level = Math.floor(player.totalLines / 10) + 1;
-        dropInterval = Math.max(50, 800 - (player.level - 1) * 90);
+        dropInterval = Math.max(100, 1000 - (player.level - 1) * 100);
     }
 }
 
@@ -230,11 +230,23 @@ function playerReset() {
     drawNext();
     if (collide(arena, player)) {
         cancelAnimationFrame(requestID);
-        alert("遊戲結束！ 你的分數是: " + player.score);
+        alert("GAME OVER! Score: " + player.score);
         location.reload();
     }
 }
+const speedRange = document.getElementById('speedRange');
+const speedValue = document.getElementById('speedValue');
 
+// 監聽滑桿變動
+speedRange.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    
+    // 更新全域變數 moveInterval (這會直接影響 update 函式的判斷)
+    moveInterval = val; 
+    
+    // 更新介面上的數字顯示
+    speedValue.innerText = val;
+});
 function update(time = 0) {
     const deltaTime = time - lastTime;
     lastTime = time;
@@ -266,7 +278,7 @@ function updateScore() {
 
 // 7. 事件監聽
 document.addEventListener('keydown', event => {
-   const blockedKeys = [32, 37, 38, 39, 40];
+    const blockedKeys = [32, 37, 38, 39, 40, 87, 65, 83, 68];
     if (blockedKeys.includes(event.keyCode)) {
         // 1. 立即停止瀏覽器的預設捲動行為
         event.preventDefault(); 
@@ -276,18 +288,17 @@ document.addEventListener('keydown', event => {
     if (event.repeat && (event.keyCode === 38 || event.keyCode === 32)) {
         return; 
     }
-
-    if (event.keyCode === 37) { keys.left = true; playerMove(-1); }
-    else if (event.keyCode === 39) { keys.right = true; playerMove(1); }
-    else if (event.keyCode === 40) { keys.down = true; }
-    else if (event.keyCode === 38) { playerRotate(1); }
+    if (event.keyCode === 37||event.keyCode === 65) { keys.left = true; playerMove(-1); }
+    else if (event.keyCode === 39||event.keyCode === 68) { keys.right = true; playerMove(1); }
+    else if (event.keyCode === 40||event.keyCode === 83) { keys.down = true; }
+    else if (event.keyCode === 38||event.keyCode === 87) { playerRotate(1); }
     else if (event.keyCode === 32) { playerHardDrop(); }
-});
+}, { passive: false });
 
 document.addEventListener('keyup', event => {
-    if (event.keyCode === 37) keys.left = false;
-    if (event.keyCode === 39) keys.right = false;
-    if (event.keyCode === 40) keys.down = false;
+    if (event.keyCode === 37 || event.keyCode === 65) keys.left = false;
+    if (event.keyCode === 39 || event.keyCode === 68) keys.right = false;
+    if (event.keyCode === 40 || event.keyCode === 83) keys.down = false;
 });
 
 function bindBtn(id, action) {
@@ -317,9 +328,3 @@ if (startBtn) {
         }
     });
 }
-
-
-
-
-
-
