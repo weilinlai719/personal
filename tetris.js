@@ -48,8 +48,12 @@ function collide(arena, player) {
     const [m, o] = [player.matrix, player.pos];
     for (let y = 0; y < m.length; ++y) {
         for (let x = 0; x < m[y].length; ++x) {
-            if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
-                return true;
+           if (m[y][x] !== 0) {
+                // 檢查是否超出左右邊界、底部，或者碰撞到已有方塊
+                if (!arena[y + o.y] || 
+                    arena[y + o.y][x + o.x] !== 0) {
+                    return true;
+                }
             }
         }
     }
@@ -222,16 +226,31 @@ function playerReset() {
     if (!player.nextMatrix) {
         player.nextMatrix = createPiece(pieces[pieces.length * Math.random() | 0]);
     }
+    
     player.matrix = player.nextMatrix;
     player.nextMatrix = createPiece(pieces[pieces.length * Math.random() | 0]);
-    player.pos.y = 0;
-    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+
+    // 讓方塊從網格的最頂端生成
+    player.pos.y = 0; 
+    player.pos.x = Math.floor(arena[0].length / 2) - Math.floor(player.matrix[0].length / 2);
 
     drawNext();
+
+    // 檢查新生成的方塊是否立刻碰撞
     if (collide(arena, player)) {
+        // 1. 遊戲結束，立刻停止所有按鍵狀態
+        keys.left = false;
+        keys.right = false;
+        keys.down = false;
+        isGameStarted = false; // 停止 update 邏輯
+
         cancelAnimationFrame(requestID);
-        alert("GAME OVER! Score: " + player.score);
-        location.reload();
+        
+        // 2. 稍微延遲彈窗，讓玩家看清楚最後一步
+        setTimeout(() => {
+            alert("遊戲結束！您的得分是：" + player.score);
+            location.reload(); 
+        }, 100);
     }
 }
 const speedRange = document.getElementById('speedRange');
@@ -248,18 +267,25 @@ speedRange.addEventListener('input', (e) => {
     speedValue.innerText = val;
 });
 function update(time = 0) {
+    if (!isGameStarted) return;
+
     const deltaTime = time - lastTime;
     lastTime = time;
 
-    // 持續移動邏輯
-    moveCounter += deltaTime;
-    if (moveCounter > moveInterval) {
-        if (keys.left) playerMove(-1);
-        if (keys.right) playerMove(1);
-        if (keys.down) playerDrop();
-        moveCounter = 0;
+    // 處理左右/下落移動
+    if (keys.left || keys.right || keys.down) {
+        moveCounter += deltaTime;
+        if (moveCounter > moveInterval) {
+            if (keys.left) playerMove(-1);
+            if (keys.right) playerMove(1);
+            if (keys.down) playerDrop();
+            moveCounter = 0;
+        }
+    } else {
+        moveCounter = 0; // 當玩家放開按鍵，重置計時器
     }
 
+    // 自動下落
     dropCounter += deltaTime;
     if (dropCounter > dropInterval) {
         playerDrop();
