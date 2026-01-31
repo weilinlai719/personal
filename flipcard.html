@@ -3,6 +3,7 @@
 <head>
     <link rel="icon" href="flipcard.png"></link>
     <title>flip-card</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
             --primary-color: #2980b9;
@@ -100,9 +101,90 @@
             font-size: 16px;
         }
         @media screen and (max-width: 768px) {
-            body{
-                grid-template-columns: none;
-            }  
+          .flip-card {
+        max-width: 100%;
+        width: 100%;      
+        height: auto;      
+        min-height: 60px;  
+        perspective: none; 
+    }
+    
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: auto;
+        transition: none;           
+        transform: none !important; 
+        transform-style: flat;
+        display: flex;              
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+    }
+
+    
+    .flip-card:hover .flip-card-inner {
+        transform: none;
+    }
+
+    .flip-card-front, .flip-card-back {
+        position: relative; 
+        width: 50%;        
+        height: 60px;       
+        backface-visibility: visible;
+        transform: none !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 10px;
+    }
+
+    .flip-card-front {
+        background-color: #f8f9fa;
+        border-right: 1px solid #eee;
+        color: #333;
+    }
+
+    .flip-card-back {
+        background-color: white;
+        color: var(--primary-color);
+    }
+
+    .flip-card-front p, .flip-card-back p {
+        display: none; 
+    }
+
+    .flip-card-front h3, .flip-card-back h3 {
+        font-size: 15px;
+        margin: 0;
+        word-break: break-all; 
+    }
+    .pagenumber {
+    position: fixed; 
+    background-color: #f0f0f0; 
+    border-top: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+    .page-button {
+        width: 30px;
+        height: 45px;
+        font-size: 18px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+     #nextpage {
+        right: 7.5px;
+        }
+
+        #prevpage {
+        left: 7.5px;
+        }
         }
         </style>
 </head>
@@ -119,18 +201,18 @@
            
             data.forEach((item) => {
                 const cardHTML = `
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <p>ID: ${item.id}</p>
-                                <h3>${item.chinese}</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <p>English...</p>
-                                <h3>${item.english}</h3>
-                            </div>
-                        </div>
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <p>#${item.id}</p>
+                        <h3>${item.chinese}</h3>
                     </div>
+                    <div class="flip-card-back">
+                        <p>#${item.id}</p>
+                        <h3>${item.english}</h3>
+                    </div>
+                </div>
+            </div>
                 `;
                 
                 document.body.insertAdjacentHTML('beforeend', cardHTML);
