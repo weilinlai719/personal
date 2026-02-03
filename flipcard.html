@@ -76,7 +76,7 @@
             font-size: 16px;
             margin: 4px 2px;
             cursor: pointer;
-            border-radius: 40%;
+            border-radius: 50%;
         }
         .page-button:hover{
             background-color: #6c757db2;
@@ -114,9 +114,9 @@
                 margin-bottom: 5px;
             }
 
-            .flip-card:active .flip-card-inner {
-                transform: rotateY(180deg);
-            }
+            .flip-card-inner.is-flipped {
+        transform: rotateY(180deg);
+    }
 
             .flip-card-front p, .flip-card-back p {
                 display: none; 
@@ -198,7 +198,7 @@
             });
             pagenumDisplay.textContent = `Page ${currentPage + 1} / ${Math.ceil(cards.length / cardsPerPage)}`;
         }
-          document.addEventListener('keydown', event => {
+        document.addEventListener('keydown', event => {
         if (event.keyCode === 39) { 
              if ((currentPage + 1) * cardsPerPage < cards.length) {
                 currentPage++;
@@ -228,8 +228,10 @@
         });
         showPage(currentPage);
     }
+    function toggleFlip(card) {
+    const inner = card.querySelector('.flip-card-inner');
+    inner.classList.toggle('is-flipped');
+}
     </script>
     </body>
 </html>
-
-
