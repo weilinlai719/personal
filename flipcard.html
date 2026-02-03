@@ -39,9 +39,6 @@
             transition: transform 0.8s;
             transform-style: preserve-3d;
         }
-        .flip-card:hover .flip-card-inner {
-            transform: rotateY(180deg);
-        }
         .flip-card-front, .flip-card-back {
             position: absolute;
             width: 100%;
@@ -99,6 +96,12 @@
             color: rgb(2, 2, 2);
             padding: 5px 15px;
             font-size: 16px;
+        }
+        @media screen and (min-width: 768px) {
+             .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+            
         }
         @media screen and (max-width: 768px) {
             body {
