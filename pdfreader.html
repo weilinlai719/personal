@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Reader</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding-top:10px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            width: 90%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    background-color: #000; 
+    margin: 0;
+    padding: 0;
+    display: block; 
+    overflow: hidden;
+}
+
+.container:fullscreen #pdf-viewer {
+    padding:5px;
+    width: 99.5%;
+    height: 99.5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto; 
+    border: none;
+}
+
+
+.container:fullscreen .controls {
+    position: absolute;
+    bottom: 20px; 
+    left: 50%;
+    transform: translateX(-50%); 
+    z-index: 100; 
+    
+    background-color: rgba(0, 0, 0, 0.1); 
+    padding: 10px 20px;
+    border-radius: 30px; 
+    backdrop-filter: blur(5px); 
+    transition: opacity 0.3s; 
+}
+
+
+.container:fullscreen h1,
+.container:fullscreen input {
+    display: none;
+}
+
+
+.container:fullscreen button {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+        .container:fullscreen button:hover {
+        background-color: #0665ae;
+        }
+        .container:fullscreen .page-info {
+        background-color: rgba(6, 5, 5, 0.2);
+        position: absolute;
+        order: 3;
+        color: rgba(255, 255, 255, 1);
+        bottom: 20px;
+        left: 50% ;
+        border-radius: 30px;
+        transform: translateX(-50%);
+        }
+        h1 {
+            color: #333;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005a9e;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #pdf-viewer {
+            border: 1px solid #ddd;
+            text-align: center;
+            min-height: 400px;
+        }
+        canvas {
+            max-width: 100%;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+        .page-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Reader</h1>
+        <div class="controls">
+            <input type="file" id="pdf-file" accept=".pdf">
+            <button id="prev-btn" disabled>⇐</button>
+            <button id="fullscreen-btn" >fullscreen</button>
+            <button id="next-btn" disabled>⇒</button>
+            
+        </div>
+        <div id="pdf-viewer">
+            <canvas id="pdf-canvas"></canvas>
+        </div>
+        <div class="page-info">
+            <span>&nbsp;&nbsp;</span><span>Page <span id="page-num">0</span> of <span id="page-count">0</span></span>&nbsp;&nbsp; </span>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        let pdfDoc = null;
+        let currentPage = 1;
+
+        const canvas = document.getElementById('pdf-canvas');
+        const ctx = canvas.getContext('2d');
+        const fileInput = document.getElementById('pdf-file');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const pageNum = document.getElementById('page-num');
+        const pageCount = document.getElementById('page-count');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const container = document.querySelector('.container');
+        let timer;
+        const controls = document.querySelector('.controls');
+
+document.addEventListener('mousemove', () => {
+    
+    if (document.fullscreenElement) {
+        controls.style.opacity = '1'; 
+        controls.style.pointerEvents = 'auto'; 
+        
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            controls.style.opacity = '0'; 
+            controls.style.pointerEvents = 'none'; 
+        }, 2000);
+    } else {
+       
+        controls.style.opacity = '1';
+        controls.style.pointerEvents = 'auto';
+    }
+});
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => {
+                    alert(`無法切換全螢幕: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fullscreenBtn.textContent = 'Exit';
+            } else {
+                fullscreenBtn.textContent = 'Full Screen';
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+                pdfjsLib.getDocument(fileReader.result).promise.then((pdf) => {
+                    pdfDoc = pdf;
+                    pageCount.textContent = pdf.numPages;
+                    currentPage = 1;
+                    renderPage();
+                    prevBtn.disabled = false;
+                    nextBtn.disabled = false;
+                });
+            };
+            fileReader.readAsArrayBuffer(file);
+        });
+
+        function renderPage() {
+            pdfDoc.getPage(currentPage).then((page) => {
+                const viewport = page.getViewport({ scale: 1.5 });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                page.render({ canvasContext: ctx, viewport }).promise.then(() => {
+                    pageNum.textContent = currentPage;
+                });
+            });
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < pdfDoc.numPages) {
+                currentPage++;
+                renderPage();
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            if (!pdfDoc) return; 
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                if (currentPage < pdfDoc.numPages) {
+                    currentPage++;
+                    renderPage();
+                }
+            } else if (event.key === 'ArrowLeft') {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderPage();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
