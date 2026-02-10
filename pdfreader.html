@@ -169,9 +169,10 @@ document.addEventListener('mousemove', () => {
         
         clearTimeout(timer);
         timer = setTimeout(() => {
+  if(document.fullscreenElement ){
             controls.style.opacity = '0'; 
             controls.style.pointerEvents = 'none'; 
-        }, 2000);
+        }}, 2000);
     } else {
        
         controls.style.opacity = '1';
