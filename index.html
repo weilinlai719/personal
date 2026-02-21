@@ -6,32 +6,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>weilin's web</title>
     <style>
+        * {
+             box-sizing: border-box;
+        }
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            background-color: #020205; overflow: hidden; color: white; 
+            overflow-x: hidden;overflow-y: auto;
+            background-color: #020205;  color: white; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
         }
 
-        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+        canvas {  position: fixed;
+    inset: 0;
+    display: block;
+    z-index: 1;}
         
-        .overlay { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100vh; 
-            z-index: 10; display: flex; flex-direction: column; 
-            align-items: center; justify-content: space-between; 
-            padding: 60px 0; pointer-events: none; 
-            box-sizing: border-box;
+         .overlay { 
+            position: relative; 
+            width: 100%; 
+            min-height: 100vh;  
+            z-index: 10; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            padding: 60px 20px; 
+            pointer-events: none; 
         }
         
         .glass-header { 
+            width: fit-content;
+            max-width: 90vw;
             background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); 
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; 
-            padding: 20px 40px; text-align: center; pointer-events: auto; 
+            padding: 20px 20px; text-align: center; pointer-events: auto; 
         }
         
        h1 {
     display: inline-block; 
     margin: 0;
-    font-size: 2.2rem;
+     text-wrap: balance;
+    font-size: clamp(2.0rem, 5vw, 2.2rem);
     background: linear-gradient(45deg, #4deeea, #f7d117);
     -webkit-background-clip: text;
     background-clip: text;
@@ -50,7 +65,7 @@
             color: #4deeea; text-decoration: none; font-weight: bold;
             background: rgba(77, 238, 234, 0.1); padding: 12px 30px;
             border-radius: 12px; border: 1px solid rgba(77, 238, 234, 0.4);
-            transition: 0.3s; text-align: center; min-width: 220px;
+            transition: 0.3s; text-align: center; 
         }
         .btn-link:hover { 
             background: rgba(77, 238, 234, 0.2); 
@@ -97,9 +112,9 @@
     let particles = [];
 
     function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
+    canvas.width = document.documentElement.clientWidth;
+    canvas.height = document.documentElement.clientHeight;
+}
     window.addEventListener('resize', resize);
     resize();
 
@@ -163,4 +178,4 @@
     animate();
 </script>
 </body>
-</html>
+</html> 
