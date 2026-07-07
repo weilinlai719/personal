@@ -16,27 +16,34 @@ import MainLayout from '../layout/mainlayout.astro';
 
         <div class="about-info-text">
             <h1 class="author-name">Weilin Lai</h1>
-            <p class="author-subtitle">前端開發者 / 空間創作者</p>
+            <p class="author-subtitle">學生 / developer</p>
+            <p class="author-subtitle">-116GAST-</p>
             
             <div class="author-bio">
-                <p>你好！歡迎來到我的個人網站。</p>
-                <p>這裡記錄了我的學習歷程與作品</p>
+                <p>這是我的個人blog，這裡會記錄我的作品、內容...</p>
+                <p>⋯⋯。⋯⋯。⋯⋯。————黃山料</p>
             </div>
         </div>
 
         <div class="about-social-networks">
-            <a href="https://github.com/weilinlai" target="_blank" rel="noopener noreferrer" class="social-button-card" title="GitHub">
-                <svg class="social-icon" aria-hidden="true">
-                    <use xlink:href="#icon-github"></use>
-                </svg>
-                <span class="social-text">GitHub</span>
+            <a href="mailto:boblai719@gmail.com" class="social-button-card" title="Gmail">
+                <img src="/personal/icon/gmail.svg" class="social-icon" alt="Gmail" />
+                <span class="social-text">Gmail</span>
+            </a>
+
+          <button type="button" class="social-button-card discord-copy-btn" title=" Discord ID" data-discord-id="12072880926215454869">
+                <img src="/personal/icon/discord.svg" class="social-icon" alt="Discord" />
+                <span class="social-text discord-text">Discord</span>
+            </button>
+
+            <a href="https://www.instagram.com/wei_lin_lai/" target="_blank" rel="noopener noreferrer" class="social-button-card" title="Instagram">
+                <img src="/personal/icon/instagram.svg" class="social-icon" alt="Instagram" />
+                <span class="social-text">Instagram</span>
             </a>
             
-            <a href="mailto:boblai719@gmail.com" class="social-button-card" title="Email">
-            
-                <span class="social-text">
-                    <span >✉️</span>
-                    Email</span>
+            <a href="https://github.com/weilinlai" target="_blank" rel="noopener noreferrer" class="social-button-card" title="GitHub">
+                <img src="/personal/icon/github.svg" class="social-icon" alt="GitHub" />
+                <span class="social-text">GitHub</span>
             </a>
         </div>
 
@@ -76,6 +83,7 @@ import MainLayout from '../layout/mainlayout.astro';
         transform: scale(1.08);
         box-shadow: 0 8px 20px var(--shadow-color1, rgba(0, 0, 0, 0.1));
     }
+
     /* 文字設定 */
     .author-name {
         font-size: 1.8rem;
@@ -88,58 +96,58 @@ import MainLayout from '../layout/mainlayout.astro';
     .author-subtitle {
         font-size: 0.95rem;
         color: var(--secondary-text-color, #6f6f6f);
-        margin-bottom: 2.5rem;
+       
     }
 
     .author-bio {
+         margin-top: 2.5rem;
         font-size: 0.95rem;
         color: var(--text-color, #171717);
         line-height: 1.8;
         margin-bottom: 3rem;
     }
     .author-bio p {
-        margin-bottom: 0.6rem;
+        margin-bottom: 0.3rem;
     }
 
-    /* 🛠️ 修正重點：社群按鈕水平置中排好 */
+    /* 社群按鈕外層容器 */
     .about-social-networks {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 1rem; /* 按鈕之間的間距 */
+        flex-wrap: wrap; 
+        gap: 1rem; 
         width: 100%;
-        max-width: 400px;
+        max-width: 600px; 
         margin-top: 1rem;
     }
 
-    /* 🛠️ 修正重點：打造像 image_df5704.png 的卡片式鈕扣 */
+    /* 打造卡片式鈕扣 */
     .social-button-card {
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.6rem; /* 圖標與文字的間距 */
+        gap: 0.6rem; 
         padding: 0.6rem 1.2rem;
-        min-width: 130px; /* 確保按鈕寬度一致、排版整齊 */
+        min-width: 130px; 
         
-        /* 背景色不是純白，採用主題微灰底色（並帶有暗黑模式自適應） */
+        /* 🛠️ 新增：重設 button 的預設樣式，讓它長得跟 a 標籤一模一樣 */
+        font-family: inherit;
+        cursor: pointer;
+        
         background-color: var(--main-color, #f4f6f9); 
-        
-        /* 明確的邊框 Border */
         border: 1px solid var(--shadow-color2, #e5e7eb); 
-        border-radius: 10px; /* 圓角細緻優雅 */
+        border-radius: 10px; 
         
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         box-shadow: 0 2px 4px var(--shadow-color2, rgba(0, 0, 0, 0.02));
     }
 
-    /* 🛠️ 修正重點：精心調校的 Hover 懸停互動效果 */
+    /* 精心調校的 Hover 懸停互動效果 */
     .social-button-card:hover {
-        /* 懸停時背景稍微加深，邊框變明顯 */
         background-color: var(--shadow-color2, #e5e7eb);
         border-color: var(--secondary-text-color, #9ca3af);
-        
-        /* 微微向上飄移並增加陰影深度，極具質感 */
         transform: translateY(-3px);
         box-shadow: 0 6px 16px var(--shadow-color1, rgba(0, 0, 0, 0.08));
     }
@@ -148,8 +156,8 @@ import MainLayout from '../layout/mainlayout.astro';
     .social-icon {
         width: 20px;
         height: 20px;
-        fill: var(--secondary-text-color, #6f6f6f); /* 預設深灰，不與背景衝突 */
-        transition: fill 0.25s ease;
+        object-fit: contain; 
+        transition: transform 0.25s ease;
     }
 
     /* 按鈕文字樣式 */
@@ -160,61 +168,82 @@ import MainLayout from '../layout/mainlayout.astro';
         transition: color 0.25s ease;
     }
 
-    /* 懸停時，內部的圖標與文字同步變深（變成純黑/純白） */
+    /* 懸停動態感 */
     .social-button-card:hover .social-icon {
-        fill: var(--text-color, #171717);
+        transform: scale(1.1);
     }
     .social-button-card:hover .social-text {
         color: var(--text-color, #171717);
     }
-
+    
   /* 📱 專屬手機版的防禦性排版修復 */
 @media (max-width: 768px) {
-  /* 1. 確保導覽列本身有固定高度與層級，並給予乾淨的背景 */
   header, .navbar {
     position: relative;
     z-index: 1000;
-    background-color: #ffffff; /* 確保導覽列本身是不透明的 */
+    background-color: #ffffff; 
   }
 
-  /* 2. 強制讓下拉選單在手機上變成「單欄橫跨排版」，防止文字被擠壓 */
   .dropdown-content.grid-container {
     position: absolute;
     top: 100%;
-    right: 5vw; /* 讓選單與手機邊門保持一點點安全距離 */
-    left: 5vw;  /* 讓選單在手機上幾乎滿版，爭取最大顯示空間 */
+    right: 5vw; 
+    left: 5vw;  
     width: 90vw !important;
     min-width: 0 !important;
     max-width: none !important;
-    
-    /* 關鍵：從原本的雙欄 (repeat(2, 1fr)) 強制改成單欄垂直排列 */
     grid-template-columns: 1fr !important; 
     gap: 8px !important;
-    
-    /* 關鍵：給予純白背景與極高的 z-index，絕對不能透到底下的頭像 */
     background-color: #ffffff !important;
     z-index: 9999 !important; 
-    
     padding: 16px !important;
     border-radius: 12px !important;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
-    
-    /* 確保手機上能看清楚邊界 */
     border: 1px solid #e5e7eb !important; 
-    
-    /* 允許過長時可以滾動 */
     max-height: 70vh;
     overflow-y: auto;
   }
 
-  /* 3. 優化手機上每個選單項目的點擊空間 */
   .dropdown-link {
     display: flex !important;
     align-items: center;
-    padding: 12px 16px !important; /* 加大按鈕彈性，方便手指點擊 */
-    background-color: #f9fafb; /* 給按鈕淡淡的底色，增加區隔感 */
+    padding: 12px 16px !important; 
+    background-color: #f9fafb; 
     border-radius: 8px;
-    white-space: nowrap; /* 強制文字絕對不折行 */
+    white-space: nowrap; 
   }
 }
 </style>
+<script>
+function setupDiscordCopy() {
+    const discordBtn = document.querySelector('.discord-copy-btn') as HTMLButtonElement | null;
+    const discordText = document.querySelector('.discord-text') as HTMLSpanElement | null;
+
+    if (discordBtn && discordText) {
+      discordBtn.addEventListener('click', async () => {
+        // 使用空值合併運算子，確保獲取到的是字串而非 null
+        const discordId = discordBtn.getAttribute('data-discord-id') ?? 'weilinlai719';
+        
+        try {
+          await navigator.clipboard.writeText(discordId);
+          
+          const originalText = 'Discord';
+          discordText.textContent = '已複製 ID !';
+          discordText.style.color = '#10b981'; 
+          
+          setTimeout(() => {
+            discordText.textContent = originalText;
+            discordText.style.color = ''; 
+          }, 2000);
+          
+        } catch (err) {
+          alert('複製失敗，請手動複製 ID: ' + discordId);
+        }
+      });
+    }
+  }
+
+  setupDiscordCopy();
+  document.addEventListener('DOMContentLoaded', setupDiscordCopy);
+  document.addEventListener('astro:page-load', setupDiscordCopy);
+</script>

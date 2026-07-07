@@ -46,9 +46,8 @@
 </header>
 
 <style> 
-  /* 導覽列基礎設定 */
   .navbar {
-    background: var(--header-bg, rgba(255, 255, 255, 0.75));
+    background: var(--header-bg, rgba(255, 255, 255, 0.85));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--shadow-color2, #e5e7eb);
@@ -60,6 +59,7 @@
     display: flex;
     align-items: center;
     width: 100%;
+    box-sizing: border-box;
   }
 
   .nav-container {
@@ -84,7 +84,6 @@
     align-items: center;
   }
 
-  /* 導覽項目按鈕 */
   .nav-item {
     text-decoration: none;
     color: var(--secondary-text-color, #6f6f6f);
@@ -102,12 +101,7 @@
 
   .nav-item:hover, .nav-item.active { 
     color: var(--text-color, #171717);
-    background: var(--shadow-color2, rgba(0,0,0,0.05)); 
-  }
-
-  /* --- 下拉選單核心區塊 --- */
-  .dropdown {
-    position: relative;
+    background: var(--shadow-color2, rgba(0,0,0,0.05));
   }
 
   .dropdown-trigger {
@@ -130,83 +124,168 @@
     transition: transform 0.3s ease;
   }
 
-  /* 🛠️ 修正重點：大幅加寬、加深呼吸感的下拉外殼 */
   .dropdown-content {
     position: absolute;
-    top: 100%;
-    left: 50%; /* 居中定位 */
-    transform: translateX(-50%) translateY(-10px); /* 居中並往上提，準備動畫 */
-    margin-top: 12px;
-    
-    /* 這裡控制寬度：260px 讓文字有足夠空間展開 */
-    width: 260px; 
-    
-    background-color: var(--secondary-color, #ffffff);
-    border: 1px solid var(--shadow-color2, #e5e7eb);
-    border-radius: 12px; /* 稍微圓潤一點更有現代感 */
-    box-shadow: 0 12px 30px var(--shadow-color1, rgba(0,0,0,0.08));
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
     padding: 8px;
-    
-    /* 隱藏與動畫 */
+    box-sizing: border-box;
+    z-index: 99999;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0.3s;
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
   }
 
-  /* 🛠️ 修正重點：選單內的連結項目加寬、加大間距 */
   .dropdown-link {
     display: block;
-    color: var(--secondary-text-color, #6f6f6f);
-    padding: 12px 16px; /* 增加上下左右的內邊距，看起來更大氣 */
+    color: #6f6f6f;
+    padding: 12px 16px;
     text-decoration: none;
     border-radius: 8px;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
   }
 
   .link-title {
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     font-weight: 500;
-    display: block;
+    white-space: nowrap;
   }
 
-  /* 滑鼠懸停連結時的動態效果 */
   .dropdown-link:hover {
-    background-color: var(--main-color, #f8f8f8);
-    color: var(--text-color, #171717);
-    padding-left: 22px; /* Hover 時優雅向右微移 */
+    background-color: #f5f5f5;
+    color: #171717;
   }
 
-  /* 觸發顯示（滑鼠移入時） */
-  .dropdown:hover .dropdown-content {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0); /* 順暢滑入 */
-  }
-
-  /* 箭頭旋轉 */
-  .dropdown:hover .chevron-icon {
-    transform: rotate(180deg);
-  }
-
-  /* 📱 手機端排版相容調整 */
-  @media (max-width: 768px) {
+  @media screen and (min-width: 769px) {
+    .dropdown {
+      position: relative;
+    }
+    
     .dropdown-content {
-      position: static;
-      transform: none !important;
-      width: 100%;
-      box-shadow: none;
-      border: none;
-      background: transparent;
-      padding-left: 12px;
-      display: none;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
+
     .dropdown:hover .dropdown-content {
-      display: block;
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(4px);
     }
+
+    .dropdown:hover .chevron-icon {
+      transform: rotate(180deg);
+    }
+
     .dropdown-link:hover {
-      padding-left: 16px;
+      padding-left: 20px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .nav-container,
+    .nav-links,
+    .dropdown {
+      position: static;
+    }
+
+    .dropdown-content {
+      top: 4rem;
+      left: 0;
+      right: 0;
+      width: 100vw;
+      border-left: none;
+      border-right: none;
+      border-radius: 0;
+      border-bottom: 2px solid #e2e8f0;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      transform: translateY(-10px);
+    }
+
+    .dropdown-content.is-active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-link {
+      background-color: #f8fafc;
+      padding: 14px 16px;
+    }
+
+    .dropdown-link:hover {
+      background-color: #f1f5f9;
+    }
+
+    .link-title {
+      font-size: 1rem;
+      color: #1e293b;
+    }
+
+    .dropdown-trigger.is-active .chevron-icon {
+      transform: rotate(180deg);
     }
   }
 </style>
+
+<script>
+  // 建立模組級變數，確保安全型別與避免重疊監聽
+  let activeTrigger: HTMLElement | null = null;
+  let activeContent: HTMLElement | null = null;
+
+  function handleTriggerClick(e: Event) {
+    e.stopPropagation();
+    if (activeContent && activeTrigger) {
+      const isActive = activeContent.classList.toggle('is-active');
+      activeTrigger.classList.toggle('is-active', isActive);
+    }
+  }
+
+  function handleOutsideClick(e: Event) {
+    if (activeContent && activeTrigger) {
+      const target = e.target as Node;
+      if (!activeContent.contains(target) && target !== activeTrigger) {
+        activeContent.classList.remove('is-active');
+        activeTrigger.classList.remove('is-active');
+      }
+    }
+  }
+
+  function setupMobileDropdown() {
+    const trigger = document.querySelector('.dropdown-trigger') as HTMLElement | null;
+    const content = document.querySelector('.dropdown-content') as HTMLElement | null;
+
+    if (!trigger || !content) return;
+
+    activeTrigger = trigger;
+    activeContent = content;
+
+    // 清理舊監聽器
+    trigger.removeEventListener('click', handleTriggerClick);
+    document.removeEventListener('click', handleOutsideClick);
+
+    if (window.innerWidth <= 768) {
+      trigger.addEventListener('click', handleTriggerClick);
+      document.addEventListener('click', handleOutsideClick);
+    } else {
+      content.classList.remove('is-active');
+      trigger.classList.remove('is-active');
+    }
+  }
+
+  // 完美支持 Astro SPA 路由生命週期
+  setupMobileDropdown();
+  document.addEventListener('DOMContentLoaded', setupMobileDropdown);
+  document.addEventListener('astro:page-load', setupMobileDropdown);
+  window.addEventListener('resize', setupMobileDropdown);
+</script>
