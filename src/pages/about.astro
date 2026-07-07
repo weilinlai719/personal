@@ -167,20 +167,53 @@ import MainLayout from '../layout/mainlayout.astro';
         color: var(--text-color, #171717);
     }
 
-    /* 📱 手機端螢幕排版優化 */
-    @media screen and (max-width: 768px) {
-        .about-page-wrapper {
-            margin: 3rem auto;
-        }
-        .author-name {
-            font-size: 1.6rem;
-        }
-        .about-social-networks {
-            gap: 0.8rem;
-        }
-        .social-button-card {
-            min-width: 110px;
-            padding: 0.5rem 1rem;
-        }
-    }
+  /* 📱 專屬手機版的防禦性排版修復 */
+@media (max-width: 768px) {
+  /* 1. 確保導覽列本身有固定高度與層級，並給予乾淨的背景 */
+  header, .navbar {
+    position: relative;
+    z-index: 1000;
+    background-color: #ffffff; /* 確保導覽列本身是不透明的 */
+  }
+
+  /* 2. 強制讓下拉選單在手機上變成「單欄橫跨排版」，防止文字被擠壓 */
+  .dropdown-content.grid-container {
+    position: absolute;
+    top: 100%;
+    right: 5vw; /* 讓選單與手機邊門保持一點點安全距離 */
+    left: 5vw;  /* 讓選單在手機上幾乎滿版，爭取最大顯示空間 */
+    width: 90vw !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    
+    /* 關鍵：從原本的雙欄 (repeat(2, 1fr)) 強制改成單欄垂直排列 */
+    grid-template-columns: 1fr !important; 
+    gap: 8px !important;
+    
+    /* 關鍵：給予純白背景與極高的 z-index，絕對不能透到底下的頭像 */
+    background-color: #ffffff !important;
+    z-index: 9999 !important; 
+    
+    padding: 16px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
+    
+    /* 確保手機上能看清楚邊界 */
+    border: 1px solid #e5e7eb !important; 
+    
+    /* 允許過長時可以滾動 */
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  /* 3. 優化手機上每個選單項目的點擊空間 */
+  .dropdown-link {
+    display: flex !important;
+    align-items: center;
+    padding: 12px 16px !important; /* 加大按鈕彈性，方便手指點擊 */
+    background-color: #f9fafb; /* 給按鈕淡淡的底色，增加區隔感 */
+    border-radius: 8px;
+    white-space: nowrap; /* 強制文字絕對不折行 */
+  }
+}
 </style>
