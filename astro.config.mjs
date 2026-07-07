@@ -4,7 +4,7 @@ import tailwind from "@astrojs/tailwind";
 export default defineConfig({
   site: 'https://weilinlai719.github.io',
   outDir: 'dist',
-  base: '/personal/',
+  base: '/personal',
   integrations: [tailwind()],
   output: 'static',
   build: {
