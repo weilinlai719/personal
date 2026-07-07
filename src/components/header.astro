@@ -1,5 +1,10 @@
 ---
 // src/components/header.astro
+ 
+        const pathname = Astro.url.pathname;
+
+// 判斷目前是否在 about 頁面（考慮到 GitHub Pages 的 /personal/ 前綴與結尾斜線）
+const isAbout = pathname.includes('/about');
 ---
 <header class="navbar">
   <div class="nav-container">
@@ -39,15 +44,17 @@
           </div>
         </div>
 
-        <a href="/personal/about/" class="nav-item nav-link">about</a>
-      </div>
+    
+    <a href="/personal/about/" class:list={['nav-item', 'nav-link', { active: isAbout }]} >
+          about
+        </a>
     </nav>
   </div>
 </header>
 
 <style> 
   .navbar {
-    background: var(--header-bg, rgba(255, 255, 255, 0.85));
+    background: var(--header-bg, rgba(255, 255, 255, 0.65));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--shadow-color2, #e5e7eb);
@@ -83,6 +90,7 @@
     gap: 10px; 
     align-items: center;
   }
+  
 
   .nav-item {
     text-decoration: none;
@@ -98,9 +106,12 @@
     align-items: center;
     gap: 6px;
   }
-
-  .nav-item:hover, .nav-item.active { 
-    color: var(--text-color, #171717);
+    .nav-item.active{ 
+    color: var(--text-color, #121213);
+    font-weight: 500;
+  }
+  .nav-item:hover { 
+    color: var(--text-color, #000000);
     background: var(--shadow-color2, rgba(0,0,0,0.05));
   }
 
@@ -242,6 +253,7 @@
   // 建立模組級變數，確保安全型別與避免重疊監聽
   let activeTrigger: HTMLElement | null = null;
   let activeContent: HTMLElement | null = null;
+  
 
   function handleTriggerClick(e: Event) {
     e.stopPropagation();
@@ -269,6 +281,11 @@
 
     activeTrigger = trigger;
     activeContent = content;
+       const toggleDropdown = (e: MouseEvent) => {
+      e.stopPropagation();
+      content.classList.toggle('is-active');
+      trigger.classList.toggle('is-active');
+    };
 
     // 清理舊監聽器
     trigger.removeEventListener('click', handleTriggerClick);
