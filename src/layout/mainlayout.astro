@@ -1,0 +1,47 @@
+---
+// src/layout/mainlayout.astro
+import Header from '../components/header.astro';
+import Footer from '../components/footer.astro';
+const { title = "weilinlai的網站" } = Astro.props;
+---
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2iImWJm50T5v5TTO5SpCdBtwzCethsvs6lPV7DZr6MPhcCKQ6DviTxpsV&s=10" /> 
+    
+    <script is:inline src="/js/iconfont.js"></script>
+</head>
+<body>
+    <Header />
+
+    <main class="main-container">
+        <slot />
+    </main>
+    
+    <Footer />
+</body>
+</html>
+
+<style is:global>   
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .main-container {
+        flex: 1;
+        width: 100%;
+    }
+</style>

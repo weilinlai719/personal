@@ -1,0 +1,24 @@
+---
+// src/pages/index.astro
+import MainLayout from '../layout/mainlayout.astro';
+---
+
+<MainLayout title="weilinlai的網站 - 首頁">
+    <div class="hero-box">
+        <h1>歡迎來到我的極簡空間</h1>
+        <p>點擊上方導覽列的 about 探索更多細節。</p>
+    </div>
+</MainLayout>
+
+<style>
+    .hero-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 40vh;
+        text-align: center;
+    }
+    h1 { font-size: 2rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-color); }
+    p { color: var(--secondary-text-color); }
+</style>

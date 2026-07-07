@@ -1,0 +1,23 @@
+---
+// src/components/footer.astro
+---
+<footer class="footer">
+    <p class="footertext">
+      © 2026
+      <a href="https://github.com/weilinlai" target="_blank">weilinlai</a>.
+      All Rights Reserved.
+    </p>
+</footer>
+
+<style>
+    .footer { 
+        text-align: center; 
+        width: 100%;
+        padding: 2rem 0; 
+        margin-top: auto;  
+        border-top: 1px solid var(--shadow-color2);
+    }
+    .footertext { color: var(--secondary-text-color); font-size: 0.85rem; }
+    .footertext a { color: var(--text-color); text-decoration: none; font-weight: 500; }
+    .footertext a:hover { text-decoration: underline; }
+</style>

@@ -1,0 +1,212 @@
+---
+// src/components/header.astro
+---
+<header class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo">
+      <a href="/personal/" class="logo-text">Weilin Lai</a>
+    </div>
+    
+    <nav class="nav-menu" id="navMenu">
+      <div class="nav-links">
+        <div class="nav-item dropdown">
+          <button class="dropdown-trigger">
+            projects
+            <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          
+          <div class="dropdown-content">
+            <a href="https://weilinlai719.github.io/personal/Taipei101" class="dropdown-link" target="_blank" rel="noopener noreferrer">
+              <span class="link-title">🏮 Taipei 101 Fireworks</span>
+            </a>
+            <a href="https://weilinlai719.github.io/personal/tetris" class="dropdown-link" target="_blank" rel="noopener noreferrer">
+              <span class="link-title">🕹️ Tetris Game</span>
+            </a>
+            <a href="https://weilinlai719.github.io/luckydraw" class="dropdown-link" target="_blank" rel="noopener noreferrer">
+              <span class="link-title">🎁 抽獎器</span>
+            </a>
+            <a href="https://weilinlai719.github.io/personal/flipcard" class="dropdown-link" target="_blank" rel="noopener noreferrer">
+              <span class="link-title">🃏 Flip Card (寒假單字)</span>
+            </a>
+            <a href="https://weilinlai719.github.io/personal/pdfreader" class="dropdown-link" target="_blank" rel="noopener noreferrer">
+              <span class="link-title">📚 PDF Reader</span>
+            </a>
+            <a href="https://weilinlai719.github.io/earth-science-explore/" class="dropdown-link" target="_blank" rel="noopener noreferrer">
+              <span class="link-title">🌎 地科探究</span>
+            </a>
+          </div>
+        </div>
+
+        <a href="/personal/about/" class="nav-item nav-link">about</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style> 
+  /* 導覽列基礎設定 */
+  .navbar {
+    background: var(--header-bg, rgba(255, 255, 255, 0.75));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--shadow-color2, #e5e7eb);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 0 20px;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .nav-container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo-text {
+    text-decoration: none;
+    color: var(--text-color, #171717);
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .nav-links { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center;
+  }
+
+  /* 導覽項目按鈕 */
+  .nav-item {
+    text-decoration: none;
+    color: var(--secondary-text-color, #6f6f6f);
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.95rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-item:hover, .nav-item.active { 
+    color: var(--text-color, #171717);
+    background: var(--shadow-color2, rgba(0,0,0,0.05)); 
+  }
+
+  /* --- 下拉選單核心區塊 --- */
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown-trigger {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .chevron-icon {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    transition: transform 0.3s ease;
+  }
+
+  /* 🛠️ 修正重點：大幅加寬、加深呼吸感的下拉外殼 */
+  .dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 50%; /* 居中定位 */
+    transform: translateX(-50%) translateY(-10px); /* 居中並往上提，準備動畫 */
+    margin-top: 12px;
+    
+    /* 這裡控制寬度：260px 讓文字有足夠空間展開 */
+    width: 260px; 
+    
+    background-color: var(--secondary-color, #ffffff);
+    border: 1px solid var(--shadow-color2, #e5e7eb);
+    border-radius: 12px; /* 稍微圓潤一點更有現代感 */
+    box-shadow: 0 12px 30px var(--shadow-color1, rgba(0,0,0,0.08));
+    padding: 8px;
+    
+    /* 隱藏與動畫 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.3s;
+  }
+
+  /* 🛠️ 修正重點：選單內的連結項目加寬、加大間距 */
+  .dropdown-link {
+    display: block;
+    color: var(--secondary-text-color, #6f6f6f);
+    padding: 12px 16px; /* 增加上下左右的內邊距，看起來更大氣 */
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+  }
+
+  .link-title {
+    font-size: 0.92rem;
+    font-weight: 500;
+    display: block;
+  }
+
+  /* 滑鼠懸停連結時的動態效果 */
+  .dropdown-link:hover {
+    background-color: var(--main-color, #f8f8f8);
+    color: var(--text-color, #171717);
+    padding-left: 22px; /* Hover 時優雅向右微移 */
+  }
+
+  /* 觸發顯示（滑鼠移入時） */
+  .dropdown:hover .dropdown-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0); /* 順暢滑入 */
+  }
+
+  /* 箭頭旋轉 */
+  .dropdown:hover .chevron-icon {
+    transform: rotate(180deg);
+  }
+
+  /* 📱 手機端排版相容調整 */
+  @media (max-width: 768px) {
+    .dropdown-content {
+      position: static;
+      transform: none !important;
+      width: 100%;
+      box-shadow: none;
+      border: none;
+      background: transparent;
+      padding-left: 12px;
+      display: none;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-link:hover {
+      padding-left: 16px;
+    }
+  }
+</style>

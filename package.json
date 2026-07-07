@@ -1,0 +1,20 @@
+
+{
+  "name": "personal",
+  "version": "0.1.0",
+  "private": true,
+ 
+   "dependencies": {
+    "@astrojs/tailwind": "^5.0.0",
+    "astro": "^3.0.0",
+    "plotly.js-dist": "^2.24.1"
+},
+  
+"scripts": {
+  "dev": "astro dev",
+  "start": "astro dev",
+  "build": "astro build",
+  "preview": "astro preview",
+  "astro": "astro"
+}
+}

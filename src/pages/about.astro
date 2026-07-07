@@ -1,0 +1,186 @@
+---
+// src/pages/about.astro
+import MainLayout from '../layout/mainlayout.astro';
+---
+
+<MainLayout title="Weilin Lai - 關於">
+    <div class="about-page-wrapper">
+        
+        <div class="about-avatar-box">
+            <img 
+              src="/images/avatar.jpg" 
+              alt="Weilin Lai" 
+              class="about-avatar" 
+            />
+        </div>
+
+        <div class="about-info-text">
+            <h1 class="author-name">Weilin Lai</h1>
+            <p class="author-subtitle">前端開發者 / 空間創作者</p>
+            
+            <div class="author-bio">
+                <p>你好！歡迎來到我的個人網站。</p>
+                <p>這裡記錄了我的學習歷程與生活隨筆。追求極簡、高效與純粹的網頁美學。</p>
+            </div>
+        </div>
+
+        <div class="about-social-networks">
+            <a href="https://github.com/weilinlai" target="_blank" rel="noopener noreferrer" class="social-button-card" title="GitHub">
+                <svg class="social-icon" aria-hidden="true">
+                    <use xlink:href="#icon-github"></use>
+                </svg>
+                <span class="social-text">GitHub</span>
+            </a>
+            
+            <a href="mailto:boblai719@gmail.com" class="social-button-card" title="Email">
+            
+                <span class="social-text">📧  Email</span>
+            </a>
+        </div>
+
+    </div>
+</MainLayout>
+
+<style>
+    /* 頁面主外殼排版 */
+    .about-page-wrapper {
+        max-width: 680px;
+        margin: 4rem auto;
+        padding: 0 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .about-avatar-box {
+        margin-bottom: 2rem;
+    }
+
+    /* 頭像樣式 */
+    .about-avatar {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        box-shadow: 0 4px 12px var(--shadow-color2, rgba(0, 0, 0, 0.05));
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    }
+
+    .about-avatar:hover {
+        transform: scale(1.08);
+        box-shadow: 0 8px 20px var(--shadow-color1, rgba(0, 0, 0, 0.1));
+    }
+
+    /* 文字設定 */
+    .author-name {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--text-color, #171717);
+        margin-bottom: 0.6rem;
+        letter-spacing: 0.5px;
+    }
+
+    .author-subtitle {
+        font-size: 0.95rem;
+        color: var(--secondary-text-color, #6f6f6f);
+        margin-bottom: 2.5rem;
+    }
+
+    .author-bio {
+        font-size: 0.95rem;
+        color: var(--text-color, #171717);
+        line-height: 1.8;
+        margin-bottom: 3rem;
+    }
+    .author-bio p {
+        margin-bottom: 0.6rem;
+    }
+
+    /* 🛠️ 修正重點：社群按鈕水平置中排好 */
+    .about-social-networks {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem; /* 按鈕之間的間距 */
+        width: 100%;
+        max-width: 400px;
+        margin-top: 1rem;
+    }
+
+    /* 🛠️ 修正重點：打造像 image_df5704.png 的卡片式鈕扣 */
+    .social-button-card {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem; /* 圖標與文字的間距 */
+        padding: 0.6rem 1.2rem;
+        min-width: 130px; /* 確保按鈕寬度一致、排版整齊 */
+        
+        /* 背景色不是純白，採用主題微灰底色（並帶有暗黑模式自適應） */
+        background-color: var(--main-color, #f4f6f9); 
+        
+        /* 明確的邊框 Border */
+        border: 1px solid var(--shadow-color2, #e5e7eb); 
+        border-radius: 10px; /* 圓角細緻優雅 */
+        
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 2px 4px var(--shadow-color2, rgba(0, 0, 0, 0.02));
+    }
+
+    /* 🛠️ 修正重點：精心調校的 Hover 懸停互動效果 */
+    .social-button-card:hover {
+        /* 懸停時背景稍微加深，邊框變明顯 */
+        background-color: var(--shadow-color2, #e5e7eb);
+        border-color: var(--secondary-text-color, #9ca3af);
+        
+        /* 微微向上飄移並增加陰影深度，極具質感 */
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px var(--shadow-color1, rgba(0, 0, 0, 0.08));
+    }
+
+    /* 圖標尺寸與填色控制 */
+    .social-icon {
+        width: 20px;
+        height: 20px;
+        fill: var(--secondary-text-color, #6f6f6f); /* 預設深灰，不與背景衝突 */
+        transition: fill 0.25s ease;
+    }
+
+    /* 按鈕文字樣式 */
+    .social-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--secondary-text-color, #6f6f6f);
+        transition: color 0.25s ease;
+    }
+
+    /* 懸停時，內部的圖標與文字同步變深（變成純黑/純白） */
+    .social-button-card:hover .social-icon {
+        fill: var(--text-color, #171717);
+    }
+    .social-button-card:hover .social-text {
+        color: var(--text-color, #171717);
+    }
+
+    /* 📱 手機端螢幕排版優化 */
+    @media screen and (max-width: 768px) {
+        .about-page-wrapper {
+            margin: 3rem auto;
+        }
+        .author-name {
+            font-size: 1.6rem;
+        }
+        .about-social-networks {
+            gap: 0.8rem;
+        }
+        .social-button-card {
+            min-width: 110px;
+            padding: 0.5rem 1rem;
+        }
+    }
+</style>

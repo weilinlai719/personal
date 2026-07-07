@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- 字体 (霞鹜文楷 Consolas, monospace, Noto Sans TC, Monaco, Fira Code, Webfont) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  
+  <meta name="description" content="喵">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Flashingtw的小站">
+<meta property="og:url" content="https://flashing.tw/about/index.html">
+<meta property="og:site_name" content="Flashingtw的小站">
+<meta property="og:description" content="喵">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://flashing.tw/images/avatar.png">
+<meta property="article:published_time" content="2026-07-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-05T16:01:57.895Z">
+<meta property="article:author" content="Flashingtw">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://flashing.tw/images/avatar.png">
+  
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.min.css" />
+  <!-- favicon -->
+  <link rel="shortcut icon" href="/images/icon.png">
+<link rel="stylesheet" href="/../style.css">
+
+
+  <!-- activeTitle -->
+  
+  <!-- inactiveTitle -->
+  
+
+  <title>Flashingtw的小站</title>
+
+  <!-- 注入配置到全局变量 -->
+  <script>
+    window.SITE_CONFIG = {
+      root: '/',
+      activeTitle: 'Flashingtw的小站',
+      inactiveTitle: '|ω･`)',
+      gsap: {"enable":true,"entrance_stagger":0.08,"scroll_trigger":true,"parallax":true,"hover_effect":true}
+    };
+  </script>
+
+  <!-- 引入 GSAP 核心库及 ScrollTrigger 插件 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- 加载JS文件 -->
+  
+<script src="/js/head.js"></script>
+<script src="/js/iconfont.js"></script>
+<script src="/js/header.js"></script>
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+  <body class="">
+    <div id="swiper-container">
+  <img
+    src="/images/swiper.png"
+    alt="輪播圖" />
+  <div class="shadow"></div>
+</div>
+
+    <div class="body-page-view"><!-- 头部 -->
+<div id="header-container" class="header-top">
+  <div class="logo">
+    <a href="/">
+       Flashingtw 
+    </a>
+  </div>
+
+  <button class="menu-toggle" aria-label="Toggle Menu" aria-expanded="false">
+    <span class="line line-1"></span>
+    <span class="line line-2"></span>
+    <span class="line line-3"></span>
+  </button>
+
+  <nav class="nav-menu">
+    <ul class="nav-list">
+       
+      <li>
+        <a href="/">首頁</a>
+      </li>
+      
+      <li>
+        <a href="/posts">文章</a>
+      </li>
+      
+      <li>
+        <a href="/stats">統計</a>
+      </li>
+      
+      <li>
+        <a href="/about">關於</a>
+      </li>
+       
+    </ul>
+  </nav>
+</div>
+
+
+<!-- 页面内容 -->
+ <div class="page-content">
+  <main class="about-main">
+    <div class="about-avatar">
+      <img src="/images/avatar.png" alt="avatar" />
+    </div>
+
+    <p class="about-name">Flashingtw</p>
+
+    <div class="about-description">
+      <p>小小競程仔</p>
+    </div>
+
+    <div class="about-links">
+      <h3>聯繫方式</h3>
+      <div class="links-section">
+        
+        <div class="link-item copy-btn" data-copy="0624joshua@gmail.com">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-youxiang"></use>
+          </svg>
+          <span>0624joshua@gmail.com</span>
+        </div>
+         
+
+        
+        <div class="link-item copy-btn" data-copy="flash.zcx">
+          <span style="font-weight: bold; margin-right: 5px; font-size: 0.9rem;">DC</span>
+          <span>flash.zcx</span>
+        </div>
+        
+      </div>
+
+      <h3>社交平台</h3>
+      <div class="links-section">
+        
+        <a href="https://github.com/Flashingtw" target="_blank" class="link-item">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-github"></use>
+          </svg>
+          <span>GitHub</span>
+        </a>
+         
+
+        
+        <a href="https://www.instagram.com/dacsc_flash.zcx/" target="_blank" class="link-item">
+          <span style="font-style: italic; font-weight: bold; margin-right: 5px;">IG</span>
+          <span>Instagram</span>
+        </a>
+        
+
+        
+        <a href="https://www.threads.com/@flash.zcx" target="_blank" class="link-item">
+          <span style="font-weight: bold; margin-right: 5px;">Th</span>
+          <span>Threads</span>
+        </a>
+        
+      </div>
+    </div>
+
+    
+
+  </main>
+</div>
+
+<script>
+  window.ABOUT_TRANSLATIONS = {
+    copied: '複製成功！',
+    copy_failed: '複製失败，請手動複製'
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const copyButtons = document.querySelectorAll('.about-links .copy-btn');
+    if (copyButtons.length === 0) return;
+
+    // 创建 toast 容器 (Create toast container if it doesn't exist)
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.className = 'toast-container';
+      document.body.appendChild(toastContainer);
+    }
+
+    function showToast(message, isSuccess = true) {
+      const toast = document.createElement('div');
+      toast.className = `toast-item ${isSuccess ? 'success' : 'error'}`;
+
+      const iconSvg = isSuccess
+        ? '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
+        : '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+
+      toast.innerHTML = `
+        <div class="toast-icon">${iconSvg}</div>
+        <div class="toast-text">${message}</div>
+      `;
+
+      toastContainer.appendChild(toast);
+
+      // 触发重绘以启动动画
+      toast.offsetHeight;
+      toast.classList.add('show');
+
+      // 2秒后淡出并移除
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.remove();
+        }, 400);
+      }, 2000);
+    }
+
+    copyButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        const textToCopy = this.getAttribute('data-copy');
+        if (!textToCopy) return;
+
+        navigator.clipboard.writeText(textToCopy).then(
+          function () {
+            const successMsg = window.ABOUT_TRANSLATIONS.copied || '已複製到剪貼簿！';
+            showToast(successMsg, true);
+
+            // GSAP 弹性点按反馈
+            if (typeof gsap !== 'undefined') {
+              gsap.fromTo(btn,
+                { scale: 0.95 },
+                { scale: 1.03, duration: 0.4, ease: 'elastic.out(1.2, 0.5)', overwrite: 'auto' }
+              );
+            }
+          },
+          function (err) {
+            console.error('Failed to copy: ', err);
+            const failMsg = window.ABOUT_TRANSLATIONS.copy_failed || '複製失敗，請手動複製';
+            showToast(failMsg, false);
+          }
+        );
+      });
+    });
+  });
+</script>
+
+</div>
+    <footer class="footer-container">
+  <div class="footer-content">
+    <p class="footer-text">
+      © 2026
+      <a href="https://github.com/Flashingtw" target="_blank">Flashingtw</a>.
+      All Rights Reserved.
+    </p>
+    <p class="footer-text">
+      Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme by 
+      <a href="https://github.com/asukacc/YoruKumo" target="_blank">YoruKumo</a>
+    </p>
+    <p class="footer-text">
+      <span>本站已運行</span>
+      <span id="runtime" class="runtime-badge"></span>
+    </p>
+  </div>
+</footer>
+
+<script>
+  function calculateRuntime() {
+    // 网站开始运行的时间，格式：年-月-日
+    const startTime = new Date('Sun Jul 05 2026 08:00:00 GMT+0800 (Taiwan Standard Time)');
+    const currentTime = new Date();
+
+    const timeDiff = currentTime - startTime;
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+    const dayStr = ' 天 ';
+    const hourStr = ' 小時 ';
+    const minuteStr = ' 分 ';
+    const secondStr = ' 秒';
+
+    document.getElementById(
+      'runtime'
+    ).innerHTML = `${days}${dayStr}${hours}${hourStr}${minutes}${minuteStr}${seconds}${secondStr}`;
+  }
+
+  // 初始运行
+  calculateRuntime();
+  // 每秒更新一次
+  setInterval(calculateRuntime, 1000);
+</script>
+
+
+    <div class="to-top">
+  <svg class="icon" aria-hidden="true">
+    <use xlink:href="#icon-arrowup"></use>
+  </svg>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toTop = document.querySelector('.to-top');
+    if (!toTop) return;
+
+    const hasGsap = typeof gsap !== 'undefined';
+
+    if (hasGsap) {
+      // 初始隐藏状态
+      gsap.set(toTop, { opacity: 0, scale: 0.6, display: 'none' });
+      
+      let isVisible = false;
+
+      window.addEventListener('scroll', function () {
+        const shouldShow = window.scrollY > window.innerHeight;
+        
+        if (shouldShow && !isVisible) {
+          isVisible = true;
+          gsap.killTweensOf(toTop);
+          gsap.set(toTop, { display: 'flex' });
+          gsap.to(toTop, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.4,
+            ease: 'back.out(1.7)'
+          });
+        } else if (!shouldShow && isVisible) {
+          isVisible = false;
+          gsap.killTweensOf(toTop);
+          gsap.to(toTop, {
+            opacity: 0,
+            scale: 0.6,
+            duration: 0.3,
+            ease: 'power2.in',
+            onComplete: () => {
+              if (!isVisible) gsap.set(toTop, { display: 'none' });
+            }
+          });
+        }
+      });
+
+      // Hover 交互与磁性效果在 animation.js 中全局托管
+    } else {
+      // 优雅降级：传统滚动监听
+      window.addEventListener('scroll', function () {
+        if (window.scrollY > window.innerHeight) {
+          toTop.style.display = 'flex';
+        } else {
+          toTop.style.display = 'none';
+        }
+      });
+    }
+
+    // 点击事件
+    toTop.addEventListener('click', function () {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    });
+  });
+</script>
+
+    
+<script src="/js/animation.js"></script>
+<script src="/js/highlight.js"></script>
+<script src="/js/image-viewer.js"></script>
+
+    <style>
+    /* 📱 針對手機版 (螢幕寬度小於 768px) 的圖片置中設定 */
+    @media screen and (max-width: 768px) {
+      #swiper-container, .swiper-container, .blog-swiper {
+        height: 30vh !important; /* 你可以自由調整高度，40vh 代表螢幕高度的 40% */
+      }
+      
+      /* 🌟 換成這個選擇器，精準狙擊！ */
+      #swiper-container img {
+        object-fit: cover !important; 
+        /* 這裡你設定了 30% center，代表圖片會偏左一點，非常適合微調主角位置 */
+        object-position: 50% center !important; 
+        width: 100% !important;
+        height: 100% !important;
+      }
+    }
+    </style>
+  </body>
+</html>
