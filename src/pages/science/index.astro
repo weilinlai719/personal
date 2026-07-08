@@ -132,7 +132,7 @@ import MainLayout from '../../layout/mainlayout.astro';
     display: flex;
     background-color: #ffffff;
     border-radius: 12px;
-    min-height: 180px;
+    height: 230px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     border: 1px solid #e2e8f0;
     overflow: hidden;
@@ -245,6 +245,7 @@ import MainLayout from '../../layout/mainlayout.astro';
     }
     .custom-science-card {
       flex-direction: column-reverse; /* 手機版圖片在上方，內容在下方 */
+      min-height: 300px; /* 取消固定高度，讓內容自適應 */
     }
     .card-right-image {
       width: 100%;
