@@ -3,8 +3,10 @@
  
         const pathname = Astro.url.pathname;
 
-// 判斷目前是否在 about 頁面（考慮到 GitHub Pages 的 /personal/ 前綴與結尾斜線）
+// 判斷目前是否在 ? 頁面（考慮到 GitHub Pages 的 /personal/ 前綴與結尾斜線）
 const isAbout = pathname.includes('/about');
+const isscience = pathname.includes('/science');
+
 ---
 <header class="navbar">
   <div class="nav-container">
@@ -15,7 +17,7 @@ const isAbout = pathname.includes('/about');
      <nav class="nav-menu" id="navMenu2">
       <div class="nav-links">
         <div class="nav-item dropdown">
-          <button class="dropdown-trigger"onclick="window.location.href='/personal/science/'">
+          <button class="dropdown-trigger"onclick="window.location.href='/personal/science/'"class:list={['nav-item', 'nav-link', { active: isscience }]}>
             探究實作
             <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
