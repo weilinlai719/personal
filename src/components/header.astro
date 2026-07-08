@@ -12,7 +12,33 @@ const isAbout = pathname.includes('/about');
       <a href="/personal/" class="logo-text">Weilin Lai</a>
     </div>
     
-    <nav class="nav-menu" id="navMenu">
+     <nav class="nav-menu" id="navMenu2">
+      <div class="nav-links">
+        <div class="nav-item dropdown">
+          <button class="dropdown-trigger"onclick="window.location.href='/personal/science/'">
+            探究實作
+            <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          
+          <div class="dropdown-content">
+            <a href="/personal/science/physics/" class="dropdown-link"  rel="noopener noreferrer">
+              <span class="link-title">物理探究</span>
+            </a>
+            <a href="/personal/science/chemistry/" class="dropdown-link" rel="noopener noreferrer">
+              <span class="link-title">化學探究</span>
+            </a>
+            <a href="/personal/science/biology/" class="dropdown-link"  rel="noopener noreferrer">
+              <span class="link-title">生物探究</span>
+            </a>
+            <a href="/personal/science/earth-science/" class="dropdown-link"  rel="noopener noreferrer">
+              <span class="link-title">地科探究</span>
+            </a>
+          </div>
+        </div>
+
+    <nav class="nav-menu" id="navMenu1">
       <div class="nav-links">
         <div class="nav-item dropdown">
           <button class="dropdown-trigger">
@@ -250,59 +276,68 @@ const isAbout = pathname.includes('/about');
 </style>
 
 <script>
-  // 建立模組級變數，確保安全型別與避免重疊監聽
-  let activeTrigger: HTMLElement | null = null;
-  let activeContent: HTMLElement | null = null;
-  
-
-  function handleTriggerClick(e: Event) {
-    e.stopPropagation();
-    if (activeContent && activeTrigger) {
-      const isActive = activeContent.classList.toggle('is-active');
-      activeTrigger.classList.toggle('is-active', isActive);
-    }
-  }
-
-  function handleOutsideClick(e: Event) {
-    if (activeContent && activeTrigger) {
-      const target = e.target as Node;
-      if (!activeContent.contains(target) && target !== activeTrigger) {
-        activeContent.classList.remove('is-active');
-        activeTrigger.classList.remove('is-active');
-      }
-    }
-  }
-
-  function setupMobileDropdown() {
-    const trigger = document.querySelector('.dropdown-trigger') as HTMLElement | null;
-    const content = document.querySelector('.dropdown-content') as HTMLElement | null;
-
-    if (!trigger || !content) return;
-
-    activeTrigger = trigger;
-    activeContent = content;
-       const toggleDropdown = (e: MouseEvent) => {
+  // 1. 定義全域唯一的點擊處理函式
+  function handleDocumentClick(e: Event) {
+    const target = e.target as HTMLElement;
+    
+    // 尋找點擊目標是否為按鈕，或是按鈕裡面的文字/SVG 箭頭
+    const trigger = target.closest('.dropdown-trigger') as HTMLElement | null;
+    
+    if (trigger) {
+      // 如果是電腦版，交給 CSS :hover 處理，JS 直接跳出不介入
+      if (window.innerWidth > 769) return;
+      
+      e.preventDefault();
       e.stopPropagation();
-      content.classList.toggle('is-active');
-      trigger.classList.toggle('is-active');
-    };
-
-    // 清理舊監聽器
-    trigger.removeEventListener('click', handleTriggerClick);
-    document.removeEventListener('click', handleOutsideClick);
-
-    if (window.innerWidth <= 768) {
-      trigger.addEventListener('click', handleTriggerClick);
-      document.addEventListener('click', handleOutsideClick);
-    } else {
-      content.classList.remove('is-active');
-      trigger.classList.remove('is-active');
+      
+      const dropdown = trigger.closest('.dropdown');
+      const content = dropdown?.querySelector('.dropdown-content') as HTMLElement | null;
+      
+      if (content) {
+        // 檢查當前這個選單是不是本來就是開著的
+        const isCurrentlyActive = content.classList.contains('is-active');
+        
+        // 【關鍵防禦】點擊任何按鈕時，先把畫面上「所有」選單（包含 navmenu1, navmenu2）全部強制關閉
+        document.querySelectorAll('.dropdown-content').forEach((c) => c.classList.remove('is-active'));
+        document.querySelectorAll('.dropdown-trigger').forEach((t) => t.classList.remove('is-active'));
+        
+        // 如果原本是關閉的，現在才把它打開（明確用 add，絕不重複觸發）
+        if (!isCurrentlyActive) {
+          content.classList.add('is-active');
+          trigger.classList.add('is-active');
+        }
+      }
+      return;
+    }
+    
+    // 點擊外面時：如果點擊的地方不在任何選單 (.dropdown) 裡面，就關閉所有開著的選單
+    if (!target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-content').forEach((c) => c.classList.remove('is-active'));
+      document.querySelectorAll('.dropdown-trigger').forEach((t) => t.classList.remove('is-active'));
     }
   }
 
-  // 完美支持 Astro SPA 路由生命週期
-  setupMobileDropdown();
-  document.addEventListener('DOMContentLoaded', setupMobileDropdown);
-  document.addEventListener('astro:page-load', setupMobileDropdown);
-  window.addEventListener('resize', setupMobileDropdown);
+  // 2. 當瀏覽器視窗縮放回電腦版時，自動清空手機版的殘留狀態
+  function handleResizeCleanup() {
+    if (window.innerWidth > 769) {
+      document.querySelectorAll('.dropdown-content').forEach((c) => c.classList.remove('is-active'));
+      document.querySelectorAll('.dropdown-trigger').forEach((t) => t.classList.remove('is-active'));
+    }
+  }
+
+  // 3. 核心初始化功能：控管監聽器數量，確保全域永遠只有一個監聽器
+  function initDropdownSystem() {
+    // 先徹底移除舊的，防止 Astro SPA 路由生命週期重複疊加
+    document.removeEventListener('click', handleDocumentClick);
+    window.removeEventListener('resize', handleResizeCleanup);
+    
+    // 重新綁定唯一的全域監聽
+    document.addEventListener('click', handleDocumentClick);
+    window.addEventListener('resize', handleResizeCleanup);
+  }
+
+  // 完美支援 Astro SPA 路由、首次載入與縮放
+  initDropdownSystem();
+  document.addEventListener('DOMContentLoaded', initDropdownSystem);
+  document.addEventListener('astro:page-load', initDropdownSystem);
 </script>

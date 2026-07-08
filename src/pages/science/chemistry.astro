@@ -1,0 +1,157 @@
+---
+// src/pages/science/chemistry.astro
+import MainLayout from '../../layout/mainlayout.astro';
+---
+
+<MainLayout title="Weilin Lai - 化學探究">
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<div class="physics-page-wrapper">
+  
+  <a href="/personal/science/" class="back-to-science-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    回探究
+  </a>
+
+  <div class="physics-pdf-container">
+    <div id="pdf-viewer">
+      <div class="pdf-loading">報告載入中，請稍候...</div>
+    </div>
+  </div>
+</div>
+</MainLayout>
+<style>
+  /* 💡 核心：限制整片內容為 60% 寬度並居中 */
+  .physics-page-wrapper {
+    width: 60%;
+    margin: 4rem auto;          /* 網頁上下留白，左右自動置中 */
+  }
+
+  /* 💡 新增：回探究按鈕樣式 */
+  .back-to-science-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;                   /* 文字與箭頭的間距 */
+    color: #64748b;             /* 質感灰藍色 */
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;      /* 與下方 PDF 容器的距離 */
+    transition: color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+
+  /* 滑鼠懸停時的效果：顏色變深、箭頭微微往左位移，極具動態質感 */
+  .back-to-science-btn:hover {
+    color: #0f172a;             /* 接近純黑 */
+    transform: translateX(-4px);/* 微微向左滑動 */
+  }
+
+  /* PDF 容器（繼承父層寬度） */
+  .physics-pdf-container {
+    width: 100%;                /* 撐滿父層的 60% */
+    height: auto;               /* 隨 PDF 頁數自動延伸，網頁本身滾動 */
+    background-color: #ffffff;  /* 💡 核心：純白背景 */
+    border-radius: 12px;        /* 💡 核心：導圓角 */
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08); /* 💡 核心：精緻外層層次陰影 */
+    border: 1px solid #e2e8f0;  
+    padding: 48px 32px;         /* 內襯留白 */
+    box-sizing: border-box;
+  }
+
+  #pdf-viewer {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;                  /* 每頁 PDF 紙張之間的間距 */
+  }
+
+  /* 動態生成的每頁 PDF 畫布樣式 */
+  #pdf-viewer :global(canvas) {
+    background-color: #ffffff;
+    max-width: 100%;
+    height: auto !important;
+    border-radius: 4px;
+  }
+
+  /* 載入中文字提示 */
+  .pdf-loading {
+    color: #64748b;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  /* 📱 手機版響應式防禦 */
+  @media screen and (max-width: 768px) {
+    .physics-page-wrapper {
+      width: 94%;               /* 手機版放大寬度 */
+      margin: 2rem auto;
+    }
+    .physics-pdf-container {
+      padding: 20px 12px;
+      border-radius: 8px;
+    }
+    #pdf-viewer {
+      gap: 16px;
+    }
+  }
+</style>
+
+<script>
+  function renderFullPDF() {
+    const baseUrl = (import.meta as any).env.BASE_URL || '/'; 
+    const cleanBase = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
+    const pdfUrl = `${cleanBase}science/chemistry.pdf`; 
+
+    const viewer = document.getElementById('pdf-viewer');
+    if (!viewer) return;
+
+    const lib = (window as any).pdfjsLib;
+    if (!lib) {
+      setTimeout(renderFullPDF, 100);
+      return;
+    }
+
+    lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    lib.getDocument(pdfUrl).promise.then(async (pdf: any) => {
+      viewer.innerHTML = '';
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        viewer.appendChild(canvas);
+
+        const viewport = page.getViewport({ scale: 1.5 });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        };
+        await page.render(renderContext).promise;
+      }
+    }).catch((err: any) => {
+      console.error('PDF 渲染出錯:', err);
+      viewer.innerHTML = `
+        <div style="color: #ef4444; padding: 20px; text-align: center;">
+          <p>❌ PDF 報告載入失敗</p>
+          <p style="font-size: 0.85rem; color: #94a3b8;">請確認檔案是否確實放在 public/science/chemistry.pdf</p>
+        </div>
+      `;
+    });
+  }
+
+  renderFullPDF();
+  document.addEventListener('DOMContentLoaded', renderFullPDF);
+  document.addEventListener('astro:page-load', renderFullPDF);
+</script>s
