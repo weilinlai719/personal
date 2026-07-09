@@ -11,19 +11,19 @@ const ispost = pathname.includes('/post');
 <header class="navbar">
   <div class="nav-container">
     <div class="nav-logo">
-      <a href="/personal/" class="logo-text">Weilin Lai</a>
+      <a href="/" class="logo-text">Weilin Lai</a>
     </div>
          
     <nav class="nav-menu" id="navMenu">
       <div class="nav-links">
         
-        <a href="/personal/post/" class:list={['nav-item', 'nav-link', { active: ispost }]}>
+        <a href="/post/" class:list={['nav-item', 'nav-link', { active: ispost }]}>
           Posts
         </a>
         
         <div class="nav-item dropdown">
           <button 
-            onclick="window.location.href='/personal/science/'" 
+            onclick="window.location.href='/science/'" 
             class:list={['dropdown-trigger', 'nav-item', 'nav-link', { active: isscience }]}
           >
             探究實作
@@ -33,16 +33,16 @@ const ispost = pathname.includes('/post');
           </button>
           
           <div class="dropdown-content">
-            <a href="/personal/science/physics/" class="dropdown-link" rel="noopener noreferrer">
+            <a href="/science/physics/" class="dropdown-link" rel="noopener noreferrer">
               <span class="link-title">物理探究</span>
             </a>
-            <a href="/personal/science/chemistry/" class="dropdown-link" rel="noopener noreferrer">
+            <a href="/science/chemistry/" class="dropdown-link" rel="noopener noreferrer">
               <span class="link-title">化學探究</span>
             </a>
-            <a href="/personal/science/biology/" class="dropdown-link" rel="noopener noreferrer">
+            <a href="/science/biology/" class="dropdown-link" rel="noopener noreferrer">
               <span class="link-title">生物探究</span>
             </a>
-            <a href="/personal/science/earth-science/" class="dropdown-link" rel="noopener noreferrer">
+            <a href="/science/earth-science/" class="dropdown-link" rel="noopener noreferrer">
               <span class="link-title">地科探究</span>
             </a>
           </div>
@@ -76,7 +76,7 @@ const ispost = pathname.includes('/post');
           </div>
         </div>
 
-        <a href="/personal/about/" class:list={['nav-item', 'nav-link', { active: isAbout }]}>
+        <a href="/about/" class:list={['nav-item', 'nav-link', { active: isAbout }]}>
           about
         </a>
         
