@@ -6,7 +6,7 @@ export default defineConfig({
   outDir: 'dist',
   base: '/personal',
   integrations: [tailwind()],
-  output: 'static',
+output: 'server',
   build: {
     format: 'directory'
   }

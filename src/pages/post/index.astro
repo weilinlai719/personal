@@ -1,0 +1,478 @@
+---
+// src/pages/post/index.astro
+import MainLayout from '../../layout/mainlayout.astro';
+---
+
+<MainLayout title="Weilin Lai - 討論區">
+  <div class="board-container">
+    <h1 class="page-title">💬 Posts</h1>
+
+    <div id="posts-container" class="posts-list">
+      <div class="loading-text">載入貼文中，請稍候...</div>
+    </div>
+
+    <button id="fab-add-post" class="fab-btn" title="發布新貼文">
+  <span>+</span>
+</button>
+
+    <div id="post-modal" class="modal-overlay">
+      <div class="modal-content">
+        <button id="close-modal" class="close-btn">&times;</button>
+        <h2>發布新動態</h2>
+        <form id="new-post-form">
+          <div class="form-group">
+            <input type="text" id="post-name" placeholder="署名 " required />
+          </div>
+          <div class="form-group">
+            <textarea id="post-content" rows="4" placeholder="內容" required></textarea>
+          </div>
+          <button type="submit" class="submit-btn" id="submit-btn">發布貼文</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</MainLayout>
+
+<style is:global>
+  /* 基礎重設，防止與外層 Layout 衝突 */
+  .board-container *, .board-container *::before, .board-container *::after {
+    box-sizing: border-box;
+  }
+
+  body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+    background-color: #f7f6f5; /* 柔和溫暖的微米色背景 */
+    color: #333; 
+    line-height: 1.5;
+    margin: 0;
+    padding-bottom: 120px; /* 幫右下角 + 號按鈕留空間 */
+  }
+
+  .board-container {
+    max-width: 850px; 
+    margin: 40px auto; 
+    padding: 0 24px;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 32px;
+    font-weight: 700;
+  }
+
+  /* 貼文列表外層，用 gap 撐開每則卡片，絕不碰撞 */
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px; 
+  }
+
+  .loading-text {
+    text-align: center;
+    color: #888;
+    padding: 40px 0;
+    font-size: 1.05rem;
+  }
+
+  /* 🌸 完美還原：NixOS 網誌風卡片框框 */
+  .post-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .post-card { 
+    background: #ffffff; 
+    border-radius: 20px; /* 優雅的大圓角 */
+    box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06); /* 輕盈質感的微光陰影 */
+    border: 1px solid #f0ede9; 
+    display: flex; 
+    align-items: center; /* 讓左右兩邊垂直置中對齊 */
+    justify-content: space-between;
+    padding: 24px 24px 24px 32px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(160, 140, 130, 0.12);
+  }
+
+  /* 左側文字主體區 */
+  .card-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 嚴格限制內部元件間距，絕不重疊卡到 */
+    min-width: 0; /* 防止文字爆開 */
+  }
+
+  /* 標題列：包含橘色立柱與發文者名字 */
+  .title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* 左側經典橘色垂直小立柱 */
+  .orange-bar {
+    width: 4px;
+    height: 22px;
+    background-color: #e67e22;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .post-author {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  /* 時間與 ID 小標籤列 */
+  .meta-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* 質感小膠囊標籤 */
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #fdf5ee; /* 淡淡的暖橘色底 */
+    color: #b87333; /* 焦糖棕色字 */
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* 貼文內文 */
+  .post-body {
+    font-size: 1.05rem;
+    color: #475569;
+    margin: 0;
+    line-height: 1.6;
+    word-break: break-all;
+    white-space: pre-wrap; /* 保留換行換氣 */
+    
+  }
+
+  /* 底部標籤 */
+  .tag-wrapper {
+    display: flex;
+  }
+
+  .hash-tag {
+    background-color: #f1f5f9;
+    color: #64748b;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* ➡️ 右側內嵌入格子的獨立箭頭區塊 */
+  .card-right-arrow {
+    width: 46px;
+    height: 90px; /* 固定高度的右側長條膠囊 */
+    background-color: #fdf5ee; 
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 24px;
+    flex-shrink: 0; /* 絕對不允許被壓縮擠扁 */
+    transition: background-color 0.2s;
+  }
+
+  .post-card:hover .card-right-arrow {
+    background-color: #fbe6d4; /* 滑過時顏色稍微加深 */
+  }
+
+  /* 純 CSS 繪製精緻箭頭 > */
+  .arrow-shape {
+    border: solid #b87333;
+    border-width: 0 2.5px 2.5px 0;
+    display: inline-block;
+    padding: 4px;
+    transform: rotate(-45deg);
+  }
+
+  .fab-btn {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff9e68, #ff6f3d);
+  color: white;
+  font-size: 36px;
+  font-weight: 300;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 111, 61, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* 🎯 專治加號歪歪的微調補丁 */
+.fab-btn span {
+  display: inline-block;
+  line-height: 1;
+  /* 如果你的螢幕看起來太靠上，就改成正數 (例如 2px)；太靠下就用負數 */
+  transform: translateY(-3px); 
+}
+
+.fab-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 24px rgba(255, 111, 61, 0.45);
+}
+  /* --- 發文彈窗基礎樣式 --- */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-content {
+    background: white;
+    width: 90%;
+    max-width: 480px;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-overlay.active .modal-content {
+    transform: translateY(0);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 1.6rem;
+    color: #94a3b8;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .modal-content h2 {
+    margin-top: 0;
+    color: #1e293b;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    background-color: #f8fafc;
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #ff6f3d;
+    background-color: #fff;
+  }
+
+  .submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #ff9e68, #ff6f3d);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .post-body, .post-summary {
+    font-size: 1.05rem !important;
+    color: #475569 !important;
+    margin: 0 !important;
+    line-height: 1.6 !important;
+    word-break: break-all !important;
+    
+    /* 核心：強制一行打點 */
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1 !important; 
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+</style>
+
+<script>
+  const API_BASE_URL = 'https://words7000.onrender.com';
+
+  const postsContainer = document.getElementById('posts-container') as HTMLElement | null;
+  const newPostForm = document.getElementById('new-post-form') as HTMLFormElement | null;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+  
+  const fabBtn = document.getElementById('fab-add-post');
+  const modalOverlay = document.getElementById('post-modal');
+  const closeModalBtn = document.getElementById('close-modal');
+
+  // 控制發文彈窗
+  if (fabBtn && modalOverlay && closeModalBtn) {
+    fabBtn.addEventListener('click', () => {
+      modalOverlay.classList.add('active');
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      modalOverlay.classList.remove('active');
+    });
+
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        modalOverlay.classList.remove('active');
+      }
+    });
+  }
+  
+  // 非同步抓取所有貼文並渲染
+  async function fetchAllPosts() {
+    if (!postsContainer) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/posts`);
+      const data = await res.json();
+
+      if (data.success && data.posts.length > 0) {
+        const reversedPosts = data.posts.reverse();
+
+        postsContainer.innerHTML = reversedPosts.map((post: any) => {
+          // 精準過濾乾淨的日期
+          const dateStr = post.time  ;
+
+          return `
+            <a href="/personal/post/${post.id}" class="post-card-link">
+              <div class="post-card">
+                
+                <div class="card-left">
+                  <div class="title-wrapper">
+                    <div class="orange-bar"></div>
+                    <h2 class="post-author">${post.name || '匿名訪客'}</h2>
+                  </div>
+                  
+                  <div class="meta-wrapper">
+                    <span class="meta-pill">📅 ${dateStr}</span>
+                    <span class="meta-pill"> ID: ${post.id}</span>
+                  </div>
+                  
+                  <p class="post-body">${post.content || '點擊查看詳細內容...'}</p>
+                  
+                  <div class="tag-wrapper">
+                    <span class="hash-tag"># 討論區動態</span>
+                  </div>
+                </div>
+                
+                <div class="card-right-arrow">
+                  <i class="arrow-shape"></i>
+                </div>
+
+              </div>
+            </a>
+          `;
+        }).join('');
+      } else {
+        postsContainer.innerHTML = `<div class="loading-text">目前尚未有任何動態</div>`;
+      }
+    } catch (err) {
+      postsContainer.innerHTML = `<div class="loading-text" style="color: #ef4444;">無法連線至伺服器，請稍後再試。</div>`;
+      console.error('Fetch posts error:', err);
+    }
+  }
+
+  // 表單發布送出邏輯
+  if (newPostForm && submitBtn && modalOverlay) {
+    newPostForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const nameInput = document.getElementById('post-name') as HTMLInputElement | null;
+      const contentInput = document.getElementById('post-content') as HTMLTextAreaElement | null;
+
+      if (!nameInput || !contentInput) return;
+
+      const name = nameInput.value.trim();
+      const content = contentInput.value.trim();
+
+      if (!name || !content) {
+        alert('署名與內容不可為空！');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '發布中...';
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/post`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, content })
+        });
+        
+        const data = await res.json();
+
+        if (data.success) {
+          alert('🎉 貼文發布成功！');
+          nameInput.value = '';
+          contentInput.value = '';
+          
+          modalOverlay.classList.remove('active');
+          await fetchAllPosts();
+        } else {
+          alert('❌ 發布失敗: ' + data.error);
+        }
+      } catch (err) {
+        alert('❌ 連線失敗，請稍後再試。');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '發布貼文';
+      }
+    });
+  }
+
+  fetchAllPosts();
+</script>

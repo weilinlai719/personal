@@ -1,0 +1,390 @@
+---
+// src/pages/personal/post/[id].astro
+import MainLayout from '../../layout/mainlayout.astro';
+
+// 👑 ✨ 關鍵核心：加上這行，告訴 Astro 此頁面不需要靜態預渲染（改用客戶端/伺服器動態處理）
+export const prerender = false;
+---
+
+<MainLayout title="Weilin Lai - 文章內容">
+  <div class="detail-container">
+    <a href="/personal/post" class="back-btn">
+      <span class="back-arrow">←</span> 返回文章列表
+    </a>
+
+    <div id="post-container">
+      <div class="loading-text">正在載入文章內容...</div>
+    </div>
+
+    <div class="comment-section">
+      <h3 class="section-title">💬 留言回覆</h3>
+      
+      <div id="comments-container" class="comments-list">
+        <div class="loading-text">正在載入留言...</div>
+      </div>
+      
+      <div class="comment-form-wrapper">
+        <h4 class="form-title">撰寫新留言</h4>
+        <form id="comment-form" class="comment-form">
+          <div class="form-group">
+            <input type="text" id="comment-name" placeholder="署名" required />
+          </div>
+          <div class="form-group">
+            <textarea id="comment-content" rows="3" placeholder="留言內文..." required></textarea>
+          </div>
+          <button type="submit" class="submit-btn">送出留言</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<style is:global>
+  /* 基礎重設，防止元件與外層 Layout 衝突打架 */
+  .detail-container *, .detail-container *::before, .detail-container *::after {
+    box-sizing: border-box;
+  }
+
+  body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+    background-color: #f7f6f5; /* 柔和溫暖的微米色背景 */
+    color: #333; 
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .detail-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* 外層各區塊嚴格間距，絕不疊加 */
+  }
+
+  /* ⬅️ 精緻的返回文章列表按鈕 */
+  .back-btn { 
+    display: inline-flex; 
+    align-items: center;
+    gap: 8px;
+    text-decoration: none; 
+    color: #b87333; 
+    font-weight: 600;
+    font-size: 1rem;
+    align-self: flex-start;
+    transition: color 0.2s;
+  }
+  .back-btn:hover {
+    color: #e67e22;
+  }
+  .back-arrow {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+
+  .loading-text {
+    text-align: center;
+    color: #888;
+    padding: 20px 0;
+  }
+
+  /* 🌸 完美還原：NixOS 質感主貼文卡片 */
+  .post-card { 
+    background: #ffffff; 
+    border-radius: 20px; 
+    box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06); 
+    border: 1px solid #f0ede9; 
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* 卡片內部元件用 gap 固定拉開，絕不碰撞 */
+    position: relative;
+  }
+
+  /* 標題與署名列（包含橘色立柱） */
+  .post-author-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* 左側經典橘色垂直小立柱 */
+  .orange-bar {
+    width: 4px;
+    height: 24px;
+    background-color: #e67e22;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .post-author-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  /* 質感小膠囊標籤列 */
+  .post-meta-wrapper { 
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #fdf5ee; 
+    color: #b87333; 
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* 貼文主要大內文 */
+  .post-content-body { 
+    font-size: 1.15rem; 
+    color: #334155;
+    line-height: 1.7;
+    white-space: pre-wrap; 
+    word-break: break-all;
+    margin: 4px 0 0 0;
+  }
+
+  /* --- 💬 留言回覆區塊 --- */
+  .comment-section { 
+    margin-top: 16px; 
+    border-top: 2px solid #eae6e1; 
+    padding-top: 32px; 
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .section-title {
+    font-size: 1.35rem;
+    color: #1e293b;
+    margin: 0;
+    font-weight: 700;
+  }
+
+  /* 留言列表盒 */
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* 每一條精緻的留言卡片 */
+  .comment-item { 
+    background: #ffffff; 
+    padding: 20px 24px; 
+    border-radius: 14px; 
+    border: 1px solid #f0ede9;
+    border-left: 4px solid #ff9e68; /* 改為溫暖的橘色系左邊線 */
+    box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .comment-meta-info { 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem; 
+    color: #1e293b; 
+    font-weight: bold; 
+  }
+
+  .comment-time {
+    font-weight: normal; 
+    color: #94a3b8; 
+    font-size: 0.8rem; 
+  }
+
+  .comment-text {
+    font-size: 1rem;
+    color: #475569;
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* --- 📝 留言表單區塊 --- */
+  .comment-form-wrapper {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f0ede9;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-title {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-group { 
+    width: 100%;
+  }
+
+  input, textarea { 
+    width: 100%; 
+    padding: 12px 16px; 
+    border: 1px solid #cbd5e1; 
+    border-radius: 10px; 
+    font-size: 0.95rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    background-color: #f8fafc;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  input:focus, textarea:focus { 
+    outline: none; 
+    border-color: #ff6f3d; 
+    background-color: #fff; 
+  }
+
+  /* 漸層橘色送出按鈕 */
+  .submit-btn { 
+    background: linear-gradient(135deg, #ff9e68, #ff6f3d); 
+    color: white; 
+    border: none; 
+    padding: 12px 24px; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-size: 1rem; 
+    font-weight: bold;
+    align-self: flex-start; /* 按鈕寬度隨文字長度自動調整 */
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .submit-btn:hover { 
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 111, 61, 0.25);
+  }
+</style>
+
+<script>
+  const API_BASE_URL = 'https://words7000.onrender.com';
+  
+  // 安全地切取網址中的 ID (避免結尾斜線影響)
+  const pathParts = window.location.pathname.replace(/\/$/, '').split('/');
+  const postId = pathParts[pathParts.length - 1];
+
+  const postContainer = document.getElementById('post-container') as HTMLElement | null;
+  const commentsContainer = document.getElementById('comments-container') as HTMLElement | null;
+  const commentForm = document.getElementById('comment-form') as HTMLFormElement | null;
+
+  // 1. 撈取單一文章
+  async function fetchPost() {
+    if (!postContainer) return;         
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/post/${postId}`);
+      const data = await res.json();
+      if (data.success) {
+        // 分割過濾乾淨的日期
+        const dateStr = data.post.time;
+
+        postContainer.innerHTML = `
+          <div class="post-card">
+            <div class="post-author-wrapper">
+              <div class="orange-bar"></div>
+              <h2 class="post-author-title">${data.post.name || '匿名訪客'}</h2>
+            </div>
+            
+            <div class="post-meta-wrapper">
+              <span class="meta-pill">📅 ${dateStr}</span>
+              <span class="meta-pill">🔑 編號: ${data.post.id}</span>
+            </div>
+            
+            <div class="post-content-body">${data.post.content || ''}</div>
+          </div>
+        `;
+      } else {
+        postContainer.innerHTML = `<div class="loading-text" style="color:red;">錯誤: ${data.error}</div>`;
+      }
+    } catch (err) {
+      postContainer.innerHTML = `<div class="loading-text" style="color:red;">無法連線至後端伺服器</div>`;
+    }
+  }
+
+  // 2. 撈取文章底下的所有留言
+  async function fetchComments() {
+    if (!commentsContainer) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/post/${postId}/comments`);
+      const data = await res.json();
+      if (data.success && data.comments && data.comments.length > 0) {
+        commentsContainer.innerHTML = data.comments.map((c: any) => {
+          const commentDate = c.time;
+          return `
+            <div class="comment-item">
+              <div class="comment-meta-info">
+                <span>👤 ${c.name || '匿名'}</span> 
+                <span class="comment-time">${commentDate}</span>
+              </div>
+              <p class="comment-text">${c.content || ''}</p>
+            </div>
+          `;
+        }).join('');
+      } else {
+        commentsContainer.innerHTML = `<div class="loading-text" style="color:#888;">目前暫無留言</div>`;
+      }
+    } catch (err) {
+      commentsContainer.innerHTML = `<div class="loading-text" style="color:red;">留言載入失敗</div>`;
+    }
+  }
+
+  // 3. 送出新留言
+  if (commentForm) {
+    commentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const nameInput = document.getElementById('comment-name') as HTMLInputElement | null;
+      const contentInput = document.getElementById('comment-content') as HTMLTextAreaElement | null;
+      if (!nameInput || !contentInput) return;
+
+      const name = nameInput.value.trim();
+      const content = contentInput.value.trim();
+
+      if (!name || !content) return;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/comment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId, name, content })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('🎉 留言成功！');
+          contentInput.value = ''; 
+          fetchComments(); // 重新動態載入留言列表
+        } else {
+          alert('❌ 留言失敗: ' + data.error);
+        }
+      } catch (err) {
+        alert('❌ 連線失敗，請稍後再試');
+      }
+    });
+  }
+
+  fetchPost();
+  fetchComments();
+</script>
