@@ -1,14 +1,13 @@
 import { defineConfig } from 'astro/config';
 import tailwind from "@astrojs/tailwind"; 
 import vercel from '@astrojs/vercel';
-// https://astro.build/config
+
 export default defineConfig({
-  site: 'https://weilinlai719.github.io',
-  outDir: 'dist',
-  base: '/personal',
+
   integrations: [tailwind()],
-output: 'server',
-adapter: vercel(),
+  output: 'server', // 👑 保持動態伺服器模式
+  adapter: vercel(), // 👑 保持 Vercel 適配器
+
   build: {
     format: 'directory'
   }
