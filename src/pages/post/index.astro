@@ -19,8 +19,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     box-sizing: border-box;
   }
 
-
-
   .board-container {
     max-width: 850px; 
     margin: 40px auto; 
@@ -38,7 +36,7 @@ import MainLayout from '../../layout/mainlayout.astro';
   .posts-list {
     display: flex;
     flex-direction: column;
-    gap: 24px; 
+    gap: 24px;
   }
 
   .loading-text {
@@ -65,11 +63,20 @@ import MainLayout from '../../layout/mainlayout.astro';
     justify-content: space-between;
     padding: 24px 24px 24px 32px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    /* 💡 新增：為了裁切右側圖片圓角與定位 */
+    position: relative;
+    overflow: hidden;
   }
 
   .post-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 32px rgba(160, 140, 130, 0.12);
+  }
+
+  /* 💡 新增變形：當卡片有圖片時，將內襯歸零讓圖片完美貼邊 */
+  .post-card.has-image {
+    padding: 0 0 0 32px; /* 保持左邊 32px 舒適距離，其餘貼邊 */
   }
 
   /* 左側文字主體區 */
@@ -79,6 +86,11 @@ import MainLayout from '../../layout/mainlayout.astro';
     flex-direction: column;
     gap: 12px; /* 嚴格限制內部元件間距，絕不重疊卡到 */
     min-width: 0; /* 防止文字爆開 */
+  }
+
+  /* 💡 新增變形：當有圖片時，補回文字區的上下內襯，並與右側圖片拉開空隙 */
+  .post-card.has-image .card-left {
+    padding: 24px 24px 24px 0;
   }
 
   /* 標題列：包含橘色立柱與發文者名字 */
@@ -133,7 +145,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     line-height: 1.6;
     word-break: break-all;
     white-space: pre-wrap; /* 保留換行換氣 */
-    
   }
 
   /* 底部標籤 */
@@ -150,6 +161,20 @@ import MainLayout from '../../layout/mainlayout.astro';
     font-weight: 600;
   }
 
+  /* 🖼️ 新增：右側精緻圖片裁切殼 */
+  .card-img-wrapper {
+    width: 260px; /* 寬度設為 260px 比例最完美，可依喜好自行調整 */
+    align-self: stretch; /* 強制填滿卡片上下高度 */
+    flex-shrink: 0; /* 絕對不允許被擠扁 */
+  }
+
+  .card-side-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 完美還原探究頁面的圖片不變形裁切 */
+    display: block;
+  }
+
   /* ➡️ 右側內嵌入格子的獨立箭頭區塊 */
   .card-right-arrow {
     width: 46px;
@@ -164,6 +189,18 @@ import MainLayout from '../../layout/mainlayout.astro';
     transition: background-color 0.2s;
   }
 
+  /* 💡 新增變形：當有圖片時，讓右側箭頭優雅地絕對定位浮動在圖片右側上方 */
+  .post-card.has-image .card-right-arrow {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 0;
+    z-index: 2;
+    background-color: rgba(253, 245, 238, 0.9); /* 帶有微微透明的專屬暖白底色，在任何圖片上都清晰 */
+    box-shadow: 0 4px 12px rgba(184, 115, 51, 0.15);
+  }
+
   .post-card:hover .card-right-arrow {
     background-color: #fbe6d4; /* 滑過時顏色稍微加深 */
   }
@@ -176,30 +213,33 @@ import MainLayout from '../../layout/mainlayout.astro';
     padding: 4px;
     transform: rotate(-45deg);
   }
-
 </style>
 
 <script>
   const API_BASE_URL = 'https://words7000.onrender.com';
-
   const postsContainer = document.getElementById('posts-container') as HTMLElement | null;
+
   // 非同步抓取所有貼文並渲染
   async function fetchAllPosts() {
     if (!postsContainer) return;
-
     try {
       const res = await fetch(`${API_BASE_URL}/api/posts`);
       const data = await res.json();
-
       if (data.success && data.posts.length > 0) {
         const reversedPosts = data.posts.reverse();
-
         postsContainer.innerHTML = reversedPosts.map((post: any) => {
-                    const dateStr = post.time  ;
+          const dateStr = post.time;
+
+          // 💡 關鍵修正：檢查資料庫有無圖片，動態控制樣式與渲染
+          const hasImg = !!post.image;
+          const cardClass = hasImg ? 'post-card has-image' : 'post-card';
+          const imgHtml = hasImg 
+            ? `<div class="card-img-wrapper"><img src="${post.image}" class="card-side-img" alt="貼文圖片" onerror="this.parentNode.style.display='none'"/></div>` 
+            : '';
 
           return `
             <a href="/post/${post.id}" class="post-card-link">
-              <div class="post-card">
+              <div class="${cardClass}">
                 
                 <div class="card-left">
                   <div class="title-wrapper">
@@ -219,6 +259,8 @@ import MainLayout from '../../layout/mainlayout.astro';
                   </div>
                 </div>
                 
+                ${imgHtml}
+                
                 <div class="card-right-arrow">
                   <i class="arrow-shape"></i>
                 </div>
@@ -235,8 +277,6 @@ import MainLayout from '../../layout/mainlayout.astro';
       console.error('Fetch posts error:', err);
     }
   }
-
-  
 
   fetchAllPosts();
 </script>

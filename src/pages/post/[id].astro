@@ -64,7 +64,7 @@ export const prerender = false;
 
   /* ⬅️ 精緻的返回文章列表按鈕 */
   .back-btn { 
-    display: inline-flex; 
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     text-decoration: none; 
@@ -91,7 +91,7 @@ export const prerender = false;
   /* 🌸 完美還原：NixOS 質感主貼文卡片 */
   .post-card { 
     background: #ffffff; 
-    border-radius: 20px; 
+    border-radius: 20px;
     box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06); 
     border: 1px solid #f0ede9; 
     padding: 32px;
@@ -143,9 +143,19 @@ export const prerender = false;
     font-weight: 500;
   }
 
+  /* 🖼️ 新增：內頁貼文圖片精緻樣式 */
+  .post-img {
+    max-width: 100%;
+    max-height: 500px; /* 限制內頁圖片最高 500px，防止過大 */
+    border-radius: 14px;
+    margin: 4px 0;
+    display: block;
+    object-fit: cover; /* 圖片完美切合不變形 */
+  }
+
   /* 貼文主要大內文 */
   .post-content-body { 
-    font-size: 1.15rem; 
+    font-size: 1.15rem;
     color: #334155;
     line-height: 1.7;
     white-space: pre-wrap; 
@@ -155,7 +165,7 @@ export const prerender = false;
 
   /* --- 💬 留言回覆區塊 --- */
   .comment-section { 
-    margin-top: 16px; 
+    margin-top: 16px;
     border-top: 2px solid #eae6e1; 
     padding-top: 32px; 
     display: flex;
@@ -181,7 +191,7 @@ export const prerender = false;
   .comment-item { 
     background: #ffffff; 
     padding: 20px 24px; 
-    border-radius: 14px; 
+    border-radius: 14px;
     border: 1px solid #f0ede9;
     border-left: 4px solid #ff9e68; /* 改為溫暖的橘色系左邊線 */
     box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
@@ -202,7 +212,7 @@ export const prerender = false;
   .comment-time {
     font-weight: normal; 
     color: #94a3b8; 
-    font-size: 0.8rem; 
+    font-size: 0.8rem;
   }
 
   .comment-text {
@@ -246,7 +256,7 @@ export const prerender = false;
     width: 100%; 
     padding: 12px 16px; 
     border: 1px solid #cbd5e1; 
-    border-radius: 10px; 
+    border-radius: 10px;
     font-size: 0.95rem;
     font-family: inherit;
     box-sizing: border-box;
@@ -257,14 +267,14 @@ export const prerender = false;
   input:focus, textarea:focus { 
     outline: none; 
     border-color: #ff6f3d; 
-    background-color: #fff; 
+    background-color: #fff;
   }
 
   /* 漸層橘色送出按鈕 */
   .submit-btn { 
     background: linear-gradient(135deg, #ff9e68, #ff6f3d); 
     color: white; 
-    border: none; 
+    border: none;
     padding: 12px 24px; 
     border-radius: 10px; 
     cursor: pointer; 
@@ -293,13 +303,17 @@ export const prerender = false;
 
   // 1. 撈取單一文章
   async function fetchPost() {
-    if (!postContainer) return;         
+    if (!postContainer) return;
     try {
       const res = await fetch(`${API_BASE_URL}/api/post/${postId}`);
       const data = await res.json();
       if (data.success) {
-        // 分割過濾乾淨的日期
         const dateStr = data.post.time;
+        
+        // 💡 關鍵修正：檢查後端資料庫內有沒有圖片網址，有的話就生成 <img> 標籤
+        const imgHtml = data.post.image 
+          ? `<img src="${data.post.image}" class="post-img" alt="貼文圖片" onerror="this.style.display='none'"/>` 
+          : '';
 
         postContainer.innerHTML = `
           <div class="post-card">
@@ -312,6 +326,8 @@ export const prerender = false;
               <span class="meta-pill">📅 ${dateStr}</span>
               <span class="meta-pill">🔑 編號: ${data.post.id}</span>
             </div>
+            
+            ${imgHtml}
             
             <div class="post-content-body">${data.post.content || ''}</div>
           </div>
