@@ -32,7 +32,7 @@ import MainLayout from '../../layout/mainlayout.astro';
     font-weight: 700;
   }
 
-  /* 貼文列表外層，用 gap 撐開每則卡片，絕不碰撞 */
+  /* 貼文列表外層 */
   .posts-list {
     display: flex;
     flex-direction: column;
@@ -46,7 +46,7 @@ import MainLayout from '../../layout/mainlayout.astro';
     font-size: 1.05rem;
   }
 
-  /* 🌸 完美還原：NixOS 網誌風卡片框框 */
+  /* 🌸 NixOS 網誌風卡片框框 */
   .post-card-link {
     text-decoration: none;
     color: inherit;
@@ -56,15 +56,13 @@ import MainLayout from '../../layout/mainlayout.astro';
   .post-card { 
     background: #ffffff; 
     border-radius: 20px; /* 優雅的大圓角 */
-    box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06); /* 輕盈質感的微光陰影 */
+    box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06); 
     border: 1px solid #f0ede9; 
     display: flex; 
-    align-items: center; /* 讓左右兩邊垂直置中對齊 */
+    align-items: center; 
     justify-content: space-between;
     padding: 24px 24px 24px 32px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    
-    /* 💡 新增：為了裁切右側圖片圓角與定位 */
     position: relative;
     overflow: hidden;
   }
@@ -74,9 +72,9 @@ import MainLayout from '../../layout/mainlayout.astro';
     box-shadow: 0 12px 32px rgba(160, 140, 130, 0.12);
   }
 
-  /* 💡 新增變形：當卡片有圖片時，將內襯歸零讓圖片完美貼邊 */
+  /* 當卡片有圖片時，將內襯歸零讓圖片完美貼邊 */
   .post-card.has-image {
-    padding: 0 0 0 32px; /* 保持左邊 32px 舒適距離，其餘貼邊 */
+    padding: 0 0 0 32px; 
   }
 
   /* 左側文字主體區 */
@@ -84,11 +82,11 @@ import MainLayout from '../../layout/mainlayout.astro';
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px; /* 嚴格限制內部元件間距，絕不重疊卡到 */
+    gap: 12px; 
     min-width: 0; /* 防止文字爆開 */
   }
 
-  /* 💡 新增變形：當有圖片時，補回文字區的上下內襯，並與右側圖片拉開空隙 */
+  /* 當有圖片時，補回文字區的上下內襯 */
   .post-card.has-image .card-left {
     padding: 24px 24px 24px 0;
   }
@@ -124,13 +122,12 @@ import MainLayout from '../../layout/mainlayout.astro';
     gap: 8px;
   }
 
-  /* 質感小膠囊標籤 */
   .meta-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background-color: #fdf5ee; /* 淡淡的暖橘色底 */
-    color: #b87333; /* 焦糖棕色字 */
+    background-color: #fdf5ee; 
+    color: #b87333; 
     padding: 4px 12px;
     border-radius: 8px;
     font-size: 0.85rem;
@@ -144,7 +141,7 @@ import MainLayout from '../../layout/mainlayout.astro';
     margin: 0;
     line-height: 1.6;
     word-break: break-all;
-    white-space: pre-wrap; /* 保留換行換氣 */
+    white-space: pre-wrap; 
   }
 
   /* 底部標籤 */
@@ -161,35 +158,35 @@ import MainLayout from '../../layout/mainlayout.astro';
     font-weight: 600;
   }
 
-  /* 🖼️ 新增：右側精緻圖片裁切殼 */
+  /* 🖼️ 右側精緻圖片裁切殼 */
   .card-img-wrapper {
-    width: 260px; /* 寬度設為 260px 比例最完美，可依喜好自行調整 */
-    align-self: stretch; /* 強制填滿卡片上下高度 */
-    flex-shrink: 0; /* 絕對不允許被擠扁 */
+    width: 260px; 
+    align-self: stretch; 
+    flex-shrink: 0; 
   }
 
   .card-side-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 完美還原探究頁面的圖片不變形裁切 */
+    object-fit: cover; 
     display: block;
   }
 
-  /* ➡️ 右側內嵌入格子的獨立箭頭區塊 */
+  /* ➡️ 右側獨立箭頭區塊 */
   .card-right-arrow {
     width: 46px;
-    height: 90px; /* 固定高度的右側長條膠囊 */
+    height: 90px; 
     background-color: #fdf5ee; 
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-left: 24px;
-    flex-shrink: 0; /* 絕對不允許被壓縮擠扁 */
+    flex-shrink: 0; 
     transition: background-color 0.2s;
   }
 
-  /* 💡 新增變形：當有圖片時，讓右側箭頭優雅地絕對定位浮動在圖片右側上方 */
+  /* 當有圖片時，讓右側箭頭絕對定位浮動在桌機版右側 */
   .post-card.has-image .card-right-arrow {
     position: absolute;
     right: 20px;
@@ -197,12 +194,12 @@ import MainLayout from '../../layout/mainlayout.astro';
     transform: translateY(-50%);
     margin-left: 0;
     z-index: 2;
-    background-color: rgba(253, 245, 238, 0.9); /* 帶有微微透明的專屬暖白底色，在任何圖片上都清晰 */
+    background-color: rgba(253, 245, 238, 0.9); 
     box-shadow: 0 4px 12px rgba(184, 115, 51, 0.15);
   }
 
   .post-card:hover .card-right-arrow {
-    background-color: #fbe6d4; /* 滑過時顏色稍微加深 */
+    background-color: #fbe6d4; 
   }
 
   /* 純 CSS 繪製精緻箭頭 > */
@@ -213,13 +210,65 @@ import MainLayout from '../../layout/mainlayout.astro';
     padding: 4px;
     transform: rotate(-45deg);
   }
+
+  /* =======================================================
+     📱 核心拯救：手機版 RWD 響應式佈局彈性調整 (螢幕寬度 768px 以下)
+     ======================================================= */
+  @media (max-width: 768px) {
+    .board-container {
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    /* 1. 當有圖片時，手機版強制轉為「上下堆疊」排版，絕不壓扁文字 */
+    .post-card.has-image {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0 0 16px 0; /* 圖片塞滿上方，下方文字留白 */
+    }
+
+    /* 2. 有圖片時，下方文字主體的內襯間距修正 */
+    .post-card.has-image .card-left {
+      padding: 20px 20px 0 20px;
+    }
+
+    /* 3. 圖片外殼在手機版變成完美的上方橫幅 (Banner) */
+    .card-img-wrapper {
+      width: 100% !important;
+      height: 180px; /* 給予固定高度，寬度隨螢幕自動伸展 */
+      order: -1; /* 透過 flex 屬性，魔法般的將圖片提到最上方展示 */
+    }
+
+    /* 4. 有圖片時的右側箭頭：移出絕對定位，轉為右下角精緻的圓形鈕 */
+    .post-card.has-image .card-right-arrow {
+      position: relative;
+      right: auto;
+      top: auto;
+      transform: none;
+      margin: 12px 20px 0 auto; /* 自動推至右下角 */
+      width: 36px;
+      height: 36px;
+      border-radius: 50%; /* 變成漂亮的圓形小雷達 */
+      box-shadow: 0 2px 8px rgba(184, 115, 51, 0.1);
+    }
+
+    /* 5. 無圖片時的純文字卡片箭頭稍微矮一點點，讓排版更精緻 */
+    .card-right-arrow {
+      height: 70px;
+      margin-left: 12px;
+    }
+  }
 </style>
 
 <script>
   const API_BASE_URL = 'https://words7000.onrender.com';
   const postsContainer = document.getElementById('posts-container') as HTMLElement | null;
 
-  // 非同步抓取所有貼文並渲染
   async function fetchAllPosts() {
     if (!postsContainer) return;
     try {
@@ -230,7 +279,7 @@ import MainLayout from '../../layout/mainlayout.astro';
         postsContainer.innerHTML = reversedPosts.map((post: any) => {
           const dateStr = post.time;
 
-          // 💡 關鍵修正：檢查資料庫有無圖片，動態控制樣式與渲染
+          // 檢查有無圖片
           const hasImg = !!post.image;
           const cardClass = hasImg ? 'post-card has-image' : 'post-card';
           const imgHtml = hasImg 
