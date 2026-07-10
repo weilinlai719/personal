@@ -1,0 +1,386 @@
+---
+// src/pages/personal/post/edit.astro
+import MainLayout from '../../layout/mainlayout.astro';
+export const prerender = false;
+---
+
+<style is:global>
+  /* ================= 🌸 核心視覺與外觀優化 ================= */
+  h2 { color: #2c3e50; font-size: 1.5rem; margin-top: 35px; margin-bottom: 20px; font-weight: 700; }
+  
+  /* 📝 表單容器外觀 */
+  .form-container {
+     background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f0ede9;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .form-container h3 { margin-top: 0; margin-bottom: 24px; color: #2c3e50; font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .form-group { margin-bottom: 20px; }
+  
+  /* 🎯 填入框與文字域：精準限制寬度為 60% */
+  input[type="text"], textarea { 
+    width: 100%; padding: 14px 18px; border: 1px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; background-color: #fff; transition: all 0.3s ease; font-size: 1rem; color: #333;
+  }
+  input:focus, textarea:focus { border-color: #e67e22; box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1); outline: none; }
+  
+  /* 📁 上傳按鈕與預覽區 */
+  .file-upload-wrapper { display: flex; align-items: center; gap: 15px; margin-top: 8px; }
+  .btn-file-select { background-color: #fdf5ee; color: #d35400; border: 1px dashed #e67e22; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
+  .btn-file-select:hover { background-color: #fae8d8; }
+  .upload-status { font-size: 0.9rem; color: #718096; }
+  .preview-container { margin-top: 15px; display: none; position: relative; width: fit-content; }
+  .preview-img { max-height: 160px; border-radius: 12px; border: 1px solid #e2e8f0; object-fit: cover; }
+  .btn-remove-preview { position: absolute; top: -10px; right: -10px; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
+
+  /* 按鈕控制區 */
+  .btn-submit { background: #e67e22; color: white; border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: background 0.2s; }
+  .btn-submit:hover { background: #d35400; }
+  .btn-cancel { background: #a0aec0; color: white; border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1rem; margin-left: 10px; transition: background 0.2s; }
+  .btn-cancel:hover { background: #718096; }
+
+  /* ================= 🌸 簡潔方格貼文卡片樣式 ================= */
+  #posts-management-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 20px;
+  }
+
+  .post-card { 
+    background: #ffffff; 
+    border-radius: 20px; 
+    padding: 24px 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); 
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border: 1px solid #f0e6df;
+  }
+  
+  .card-main { flex: 1; padding-right: 20px; }
+  
+  /* 標題與左側橘色直線 */
+  .post-card .post-title { 
+    font-size: 1.4rem; 
+    font-weight: 800; 
+    color: #1a202c; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    margin: 0 0 12px 0; 
+  }
+  .post-card .post-title::before { 
+    content: ""; 
+    display: block; 
+    width: 4px; 
+    height: 20px; 
+    background-color: #e67e22; 
+    border-radius: 4px; 
+  }
+
+  /* 標籤群組 (日期、ID) */
+  .post-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .meta-badge { 
+    background-color: #fdf5ee; 
+    color: #d35400; 
+    padding: 4px 12px; 
+    border-radius: 8px; 
+    font-size: 0.85rem; 
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* 貼文內文 */
+  .post-summary { font-size: 1.05rem; color: #4a5568; margin: 0; line-height: 1.6; }
+  
+  /* 貼文內圖片 */
+  .post-img { max-width: 100%; max-height: 250px; border-radius: 12px; margin-bottom: 15px; object-fit: cover; display: block; }
+
+  /* 右側管理按鈕區（簡潔合併） */
+  .card-action-zone { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+    flex-shrink: 0; 
+  }
+  .btn-action { 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 8px; 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    cursor: pointer; 
+    min-width: 70px; 
+    text-align: center; 
+    transition: all 0.2s; 
+  }
+  .btn-edit { background-color: #fdf5ee; color: #d35400; border: 1px solid #fbe5d2; }
+  .btn-edit:hover { background-color: #fae8d8; }
+  .btn-delete { background-color: #fee2e2; color: #ef4444; }
+  .btn-delete:hover { background-color: #fecaca; }
+    .detail-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* 外層各區塊嚴格間距，絕不疊加 */
+  }
+</style>
+
+<MainLayout title="文章管理後台">
+<div class="detail-container">
+  <div class="form-container">
+    <h3 id="form-title">✨ 發布新動態</h3>
+    <form id="post-form">
+      <input type="hidden" id="edit-id" />
+      <input type="hidden" id="post-image-url" /> 
+
+      <div class="form-group">
+<div class="form-group">
+  <input 
+    type="text" 
+    id="post-name" 
+    value="Weilin" 
+    placeholder="署名" 
+    required 
+  />
+</div>      </div>
+      
+      <div class="form-group">
+        <textarea id="post-content" rows="4" placeholder="內文" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label style="font-weight: 600; color: #4a5568; font-size: 0.95rem; display: block; margin-bottom: 8px;">分享圖片（選填）</label>
+        <div class="file-upload-wrapper">
+          <label for="file-input" class="btn-file-select">選擇電腦中的照片 📷</label>
+          <input type="file" id="file-input" accept="image/*" style="display: none;" />
+          <span class="upload-status" id="upload-status">尚未選擇檔案</span>
+        </div>
+        
+        <div class="preview-container" id="preview-container">
+          <img src="" class="preview-img" id="form-preview-img" alt="預覽圖" />
+          <button type="button" class="btn-remove-preview" id="btn-remove-img">✕</button>
+        </div>
+      </div>
+
+      <button type="submit" id="btn-submit-text" class="btn-submit">發布貼文</button>
+      <button type="button" id="btn-cancel-edit" class="btn-cancel" style="display: none;">取消修改</button>
+    </form>
+  </div>
+
+  <div id="posts-management-list">
+    <p style="color: #a0aec0;">正在載入文章列表...</p>
+  </div>
+</div>
+</MainLayout>
+
+<script>
+  const API_BASE_URL = 'https://words7000.onrender.com';
+  const IMGBB_API_KEY = '54770dda83053262ce876d71a4c807f8'; 
+
+  const postForm = document.getElementById('post-form') as HTMLFormElement | null;
+  const postsListContainer = document.getElementById('posts-management-list') as HTMLElement | null;
+  const formTitle = document.getElementById('form-title') as HTMLElement | null;
+  const btnSubmitText = document.getElementById('btn-submit-text') as HTMLButtonElement | null;
+  const btnCancelEdit = document.getElementById('btn-cancel-edit') as HTMLButtonElement | null;
+  const nameInput = document.getElementById('post-name') as HTMLInputElement | null;
+  const contentInput = document.getElementById('post-content') as HTMLTextAreaElement | null;
+  const imageUrlInput = document.getElementById('post-image-url') as HTMLInputElement | null;
+  const editIdInput = document.getElementById('edit-id') as HTMLInputElement | null;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement | null;
+  const uploadStatus = document.getElementById('upload-status') as HTMLElement | null;
+  const previewContainer = document.getElementById('preview-container') as HTMLElement | null;
+  const formPreviewImg = document.getElementById('form-preview-img') as HTMLImageElement | null;
+  const btnRemoveImg = document.getElementById('btn-remove-img') as HTMLButtonElement | null;
+
+  let isEditing = false;
+  if (fileInput) {
+    fileInput.addEventListener('change', async (e) => {
+      const target = e.target as HTMLInputElement;
+      if (!target.files || target.files.length === 0) return;
+
+      const file = target.files[0];
+      if (uploadStatus) uploadStatus.innerText = '正在上傳圖片至 ImgBB... ⏳';
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        
+        if (result.success && result.data && result.data.url) {
+          const uploadedUrl = result.data.url; 
+          
+          if (imageUrlInput) imageUrlInput.value = uploadedUrl;
+          if (uploadStatus) uploadStatus.innerText = '圖片上傳成功！';
+          if (formPreviewImg) formPreviewImg.src = uploadedUrl;
+          if (previewContainer) previewContainer.style.display = 'block';
+        } else {
+          alert('圖片上傳失敗，請確認你的 ImgBB API Key 是否填寫正確');
+          if (uploadStatus) uploadStatus.innerText = '上傳失敗';
+        }
+      } catch (err) {
+        alert('上傳至 ImgBB 時發生連線錯誤');
+        if (uploadStatus) uploadStatus.innerText = '連線錯誤';
+      }
+    });
+  }
+
+  if (btnRemoveImg) {
+    btnRemoveImg.addEventListener('click', () => {
+      if (imageUrlInput) imageUrlInput.value = '';
+      if (fileInput) fileInput.value = '';
+      if (uploadStatus) uploadStatus.innerText = '尚未選擇檔案';
+      if (previewContainer) previewContainer.style.display = 'none';
+      if (formPreviewImg) formPreviewImg.src = '';
+    });
+  }
+
+  async function fetchPosts() {
+    if (!postsListContainer) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/posts`);
+      const data = await res.json();
+      if (data.success && data.posts && data.posts.length > 0) {
+        const sortedPosts = data.posts.reverse();
+        postsListContainer.innerHTML = sortedPosts.map((post: any) => {
+          const imgHtml = post.image ? `<img src="${post.image}" class="post-img" alt="貼文圖片" onerror="this.style.display='none'"/>` : '';
+          
+          return `
+            <div class="post-card">
+              <div class="card-main">
+                <h2 class="post-title">${post.name}</h2>
+                <div class="post-meta">
+                  <span class="meta-badge">📅 ${post.time ? post.time.split(' ')[0] : ''}</span>
+                  <span class="meta-badge">🆔 編號: ${post.id}</span>
+                </div>
+                ${imgHtml}
+                <div class="post-summary" style="white-space: pre-wrap;">${post.content}</div>
+              </div>
+              <div class="card-action-zone">
+                <button class="btn-action btn-edit" onclick="window.startEdit('${post.id}', '${encodeURIComponent(post.name)}', '${encodeURIComponent(post.content)}', '${post.image || ''}')">修改</button>
+                <button class="btn-action btn-delete" onclick="window.deletePost('${post.id}')">刪除</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        postsListContainer.innerHTML = '<p>目前尚無任何貼文。</p>';
+      }
+    } catch (err) {
+      postsListContainer.innerHTML = '<p style="color:red;">無法連線至後端伺服器</p>';
+    }
+  }
+
+  if (postForm) {
+    postForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!nameInput || !contentInput || !imageUrlInput || !editIdInput) return;
+
+      const name = nameInput.value;
+      const content = contentInput.value;
+      const image = imageUrlInput.value; 
+      const id = editIdInput.value;
+
+      try {
+        let res;
+        if (isEditing) {
+          res = await fetch(`${API_BASE_URL}/api/post/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, content, image })
+          });
+        } else {
+          res = await fetch(`${API_BASE_URL}/api/post`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, content, image })
+          });
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          alert(isEditing ? '修改成功！' : '發布成功！');
+          resetForm();
+          fetchPosts();
+        } else {
+          alert('操作失敗: ' + data.error);
+        }
+      } catch (err) {
+        alert('連線失敗，請稍後再試');
+      }
+    });
+  }
+
+  (window as any).startEdit = (id: string, encodedName: string, encodedContent: string, image: string) => {
+    if (!nameInput || !contentInput || !imageUrlInput || !editIdInput || !formTitle || !btnSubmitText || !btnCancelEdit) return;
+    isEditing = true;
+    formTitle.innerText = `✍️ 正在修改編號 #${id} 的貼文`;
+    btnSubmitText.innerText = '儲存修改';
+    if (btnCancelEdit) btnCancelEdit.style.display = 'inline-block';
+
+    editIdInput.value = id;
+    nameInput.value = decodeURIComponent(encodedName);
+    contentInput.value = decodeURIComponent(encodedContent);
+    imageUrlInput.value = image;
+
+    if (image) {
+      if (formPreviewImg) formPreviewImg.src = image;
+      if (previewContainer) previewContainer.style.display = 'block';
+      if (uploadStatus) uploadStatus.innerText = '已有圖片檔案';
+    } else {
+      if (previewContainer) previewContainer.style.display = 'none';
+      if (uploadStatus) uploadStatus.innerText = '無圖片';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  (window as any).deletePost = async (id: string) => {
+    if (!confirm(`確定要刪除編號 #${id} 的貼文嗎？`)) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/post/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        alert('文章已成功刪除！');
+        if (isEditing && editIdInput?.value === id) resetForm();
+        fetchPosts();
+      } else {
+        alert('刪除失敗: ' + data.error);
+      }
+    } catch (err) {
+      alert('連線失敗，無法刪除');
+    }
+  };
+
+  function resetForm() {
+    if (!nameInput || !contentInput || !imageUrlInput || !editIdInput || !formTitle || !btnSubmitText || !btnCancelEdit || !previewContainer) return;
+    isEditing = false;
+    formTitle.innerText = '✨ 發布新動態';
+    btnSubmitText.innerText = '發布貼文';
+    btnCancelEdit.style.display = 'none';
+    postForm?.reset();
+    editIdInput.value = '';
+    imageUrlInput.value = '';
+    previewContainer.style.display = 'none';
+    if (uploadStatus) uploadStatus.innerText = '尚未選擇檔案';
+  }
+
+  if (btnCancelEdit) btnCancelEdit.addEventListener('click', resetForm);
+
+  fetchPosts();
+</script>

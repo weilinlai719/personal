@@ -10,27 +10,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     <div id="posts-container" class="posts-list">
       <div class="loading-text">載入貼文中，請稍候...</div>
     </div>
-
-    <button id="fab-add-post" class="fab-btn" title="發布新貼文">
-  <span>+</span>
-</button>
-
-    <div id="post-modal" class="modal-overlay">
-      <div class="modal-content">
-        <button id="close-modal" class="close-btn">&times;</button>
-        <h2>發布新動態</h2>
-        <form id="new-post-form">
-          <div class="form-group">
-            <input type="text" id="post-name" placeholder="署名 " required />
-          </div>
-          <div class="form-group">
-            <textarea id="post-content" rows="4" placeholder="內容" required></textarea>
-          </div>
-          <button type="submit" class="submit-btn" id="submit-btn">發布貼文</button>
-        </form>
-      </div>
-    </div>
-
   </div>
 </MainLayout>
 
@@ -198,174 +177,12 @@ import MainLayout from '../../layout/mainlayout.astro';
     transform: rotate(-45deg);
   }
 
-  .fab-btn {
-  position: fixed;
-  bottom: 40px;
-  right: 40px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ff9e68, #ff6f3d);
-  color: white;
-  font-size: 36px;
-  font-weight: 300;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(255, 111, 61, 0.35);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex;
-  z-index: 9999;  
-}
-
-/* 🎯 專治加號歪歪的微調補丁 */
-.fab-btn span {
-  display: inline-block;
-  line-height: 1;
-  /* 如果你的螢幕看起來太靠上，就改成正數 (例如 2px)；太靠下就用負數 */
-  transform: translateY(-3px); 
-}
-
-.fab-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 8px 24px rgba(255, 111, 61, 0.45);
-}
-  /* --- 發文彈窗基礎樣式 --- */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-
-  .modal-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .modal-content {
-    background: white;
-    width: 90%;
-    max-width: 480px;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-    position: relative;
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
-  }
-
-  .modal-overlay.active .modal-content {
-    transform: translateY(0);
-  }
-
-  .close-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 1.6rem;
-    color: #94a3b8;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .modal-content h2 {
-    margin-top: 0;
-    color: #1e293b;
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-  }
-
-  .form-group {
-    margin-bottom: 16px;
-  }
-
-  input, textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-family: inherit;
-    box-sizing: border-box;
-    background-color: #f8fafc;
-  }
-
-  input:focus, textarea:focus {
-    outline: none;
-    border-color: #ff6f3d;
-    background-color: #fff;
-  }
-
-  .submit-btn {
-    width: 100%;
-    background: linear-gradient(135deg, #ff9e68, #ff6f3d);
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .post-body, .post-summary {
-    font-size: 1.05rem !important;
-    color: #475569 !important;
-    margin: 0 !important;
-    line-height: 1.6 !important;
-    word-break: break-all !important;
-    
-    /* 核心：強制一行打點 */
-    display: -webkit-box !important;
-    -webkit-line-clamp: 1 !important; 
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
 </style>
 
 <script>
   const API_BASE_URL = 'https://words7000.onrender.com';
 
   const postsContainer = document.getElementById('posts-container') as HTMLElement | null;
-  const newPostForm = document.getElementById('new-post-form') as HTMLFormElement | null;
-  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
-  
-  const fabBtn = document.getElementById('fab-add-post');
-  const modalOverlay = document.getElementById('post-modal');
-  const closeModalBtn = document.getElementById('close-modal');
-
-  // 控制發文彈窗
-  if (fabBtn && modalOverlay && closeModalBtn) {
-    fabBtn.addEventListener('click', () => {
-      modalOverlay.classList.add('active');
-    });
-
-    closeModalBtn.addEventListener('click', () => {
-      modalOverlay.classList.remove('active');
-    });
-
-    modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) {
-        modalOverlay.classList.remove('active');
-      }
-    });
-  }
-  
   // 非同步抓取所有貼文並渲染
   async function fetchAllPosts() {
     if (!postsContainer) return;
@@ -378,8 +195,7 @@ import MainLayout from '../../layout/mainlayout.astro';
         const reversedPosts = data.posts.reverse();
 
         postsContainer.innerHTML = reversedPosts.map((post: any) => {
-          // 精準過濾乾淨的日期
-          const dateStr = post.time  ;
+                    const dateStr = post.time  ;
 
           return `
             <a href="/post/${post.id}" class="post-card-link">
@@ -420,54 +236,7 @@ import MainLayout from '../../layout/mainlayout.astro';
     }
   }
 
-  // 表單發布送出邏輯
-  if (newPostForm && submitBtn && modalOverlay) {
-    newPostForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const nameInput = document.getElementById('post-name') as HTMLInputElement | null;
-      const contentInput = document.getElementById('post-content') as HTMLTextAreaElement | null;
-
-      if (!nameInput || !contentInput) return;
-
-      const name = nameInput.value.trim();
-      const content = contentInput.value.trim();
-
-      if (!name || !content) {
-        alert('署名與內容不可為空！');
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = '發布中...';
-
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/post`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, content })
-        });
-        
-        const data = await res.json();
-
-        if (data.success) {
-          alert('🎉 貼文發布成功！');
-          nameInput.value = '';
-          contentInput.value = '';
-          
-          modalOverlay.classList.remove('active');
-          await fetchAllPosts();
-        } else {
-          alert('❌ 發布失敗: ' + data.error);
-        }
-      } catch (err) {
-        alert('❌ 連線失敗，請稍後再試。');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = '發布貼文';
-      }
-    });
-  }
+  
 
   fetchAllPosts();
 </script>
