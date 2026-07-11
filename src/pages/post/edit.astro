@@ -250,13 +250,20 @@ export const prerender = false;
     });
   }
 
-  async function fetchPosts() {
+async function fetchPosts() {
     if (!postsListContainer) return;
     try {
       const res = await fetch(`${API_BASE_URL}/api/posts`);
       const data = await res.json();
-      if (data.success && data.posts && data.posts.length > 0) {
-        const sortedPosts = data.posts.reverse();
+      
+      // 【核心修改】先篩選出有 id 的貼文，若無資料則給空陣列
+      const validPosts = data.success && data.posts 
+        ? data.posts.filter((post: any) => post.id) 
+        : [];
+
+      // 改用過濾後的 validPosts 進行判斷與渲染
+      if (validPosts.length > 0) {
+        const sortedPosts = validPosts.reverse();
         postsListContainer.innerHTML = sortedPosts.map((post: any) => {
           const imgHtml = post.image ? `<img src="${post.image}" class="post-img" alt="貼文圖片" onerror="this.style.display='none'"/>` : '';
           
@@ -284,9 +291,9 @@ export const prerender = false;
     } catch (err) {
       postsListContainer.innerHTML = '<p style="color:red;">無法連線至後端伺服器</p>';
     }
-  }
+}
 
-  if (postForm) {
+if (postForm) {
     postForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!nameInput || !contentInput || !imageUrlInput || !editIdInput) return;
@@ -324,7 +331,7 @@ export const prerender = false;
         alert('連線失敗，請稍後再試');
       }
     });
-  }
+}
 
   (window as any).startEdit = (id: string, encodedName: string, encodedContent: string, image: string) => {
     if (!nameInput || !contentInput || !imageUrlInput || !editIdInput || !formTitle || !btnSubmitText || !btnCancelEdit) return;
