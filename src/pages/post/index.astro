@@ -285,7 +285,7 @@ import MainLayout from '../../layout/mainlayout.astro';
           const imgHtml = hasImg 
             ? `<div class="card-img-wrapper"><img src="${post.image}" class="card-side-img" alt="貼文圖片" onerror="this.parentNode.style.display='none'"/></div>` 
             : '';
-
+          const idHtml = post.id ? `<span class="meta-pill"> ${post.id}</span>` : '';
           return `
             <a href="/post/${post.id}" class="post-card-link">
               <div class="${cardClass}">
@@ -298,6 +298,8 @@ import MainLayout from '../../layout/mainlayout.astro';
                   
                   <div class="meta-wrapper">
                     <span class="meta-pill">📅 ${dateStr}</span>
+                    ${idHtml}
+
                     <span class="meta-pill"> ${post.id}</span>
                   </div>
                   
@@ -309,6 +311,7 @@ import MainLayout from '../../layout/mainlayout.astro';
                 </div>
                 
                 ${imgHtml}
+                
                 
                 <div class="card-right-arrow">
                   <i class="arrow-shape"></i>
