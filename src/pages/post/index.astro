@@ -274,8 +274,15 @@ import MainLayout from '../../layout/mainlayout.astro';
     try {
       const res = await fetch(`${API_BASE_URL}/api/posts`);
       const data = await res.json();
-      if (data.success && data.posts.length > 0) {
-        const reversedPosts = data.posts.reverse();
+      
+      // 【核心修改】先篩選出有 id 的貼文，如果沒有資料就給空陣列
+      const validPosts = data.success && data.posts 
+        ? data.posts.filter((post: any) => post.id) 
+        : [];
+
+      // 改用過濾後的 validPosts 來判斷與渲染
+      if (validPosts.length > 0) {
+        const reversedPosts = validPosts.reverse();
         postsContainer.innerHTML = reversedPosts.map((post: any) => {
           const dateStr = post.time;
 
@@ -285,7 +292,7 @@ import MainLayout from '../../layout/mainlayout.astro';
           const imgHtml = hasImg 
             ? `<div class="card-img-wrapper"><img src="${post.image}" class="card-side-img" alt="貼文圖片" onerror="this.parentNode.style.display='none'"/></div>` 
             : '';
-          const idHtml = post.id ? `<span class="meta-pill"> ${post.id}</span>` : '';
+
           return `
             <a href="/post/${post.id}" class="post-card-link">
               <div class="${cardClass}">
@@ -298,8 +305,6 @@ import MainLayout from '../../layout/mainlayout.astro';
                   
                   <div class="meta-wrapper">
                     <span class="meta-pill">📅 ${dateStr}</span>
-                    ${idHtml}
-
                     <span class="meta-pill"> ${post.id}</span>
                   </div>
                   
@@ -312,7 +317,6 @@ import MainLayout from '../../layout/mainlayout.astro';
                 
                 ${imgHtml}
                 
-                
                 <div class="card-right-arrow">
                   <i class="arrow-shape"></i>
                 </div>
@@ -322,13 +326,14 @@ import MainLayout from '../../layout/mainlayout.astro';
           `;
         }).join('');
       } else {
+        // 如果原本有貼文，但過濾完後一則都不剩，也會正確顯示這個提示
         postsContainer.innerHTML = `<div class="loading-text">目前尚未有任何動態</div>`;
       }
     } catch (err) {
       postsContainer.innerHTML = `<div class="loading-text" style="color: #ef4444;">無法連線至伺服器，請稍後再試。</div>`;
       console.error('Fetch posts error:', err);
     }
-  }
+}
 
   fetchAllPosts();
 </script>
