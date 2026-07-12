@@ -135,14 +135,16 @@ import MainLayout from '../../layout/mainlayout.astro';
   }
 
   /* 貼文內文 */
-  .post-body {
-    font-size: 1.05rem;
-    color: #475569;
-    margin: 0;
-    line-height: 1.6;
-    word-break: break-all;
-    white-space: pre-wrap; 
-  }
+.post-body {
+  font-size: 1.05rem;
+  color: #475569;
+  margin: 0;
+  line-height: 1.6;
+  word-break: break-all;
+    white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
+}
 
   /* 底部標籤 */
   .tag-wrapper {
@@ -308,7 +310,13 @@ import MainLayout from '../../layout/mainlayout.astro';
                     <span class="meta-pill"> ${post.id}</span>
                   </div>
                   
-                  <p class="post-body">${post.content || '點擊查看詳細內容...'}</p>
+                  <p class="post-body">
+                    ${
+                      post.content 
+                        ? post.content.split('\n')[0] + (post.content.includes('\n') ? '...' : '') 
+                        : '點擊查看詳細內容...'
+                    }
+                  </p>   
                   
                   <div class="tag-wrapper">
                     <span class="hash-tag"># ${post.hashtag || "posts" } </span>
