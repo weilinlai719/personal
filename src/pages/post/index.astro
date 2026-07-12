@@ -311,7 +311,7 @@ import MainLayout from '../../layout/mainlayout.astro';
                   <p class="post-body">${post.content || '點擊查看詳細內容...'}</p>
                   
                   <div class="tag-wrapper">
-                    <span class="hash-tag"># posts</span>
+                    <span class="hash-tag"># ${post.hashtag || "posts" } </span>
                   </div>
                 </div>
                 
