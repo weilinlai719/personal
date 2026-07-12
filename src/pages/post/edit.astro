@@ -157,7 +157,9 @@ export const prerender = false;
       <div class="form-group">
         <textarea id="post-content" rows="4" placeholder="內文" required></textarea>
       </div>
-
+       <div class="form-group">
+        <textarea id="post-hashtag" rows="1" placeholder="hashtag" required></textarea>
+      </div>
       <div class="form-group">
         <label style="font-weight: 600; color: #4a5568; font-size: 0.95rem; display: block; margin-bottom: 8px;">分享圖片（選填）</label>
         <div class="file-upload-wrapper">
@@ -196,6 +198,7 @@ export const prerender = false;
   const contentInput = document.getElementById('post-content') as HTMLTextAreaElement | null;
   const imageUrlInput = document.getElementById('post-image-url') as HTMLInputElement | null;
   const editIdInput = document.getElementById('edit-id') as HTMLInputElement | null;
+  const hashtagInput = document.getElementById('post-hashtag') as HTMLTextAreaElement | null;
   const fileInput = document.getElementById('file-input') as HTMLInputElement | null;
   const uploadStatus = document.getElementById('upload-status') as HTMLElement | null;
   const previewContainer = document.getElementById('preview-container') as HTMLElement | null;
@@ -277,6 +280,8 @@ export const prerender = false;
                 </div>
                 ${imgHtml}
                 <div class="post-summary" style="white-space: pre-wrap;">${post.content}</div>
+                <span class="hash-tag"># ${post.hashtag || "posts" } </span>
+
               </div>
               <div class="card-action-zone">
                 <button class="btn-action btn-edit" onclick="window.startEdit('${post.id}', '${encodeURIComponent(post.name)}', '${encodeURIComponent(post.content)}', '${post.image || ''}')">修改</button>
@@ -296,12 +301,13 @@ export const prerender = false;
   if (postForm) {
     postForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!nameInput || !contentInput || !imageUrlInput || !editIdInput) return;
+      if (!nameInput || !contentInput || !imageUrlInput || !editIdInput || !hashtagInput) return;
 
       const name = nameInput.value;
       const content = contentInput.value;
       const image = imageUrlInput.value; 
       const id = editIdInput.value;
+      const hashtag = hashtagInput.value; 
 
       try {
         let res;
@@ -309,13 +315,13 @@ export const prerender = false;
           res = await fetch(`${API_BASE_URL}/api/post/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, content, image })
+            body: JSON.stringify({ name, content, image, hashtag })
           });
         } else {
           res = await fetch(`${API_BASE_URL}/api/post`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, content, image })
+            body: JSON.stringify({ name, content, image, hashtag })
           });
         }
 
