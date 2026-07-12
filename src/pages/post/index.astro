@@ -3,7 +3,7 @@
 import MainLayout from '../../layout/mainlayout.astro';
 ---
 
-<MainLayout title="Weilin Lai - 討論區">
+<MainLayout title="Weilin Lai - post">
   <div class="board-container">
     <h1 class="page-title">💬 Posts</h1>
 
@@ -65,6 +65,7 @@ import MainLayout from '../../layout/mainlayout.astro';
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
     overflow: hidden;
+    height: 180px;
   }
 
   .post-card:hover {
@@ -160,7 +161,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     font-weight: 600;
   }
 
-  /* 🖼️ 右側精緻圖片裁切殼 */
   .card-img-wrapper {
     width: 260px; 
     align-self: stretch; 
@@ -258,7 +258,9 @@ import MainLayout from '../../layout/mainlayout.astro';
       border-radius: 50%; /* 變成漂亮的圓形小雷達 */
       box-shadow: 0 2px 8px rgba(184, 115, 51, 0.1);
     }
-
+    .post-card {
+      height: auto; 
+    }
     /* 5. 無圖片時的純文字卡片箭頭稍微矮一點點，讓排版更精緻 */
     .card-right-arrow {
       height: 70px;
