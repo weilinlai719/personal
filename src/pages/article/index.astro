@@ -1,260 +1,201 @@
 ---
-// article/index.astro
+// src/pages/article/index.astro
 import MainLayout from '../../layout/mainlayout.astro';
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+// 👑 動態獲取所有內容集合文章
+const allArticles = await getCollection('article');
+
+// 2. 👑 加入自訂排序：按照 Frontmatter 中的 date 字串進行倒序排列（新到舊）
+allArticles.sort((a, b) => {
+  const dateA = a.data.date || '';
+  const dateB = b.data.date || '';
+  // 倒序排列：最新的排在前面
+  return dateB.localeCompare(dateA);
+});
 ---
 
-<MainLayout title="Weilin Lai - 自然科學探究">
+<MainLayout title="Weilin Lai - 文章">
   <div class="science-archive-container">
-    <h1 class="page-title">自然科學探究與實作</h1>
+    <h1 class="page-title">💬 Articles</h1>
     
     <div class="science-cards-grid">
-    
-    <a href="/article/physics" class="science-card-link">
-      <div class="custom-science-card">
-        <div class="card-left-content">
-          <div class="card-top-meta">
-            <span class="card-date">📅 2026年6月</span>
-          </div>
-          <h2 class="card-main-title">物理探究：紙飛機不同配重分布下飛行｢狀態/距離｣之關係</h2>
-          <div class="card-bottom-actions">
-            <span class="more-pill-btn">more...</span>
-            <span class="subject-tag">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-              物理
-            </span>
-          </div>
-        </div>
-        <div class="card-right-image bg-physics">
-          <img src="/science/physics.jpg" alt="物理" />
-          </div>
-      </div>
-    </a>
+      {allArticles.map((article: CollectionEntry<'article'>) => (
+        <a href={`/article/${article.id}/`} class="science-card-link">
+          <div class="custom-science-card">
+            
+            <div class="card-left-content">
+              <div class="title-wrapper">
+                <div class="orange-bar"></div>
+                <h2 class="card-main-title">{article.data.title || '未命名文章'}</h2>
+              </div>
+              
+              <div class="meta-wrapper">
+                <span class="meta-pill">📅 {article.data.date || '未分類'}</span>
+                <span class="meta-pill-tag">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                  {article.data.subject || '# 文章'}
+                </span>
+              </div>
+              
+              <p class="card-summary">點擊進入查看詳細內容...</p>
+            </div>
+            
+            <div class="card-right-arrow">
+              <i class="arrow-shape"></i>
+            </div>
 
-    <a href="/article/chemistry" class="science-card-link">
-      <div class="custom-science-card">
-        <div class="card-left-content">
-          <div class="card-top-meta">
-            <span class="card-date">📅 2026年1月</span>
           </div>
-          <h2 class="card-main-title">化學探究：校園各種水源pH值比較</h2>
-          <div class="card-bottom-actions">
-            <span class="more-pill-btn">more...</span>
-            <span class="subject-tag">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-              化學
-            </span>
-          </div>
-        </div>
-        <div class="card-right-image bg-chemistry">
-          <img src="/science/chemistry.jpg" alt="化學" />
-          </div>
-      </div>
-    </a>
-
-    <a href="/article/biology" class="science-card-link">
-      <div class="custom-science-card">
-        <div class="card-left-content">
-          <div class="card-top-meta">
-            <span class="card-date">📅 2025年11月</span>
-          </div>
-          <h2 class="card-main-title">生物探究：:DNA粗萃取與清潔劑濃度關係之探討 </h2>
-          <div class="card-bottom-actions">
-            <span class="more-pill-btn">more...</span>
-            <span class="subject-tag">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-              生物
-            </span>
-          </div>
-        </div>
-        <div class="card-right-image bg-biology">
-          <img src="/science/biology.jpg" alt="生物" />
-          </div>
-      </div>
-    </a>
-
-    <a href="/article/earth-science" class="science-card-link">
-      <div class="custom-science-card">
-        <div class="card-left-content">
-          <div class="card-top-meta">
-            <span class="card-date">📅 2026年3月</span>
-          </div>
-          <h2 class="card-main-title">地球科學：聖嬰與反聖嬰之下台灣區域海氣溫度變異之影響</h2>
-          <div class="card-bottom-actions">
-            <span class="more-pill-btn">more...</span>
-            <span class="subject-tag">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-              地科
-            </span>
-          </div>
-        </div>
-        <div class="card-right-image bg-earth">
-          <img src="/science/earth-science.jpg" alt="地球科學" />
-          </div>
-      </div>
-    </a>
-
+        </a>
+      ))}
+    </div>
   </div>
-</div>
 </MainLayout>
-<style>
-  /* 全域容器：對齊你的 60% 網頁核心寬度 */
+
+<style is:global>
+  /* ================= 🌸 核心佈局與視覺語彙 ================= */
   .science-archive-container {
-    width: 60%;
-    margin: 4rem auto;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    max-width: 850px; 
+    margin: 40px auto; 
+    padding: 0 24px;
+    box-sizing: border-box;
   }
 
   .page-title {
-    font-size: 1.75rem;
-    color: #0f172a;
-    margin-bottom: 2rem;
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 32px;
     font-weight: 700;
-    border-left: 5px solid #f43f5e;
-    padding-left: 12px;
   }
 
-  /* 列表排版 */
   .science-cards-grid {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 24px; 
   }
 
-  /* 移除超連結預設底線 */
   .science-card-link {
     text-decoration: none;
     color: inherit;
     display: block;
   }
 
-  /* 💡 核心：復刻截圖外觀的卡片主體 */
+  /* 🎯 文章卡片主體 */
   .custom-science-card {
     display: flex;
-    background-color: #ffffff;
-    border-radius: 12px;
-    height: 230px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    border: 1px solid #e2e8f0;
+    justify-content: space-between;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f0ede9;
+    min-height: 160px;
+    box-shadow: 0 4px 12px rgba(160, 140, 130, 0.02);
     overflow: hidden;
-    position: relative;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: all 0.3s ease;
   }
 
-  /* 滑鼠懸停骨感動畫 */
   .custom-science-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(160, 140, 130, 0.07);
+    border-color: #e2ded9;
   }
 
-  /* 左側內容排版 */
+  /* 📝 左側內容排版 */
   .card-left-content {
     flex: 1;
     padding: 24px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    z-index: 2; /* 確保內容在斜切面之上 */
-    background-color: #ffffff;
+    justify-content: center;
   }
 
-  .card-top-meta {
-    color: #94a3b8;
-    font-size: 0.85rem;
+  .title-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     margin-bottom: 8px;
   }
 
+  .orange-bar {
+    width: 4px;
+    height: 24px;
+    background-color: #ff7a00; /* 經典經典橘條 */
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
   .card-main-title {
-    color: #1e3a8a; /* 精緻的藍色標題 */
-    font-size: 1.35rem;
-    font-weight: 700;
-    line-height: 1.4;
+    font-size: 1.25rem;
+    color: #2c3e50;
     margin: 0;
-    margin-bottom: 16px;
-    /* 限制兩行，超出顯示點點點 */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-weight: 600;
+    line-height: 1.4;
   }
 
-  /* 底部按鈕與標籤容器 */
-  .card-bottom-actions {
+  /* 🏷️ 標籤與 Meta 樣式 */
+  .meta-wrapper {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
   }
 
-  /* 💡 精密復刻：左下角 more... 漸層按鈕 */
-  .more-pill-btn {
-    background: linear-gradient(135deg, #ff7e5f, #feb47b, #ff7e5f);
-    background-size: 200% auto;
-    color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
-    padding: 6px 16px;
-    border-radius: 20px 8px 8px 20px; /* 仿截圖的不對稱微圓角，或直接用 20px */
-    box-shadow: 0 4px 10px rgba(255, 126, 95, 0.2);
-    transition: background-position 0.3s;
+  .meta-pill {
+    font-size: 0.85rem;
+    color: #8c8c8c;
   }
 
-  .custom-science-card:hover .more-pill-btn {
-    background-position: right center; /* 懸停時漸層流動效果 */
-  }
-
-  /* 右下角主題標籤 */
-  .subject-tag {
+  .meta-pill-tag {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     color: #64748b;
     font-size: 0.85rem;
+    font-weight: 500;
   }
 
-  /* 💡 核心：右側斜切圖片區 (利用 clip-path 達成完美斜切) */
-  .card-right-image {
-    width: 40%;
-    position: relative;
-    /* clip-path 的四個點座標：右上、右下、左下、左上 */
-    /* 這裡讓左上點往右縮進 (20% 0)，左下點靠最左 (0% 100%)，達成由上往左下的斜線 */
-    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
-    margin-left: -5%; /* 讓斜切面自然咬合左側白底 */
-    overflow: hidden;
+  .card-summary {
+    font-size: 0.95rem;
+    color: #6f6f6f;
+    margin: 0;
+    line-height: 1.5;
   }
 
-  /* 確保未來塞入的圖片能填滿並完美適應 */
-  .card-right-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  /* 👑 右側箭頭貨真價實的極簡美學 */
+  .card-right-arrow {
+    width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #faf9f6; /* 溫和的淺灰底色 */
+    border-left: 1px solid #fcfbfa;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  /* 懸停時，右側箭頭區塊背景優雅轉橘 */
+  .custom-science-card:hover .card-right-arrow {
+    background: #ff7a00;
+  }
+
+  /* 箭頭骨架 */
+  .arrow-shape {
     display: block;
+    width: 10px;
+    height: 10px;
+    border-top: 2.5px solid #b5b5b5;
+    border-right: 2.5px solid #b5b5b5;
+    transform: rotate(45deg);
+    transition: all 0.3s ease;
   }
 
-  /* 🎨 暫時擱置圖片時的優雅幾何漸層色塊 */
-  .bg-physics { background: linear-gradient(135deg, #6ee7b7, #3b82f6); }
-  .bg-chemistry { background: linear-gradient(135deg, #fcd34d, #f97316); }
-  .bg-biology { background: linear-gradient(135deg, #a7f3d0, #059669); }
-  .bg-earth { background: linear-gradient(135deg, #c084fc, #6366f1); }
-
-
-  /* 📱 響應式優化：手機版自動改為上下堆疊，並取消斜切 */
-  @media screen and (max-width: 768px) {
-    .science-archive-container {
-      width: 92%;
-      margin: 2rem auto;
-    }
-    .custom-science-card {
-      flex-direction: column-reverse; /* 手機版圖片在上方，內容在下方 */
-      min-height: 300px; /* 取消固定高度，讓內容自適應 */
-    }
-    .card-right-image {
-      width: 100%;
-      height: 120px;
-      clip-path: none; /* 關閉斜切，回歸正常方塊 */
-      margin-left: 0;
-    }
-    .card-main-title {
-      font-size: 1.15rem;
-    }
+  /* 懸停時，箭頭變白並向右微彈動 */
+  .custom-science-card:hover .arrow-shape {
+    border-color: #ffffff;
+    transform: rotate(45deg) translate(2px, -2px);
   }
 </style>

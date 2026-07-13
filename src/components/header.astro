@@ -4,8 +4,8 @@ const pathname = Astro.url.pathname;
 
 // 判斷目前是否在該頁面
 const isAbout = pathname.includes('/about');
-const isscience = pathname.includes('/science');
 const ispost = pathname.includes('/post');
+const isarticle = pathname.includes('/article');
 ---
 
 <header class="navbar">
@@ -26,34 +26,11 @@ const ispost = pathname.includes('/post');
         <a href="/post/" class:list={['nav-item', 'nav-link', { active: ispost }]}>
           Posts
         </a>
+     
         
-        <div class="nav-item dropdown">
-          <button 
-            onclick="window.location.href='/article/'" 
-            class:list={['dropdown-trigger', { active: isscience }]}
-            id="articleTrigger" 
-          >
-            Article
-            <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          </button>
-          
-          <div class="dropdown-content">
-            <a href="/article/physics/" class="dropdown-link" rel="noopener noreferrer">
-              <span class="link-title">物理探究</span>
-            </a>
-            <a href="/article/chemistry/" class="dropdown-link" rel="noopener noreferrer">
-              <span class="link-title">化學探究</span>
-            </a>
-            <a href="/article/biology/" class="dropdown-link" rel="noopener noreferrer">
-              <span class="link-title">生物探究</span>
-            </a>
-            <a href="/article/earth-science/" class="dropdown-link" rel="noopener noreferrer">
-              <span class="link-title">地科探究</span>
-            </a>
-          </div>
-        </div> 
+        <a href="/article/" class:list={['nav-item', 'nav-link', { active: isarticle }]}>
+          article
+        </a>
 
         <div class="nav-item dropdown">
           <button class="dropdown-trigger" id="projectsTrigger">
