@@ -18,11 +18,11 @@ import MainLayout from '../layout/mainlayout.astro';
             <h1 class="author-name">Weilin Lai</h1>
             <p class="author-subtitle">學生 / developer</p>
             <p class="author-subtitle">-116GAST-</p>
-        <div class="about-social-networks"style="margin-top: 0rem;">
-            <span class="author-subtitle">language：</span>
 
-            <img src="/icon/ts.svg" class="social-icon" alt="typescript" />
-            <img src="/icon/c.svg" class="social-icon" alt="c" />
+        <div class="about-languages"style="margin-top: 0rem;">
+            <span class="author-subtitle">language：</span>
+            <img src="/icon/ts.svg" class="social-icon1" alt="typescript" />
+            <img src="/icon/c.svg" class="social-icon1" alt="c" />
         </div>
             
             <div class="author-bio">
@@ -164,6 +164,23 @@ import MainLayout from '../layout/mainlayout.astro';
         height: 20px;
         object-fit: contain; 
         transition: transform 0.25s ease;
+    }
+   /* 專屬語言欄位的排版 */
+    .about-languages {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;       /* 控制文字與圖標、圖標與圖標之間的微小間距（可自由調整，例如 6px~8px） */
+        margin-top: 0.5rem; /* 調整與上方 -116GAST- 的距離 */
+    }
+
+    /* 確保圖片微調對齊文字 */
+    .social-icon1 {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+        display: inline-block;
+        vertical-align: middle;
     }
 
     /* 按鈕文字樣式 */
