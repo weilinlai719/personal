@@ -7,8 +7,6 @@ import MainLayout from '../layout/mainlayout.astro';
     <div class="hero-box">
         <h1>Welcome!</h1>
         <p>點擊上方選單開始探索</p>
-        
-        <p class="visitor-stats">你是第 <span id="visitor-count">載入中...</span> 位訪客</p>
     </div>
 </MainLayout>
 
@@ -21,62 +19,13 @@ import MainLayout from '../layout/mainlayout.astro';
         min-height: 40vh;
         text-align: center;
     }
-    h1 { font-size: 2rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-color); }
-    p { color: var(--secondary-text-color); }
-    
-    /* 💡 新增的訪客統計樣式 */
-    .visitor-stats {
-        margin-top: 2rem;
-        font-size: 1rem;
-        color: var(--secondary-text-color);
-        background: rgba(150, 150, 150, 0.1);
-        padding: 0.5rem 1.5rem;
-        border-radius: 20px;
+    h1 { 
+        font-size: 2rem; 
+        font-weight: 600; 
+        margin-bottom: 1rem; 
+        color: var(--text-color); 
     }
-    #visitor-count {
-        font-weight: bold;
-        color: #0070f3; /* 你可以改成你的主色調 */
-        font-size: 1.2rem;
+    p { 
+        color: var(--secondary-text-color); 
     }
 </style>
-
-<script>
-    const API_BASE_URL = 'https://words7000.onrender.com';
-
-    async function recordAndFetchVisitorCount() {
-        try {
-            // 💡 收集前端可得的、不需同意的硬體與環境資料
-            const visitorData = {
-                screenResolution: `${window.screen.width}x${window.screen.height}`,
-                language: navigator.language || navigator.language,
-                url: window.location.href
-            };
-
-            // 發送紀錄請求給後端
-            const res = await fetch(`${API_BASE_URL}/api/visit`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(visitorData)
-            });
-
-            const data = await res.json();
-            
-            if (data.success) {
-                // 將後端回傳的總人數更新到畫面上
-                const countSpan = document.getElementById('visitor-count');
-                if (countSpan) {
-                    countSpan.innerText = data.count;
-                }
-            }
-        } catch (error) {
-            console.error('無法記錄或獲取訪客人數:', error);
-            const countSpan = document.getElementById('visitor-count');
-            if (countSpan) countSpan.innerText = "-";
-        }
-    }
-
-    // 當網頁完全解析完畢後，執行紀錄功能
-    window.addEventListener('DOMContentLoaded', recordAndFetchVisitorCount);
-</script>
