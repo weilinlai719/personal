@@ -1,0 +1,216 @@
+---
+// src/pages/projects/cui.astro
+import MainLayout from '../../layout/mainlayout.astro';
+---
+<MainLayout title="projects-CUI">
+
+  <main class="project-container">
+    <header class="project-header">
+      <div class="project-badge">Project</div>
+      <h1 class="project-title">CUI</h1>
+      <p class="project-subtitle">用 C 語言編輯成的輕量化 UI 庫</p>
+
+      <div class="project-links">
+        <a href="https://github.com/cji-3/CUI" target="_blank" rel="noopener noreferrer" class="btn">
+          <img src="/icon/github.svg" class="social-icon" alt="GitHub" />
+                <span class="social-text">GitHub詳細內容</span>
+        </a>
+        <a href="https://discord.gg/QvqhQyJDbB" target="_blank" rel="noopener noreferrer" class="btn">
+          <img src="/icon/discord.svg" class="social-icon" alt="Discord" />
+                <span class="social-text discord-text">加入我們</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="project-card">
+      <h2>專案簡介</h2>
+      <p>
+        <strong>CUI</strong> 是一個採用SDL開發的輕量化 C 語言使用者介面庫，
+        由兩位高中生共同開發，旨在提供簡單易用的 UI 元件，方便開發者快速構建圖形化應用程式，並精進後端開發能力。
+      </p>
+
+      <h2>專案架構</h2>
+      <div class="component-grid">
+        <div class="comp-group">
+          <h3>1. 顯示元件</h3>
+          <p>Label, Image, Rect/Panel, Divider</p>
+        </div>
+        <div class="comp-group">
+          <h3>2. 互動元件</h3>
+          <p>Button, IconButton, Toggle, Checkbox, Slider, ProgressBar</p>
+        </div>
+        <div class="comp-group">
+          <h3>3. 文字輸入</h3>
+          <p>TextBox, TextArea, PasswordBox</p>
+        </div>
+        <div class="comp-group">
+          <h3>4. 佈局容器</h3>
+          <p>Ctnr, VBox, HBox, Grid, ScrollView</p>
+        </div>
+        <div class="comp-group">
+          <h3>5. 高階元件</h3>
+          <p>Window/Modal, Menu, Dropdown, Tooltip, MessageBox</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</MainLayout>
+
+<style>
+  .project-container {
+    max-width: 800px;
+    margin: 4rem auto;
+    padding: 0 1.5rem;
+  }
+
+  .project-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .project-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-color);
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  .project-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+  }
+
+  .project-subtitle {
+    font-size: 1.15rem;
+    color: var(--secondary-text-color);
+    margin-bottom: 1.75rem;
+  }
+
+  .project-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  /* 按鈕通用樣式 */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+     background: #e4e4e4; 
+    color: #000000;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+
+  .btn:hover {
+    background: #8a8888;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  }
+
+  .project-card {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 2.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  }
+
+  .project-card h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-top: 1.75rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--accent-color);
+    padding-left: 0.75rem;
+  }
+
+  .project-card h2:first-child {
+    margin-top: 0;
+  }
+
+  .project-card p {
+    color: #4b5563;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+  }
+
+  /* 列表樣式 */
+  .feature-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .feature-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.8rem;
+    color: #4b5563;
+  }
+
+  .feature-list li::before {
+    content: "◈";
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+  }
+
+  /* 元件網格佈局 */
+  .component-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .comp-group h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 0.4rem;
+  }
+
+  .comp-group p {
+    font-size: 0.9rem;
+    font-family: monospace;
+    background: #d0cbcb;
+    padding: 0.5rem;
+    border-radius: 6px;
+    color: #000000;
+  }
+  .social-icon {
+        width: 20px;
+        height: 20px;
+        object-fit: contain; 
+        transition: transform 0.25s ease;
+    }
+  code {
+    background: #f1f1f1;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #e83e8c;
+  }
+
+  @media (max-width: 768px) {
+    .component-grid {
+      grid-template-columns: 1fr;
+    }
+    .project-links {
+        flex-direction: column;
+    }
+  }
+</style>

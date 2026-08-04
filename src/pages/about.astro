@@ -6,12 +6,19 @@ import MainLayout from '../layout/mainlayout.astro';
 <MainLayout title="Weilin Lai - 關於">
     <div class="about-page-wrapper">
         
-        <div class="about-avatar-box">
-            <img 
-              src="/images/avatar.jpg" 
-              alt="Weilin Lai" 
-              class="about-avatar" 
-            />
+        <div class="avatar-flip-card" id="avatar-flip-card">
+            <div class="avatar-flip-inner">
+                <img 
+                  src="/images/avatar.jpg" 
+                  alt="Weilin Lai 正面" 
+                  class="about-avatar avatar-front" 
+                />
+                <img 
+                  src="/images/avatar1.jpg" 
+                  alt="Weilin Lai 反面" 
+                  class="about-avatar avatar-back" 
+                />
+            </div>
         </div>
 
         <div class="about-info-text">
@@ -19,15 +26,15 @@ import MainLayout from '../layout/mainlayout.astro';
             <p class="author-subtitle">學生 / developer</p>
             <p class="author-subtitle">-116GAST-</p>
 
-        <div class="about-languages"style="margin-top: 0rem;">
-            <span class="author-subtitle">language：</span>
-            <img src="/icon/ts.svg" class="social-icon1" alt="typescript" />
-            <img src="/icon/c.svg" class="social-icon1" alt="c" />
-        </div>
+            <div class="about-languages" style="margin-top: 0rem;">
+                <span class="author-subtitle">language：</span>
+                <img src="/icon/ts.svg" class="social-icon1" alt="typescript" />
+                <img src="/icon/c.svg" class="social-icon1" alt="c" />
+            </div>
             
             <div class="author-bio">
-                <p>高中生，喜歡嘗試沒試過的東西，第一次準備學測🫠</p>
-                <p>因為我們是我們，所以我們是我們。</p>
+                <p>摸過：API、後端、web、.Net、開源函式庫、GUI(擱置中)；沒有摸過，但想碰：AI、algorithm、資安、無人機、賽車(台大方程式車隊)、火箭(臺灣盃火箭競賽)</p>
+                <p>誰知道以後會發生甚麼事呢，努力就對了!</p>
             </div>
         </div>
 
@@ -37,7 +44,7 @@ import MainLayout from '../layout/mainlayout.astro';
                 <span class="social-text">Gmail</span>
             </a>
 
-          <button type="button" class="social-button-card discord-copy-btn" title=" Discord ID" data-discord-id="12072880926215454869">
+            <button type="button" class="social-button-card discord-copy-btn" title="Discord ID" data-discord-id="12072880926215454869">
                 <img src="/icon/discord.svg" class="social-icon" alt="Discord" />
                 <span class="social-text discord-text">Discord</span>
             </button>
@@ -68,25 +75,72 @@ import MainLayout from '../layout/mainlayout.astro';
         text-align: center;
     }
 
-    .about-avatar-box {
-        margin-bottom: 2rem;
-    }
-
-    /* 頭像樣式 */
-    .about-avatar {
+   /* 1. 外層容器：負責 Hover 放大效果 */
+    .avatar-flip-card {
         width: 110px;
         height: 110px;
+        perspective: 1000px;
+        cursor: pointer;
+        user-select: none;
+        margin-bottom: 2rem;
+        /* 滑鼠懸停時微幅放大外層 */
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .avatar-flip-card:hover {
+        transform: scale(1.08);
+    }
+
+    /* 2. 內層旋轉容器：負責點擊 3D 翻牌效果 */
+    .avatar-flip-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+    }
+
+    /* 當點擊加上 .flipped 類別時才旋轉 180 度 */
+    .avatar-flip-card.flipped .avatar-flip-inner {
+        transform: rotateY(180deg);
+    }
+
+    /* 3. 正反面頭像基礎設定 */
+    .about-avatar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         object-fit: cover;
         display: block !important;
         opacity: 1 !important;
         visibility: visible !important;
+        
+        /* 嚴格隱藏背面與啟動 GPU 加速 */
+        -webkit-backface-visibility: hidden !important;
+        backface-visibility: hidden !important;
+        
         box-shadow: 0 4px 12px var(--shadow-color2, rgba(0, 0, 0, 0.05));
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+        transition: box-shadow 0.4s ease;
     }
 
-    .about-avatar:hover {
-        transform: scale(1.08);
+    /* 正面 (預設 0 度) */
+    .avatar-front {
+        z-index: 2;
+        transform: rotateY(0deg) translateZ(1px);
+    }
+
+    /* 反面 (預設 180 度) */
+    .avatar-back {
+        transform: rotateY(180deg) translateZ(1px);
+    }
+
+    /* Hover 時順便提升陰影感 */
+    .avatar-flip-card:hover .about-avatar {
         box-shadow: 0 8px 20px var(--shadow-color1, rgba(0, 0, 0, 0.1));
     }
 
@@ -102,18 +156,17 @@ import MainLayout from '../layout/mainlayout.astro';
     .author-subtitle {
         font-size: 0.95rem;
         color: var(--secondary-text-color, #6f6f6f);
-       
     }
 
     .author-bio {
-         margin-top: 2.5rem;
+        margin-top: 2.5rem;
         font-size: 0.95rem;
         color: var(--text-color, #171717);
         line-height: 1.8;
         margin-bottom: 3rem;
     }
     .author-bio p {
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.5rem;
     }
 
     /* 社群按鈕外層容器 */
@@ -128,7 +181,7 @@ import MainLayout from '../layout/mainlayout.astro';
         margin-top: 1rem;
     }
 
-    /* 打造卡片式鈕扣 */
+    /* 卡片式按鈕 */
     .social-button-card {
         text-decoration: none;
         display: inline-flex;
@@ -136,21 +189,16 @@ import MainLayout from '../layout/mainlayout.astro';
         justify-content: center;
         gap: 0.6rem; 
         padding: 0.6rem 1.2rem;
-        min-width: 130px; 
-        
-        /* 🛠️ 新增：重設 button 的預設樣式，讓它長得跟 a 標籤一模一樣 */
+        min-width: 130px;
         font-family: inherit;
         cursor: pointer;
-        
         background-color: var(--main-color, #f4f6f9); 
         border: 1px solid var(--shadow-color2, #e5e7eb); 
         border-radius: 10px; 
-        
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         box-shadow: 0 2px 4px var(--shadow-color2, rgba(0, 0, 0, 0.02));
     }
 
-    /* 精心調校的 Hover 懸停互動效果 */
     .social-button-card:hover {
         background-color: var(--shadow-color2, #e5e7eb);
         border-color: var(--secondary-text-color, #9ca3af);
@@ -158,23 +206,21 @@ import MainLayout from '../layout/mainlayout.astro';
         box-shadow: 0 6px 16px var(--shadow-color1, rgba(0, 0, 0, 0.08));
     }
 
-    /* 圖標尺寸與填色控制 */
     .social-icon {
         width: 20px;
         height: 20px;
         object-fit: contain; 
         transition: transform 0.25s ease;
     }
-   /* 專屬語言欄位的排版 */
+
     .about-languages {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;       /* 控制文字與圖標、圖標與圖標之間的微小間距（可自由調整，例如 6px~8px） */
-        margin-top: 0.5rem; /* 調整與上方 -116GAST- 的距離 */
+        gap: 0.5rem;
+        margin-top: 0.5rem;
     }
 
-    /* 確保圖片微調對齊文字 */
     .social-icon1 {
         width: 20px;
         height: 20px;
@@ -183,7 +229,6 @@ import MainLayout from '../layout/mainlayout.astro';
         vertical-align: middle;
     }
 
-    /* 按鈕文字樣式 */
     .social-text {
         font-size: 0.9rem;
         font-weight: 500;
@@ -191,7 +236,6 @@ import MainLayout from '../layout/mainlayout.astro';
         transition: color 0.25s ease;
     }
 
-    /* 懸停動態感 */
     .social-button-card:hover .social-icon {
         transform: scale(1.1);
     }
@@ -199,74 +243,91 @@ import MainLayout from '../layout/mainlayout.astro';
         color: var(--text-color, #171717);
     }
     
-  /* 📱 專屬手機版的防禦性排版修復 */
-@media (max-width: 768px) {
-  header, .navbar {
-    position: relative;
-    z-index: 1000;
-    background-color: #ffffff; 
-  }
-
-  .dropdown-content.grid-container {
-    position: absolute;
-    top: 100%;
-    right: 5vw; 
-    left: 5vw;  
-    width: 90vw !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    grid-template-columns: 1fr !important; 
-    gap: 8px !important;
-    background-color: #ffffff !important;
-    z-index: 9999 !important; 
-    padding: 16px !important;
-    border-radius: 12px !important;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
-    border: 1px solid #e5e7eb !important; 
-    max-height: 70vh;
-    overflow-y: auto;
-  }
-
-  .dropdown-link {
-    display: flex !important;
-    align-items: center;
-    padding: 12px 16px !important; 
-    background-color: #f9fafb; 
-    border-radius: 8px;
-    white-space: nowrap; 
-  }
-}
-</style>
-<script>
-function setupDiscordCopy() {
-    const discordBtn = document.querySelector('.discord-copy-btn') as HTMLButtonElement | null;
-    const discordText = document.querySelector('.discord-text') as HTMLSpanElement | null;
-
-    if (discordBtn && discordText) {
-      discordBtn.addEventListener('click', async () => {
-        // 使用空值合併運算子，確保獲取到的是字串而非 null
-        const discordId = discordBtn.getAttribute('data-discord-id') ?? 'weilinlai719';
-        
-        try {
-          await navigator.clipboard.writeText(discordId);
-          
-          const originalText = 'Discord';
-          discordText.textContent = '已複製 ID !';
-          discordText.style.color = '#10b981'; 
-          
-          setTimeout(() => {
-            discordText.textContent = originalText;
-            discordText.style.color = ''; 
-          }, 2000);
-          
-        } catch (err) {
-          alert('複製失敗，請手動複製 ID: ' + discordId);
+    /* 📱 專屬手機版排版修復 */
+    @media (max-width: 768px) {
+        header, .navbar {
+            position: relative;
+            z-index: 1000;
+            background-color: #ffffff; 
         }
-      });
-    }
-  }
 
-  setupDiscordCopy();
-  document.addEventListener('DOMContentLoaded', setupDiscordCopy);
-  document.addEventListener('astro:page-load', setupDiscordCopy);
+        .dropdown-content.grid-container {
+            position: absolute;
+            top: 100%;
+            right: 5vw; 
+            left: 5vw;
+            width: 90vw !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            grid-template-columns: 1fr !important; 
+            gap: 8px !important;
+            background-color: #ffffff !important;
+            z-index: 9999 !important; 
+            padding: 16px !important;
+            border-radius: 12px !important;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
+            border: 1px solid #e5e7eb !important; 
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .dropdown-link {
+            display: flex !important;
+            align-items: center;
+            padding: 12px 16px !important; 
+            background-color: #f9fafb; 
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+    }
+</style>
+
+<script>
+    // 💡 頭像翻牌初始化事件
+    function setupAvatarFlip() {
+        const flipCard = document.getElementById('avatar-flip-card');
+        if (flipCard) {
+            // 避免重複綁定 listener
+            flipCard.onclick = () => {
+                flipCard.classList.toggle('flipped');
+            };
+        }
+    }
+
+    // 複製 Discord ID 功能 [cite: 39]
+    function setupDiscordCopy() {
+        const discordBtn = document.querySelector('.discord-copy-btn') as HTMLButtonElement | null;
+        const discordText = document.querySelector('.discord-text') as HTMLSpanElement | null;
+
+        if (discordBtn && discordText) {
+            discordBtn.addEventListener('click', async () => {
+                const discordId = discordBtn.getAttribute('data-discord-id') ?? 'weilinlai719';
+                
+                try {
+                    await navigator.clipboard.writeText(discordId);
+                    
+                    const originalText = 'Discord';
+                    discordText.textContent = '已複製 ID !';
+                    discordText.style.color = '#10b981'; 
+                    
+                    setTimeout(() => {
+                        discordText.textContent = originalText;
+                        discordText.style.color = ''; 
+                    }, 2000);
+                } catch (err) {
+                    alert('複製失敗，請手動複製 ID: ' + discordId);
+                }
+            });
+        }
+    }
+
+    function initPageScripts() {
+        setupAvatarFlip();
+        setupDiscordCopy();
+    }
+
+    // 初始化綁定
+    initPageScripts();
+    document.addEventListener('DOMContentLoaded', initPageScripts);
+    document.addEventListener('astro:page-load', initPageScripts);
 </script>
