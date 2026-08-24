@@ -1,76 +1,89 @@
 {
-	"version": 3,
-	"routes": [
-		{
-			"handle": "filesystem"
-		},
-		{
-			"src": "^/_astro/(.*)$",
-			"headers": {
-				"cache-control": "public, max-age=31536000, immutable"
-			},
-			"continue": true
-		},
-		{
-			"src": "^/_server-islands/([^/]+?)/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/_image/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/about/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/article/biology/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/article/chemistry/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/article/earth-science/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/article/physics/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/article/([^/]+?)/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/article/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/post/([^/]+?)/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/post/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/projects/cui/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/404/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/.*$",
-			"dest": "_render",
-			"status": 404
-		}
-	]
+  "version": 3,
+  "routes": [
+    {
+      "handle": "error"
+    },
+    {
+      "status": 404,
+      "src": "^(?!/api).*$",
+      "dest": "/404.html"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^/_astro/(.*)$",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/_server-islands/([^/]+?)/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/_image/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/about/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/article/biology/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/article/chemistry/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/article/earth-science/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/article/physics/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/article/([^/]+?)/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/article/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/post/([^/]+?)/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/post/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/projects/cui/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/404/?$",
+      "dest": "_render"
+    },
+    {
+      "src": "^/.*$",
+      "dest": "_render",
+      "status": 404
+    }
+  ],
+  "framework": {
+    "slug": "astro",
+    "version": "7.0.7"
+  },
+  "crons": []
 }
