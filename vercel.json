@@ -1,4 +1,0 @@
-{
-  "framework": "astro",
-  "outputDirectory": ".vercel/output"
-}
