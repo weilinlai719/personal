@@ -1,49 +1,33 @@
 ---
 // src/pages/article/[name].astro
 import MainLayout from '../../layout/mainlayout.astro';
-// 💡 Astro 5+ 新增了 render 函數來渲染 Markdown
 import { getEntry, render } from 'astro:content';
 
 export const prerender = false;
-
 const { name } = Astro.params;
-
-if (!name) {
-  return Astro.redirect('/404');
-}
-
-// 🎯 透過 name (也就是 md 的檔名 id) 撈取文章
+if (!name) return Astro.redirect('/404');
 const entry = await getEntry('article', name);
-
-if (!entry) {
-  return Astro.redirect('/404');
-}
-
-// 💡 Astro 5+ 標準渲染方式：改用 render(entry)
+if (!entry) return Astro.redirect('/404');
 const { Content } = await render(entry);
 const { title, date, subject } = entry.data;
 ---
 
 <MainLayout title={`Weilin Lai - ${title}`}>
   <div class="detail-container">
-    <a href="/article/" class="back-btn">
-      <span class="back-arrow">←</span> 返回列表
-    </a>
-
+    <a href="/article/" class="back-btn">← 返回列表</a>
     <article class="article-post-card">
       <header class="article-header">
         <div class="title-wrapper">
           <div class="orange-bar"></div>
           <h1 class="article-main-title">{title}</h1>
         </div>
-        
         <div class="meta-wrapper">
           {date && <span class="meta-pill">📅 {date}</span>}
           {subject && <span class="meta-pill">{subject}</span>}
         </div>
       </header>
-
-      <div class="markdown-body">
+      <!-- 乾淨的內容容器 -->
+      <div class="md-content">
         <Content />
       </div>
     </article>
@@ -51,8 +35,8 @@ const { title, date, subject } = entry.data;
 </MainLayout>
 
 <style is:global>
-  /* 此處完全保留原本的 CSS 樣式 ... */
-  .detail-container { max-width: 850px; margin: 40px auto; padding: 0 24px; box-sizing: border-box; }
+
+ .detail-container { max-width: 850px; margin: 40px auto; padding: 0 24px; box-sizing: border-box; }
   .back-btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #6f6f6f; font-weight: 500; margin-bottom: 24px; transition: color 0.2s; }
   .back-btn:hover { color: #171717; }
   .article-post-card { background: #ffffff; border-radius: 16px; border: 1px solid #f0ede9; padding: 32px; box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03); }
@@ -67,81 +51,175 @@ const { title, date, subject } = entry.data;
   .markdown-body ul, .markdown-body ol { padding-left: 24px; margin-bottom: 16px; }
   .markdown-body li { margin-bottom: 6px; }
 
-  /* ================= 📝 Markdown 內文精緻排版 ================= */
-.markdown-body {
-  color: #334155;          /* 深灰文字，比純黑更溫和 */
-  line-height: 1.8;        /* 舒適的行高 */
-  font-size: 1.05rem;
+
+  /* 基礎與容器定義 */
+  .detail-container { max-width: 850px; margin: 40px auto; padding: 0 24px; }
+  .article-post-card { background: #fff; padding: 32px; border-radius: 16px; border: 1px solid #f0ede9; }
+  .md-content { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; color: #24292e; word-wrap: break-word; }
+
+  /* 區塊間距統一 */
+  .md-content p, .md-content blockquote, .md-content ul, .md-content ol, .md-content pre, .md-content table { margin-top: 0; margin-bottom: 16px; }
+
+  /* 標題系統 */
+  .md-content h1, .md-content h2, .md-content h3, .md-content h4, .md-content h5, .md-content h6 { margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25; }
+  .md-content h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+  .md-content h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+  .md-content h3 { font-size: 1.25em; } .md-content h4 { font-size: 1em; } .md-content h5 { font-size: 0.875em; } .md-content h6 { font-size: 0.85em; color: #6a737d; }
+
+  /* 文本裝飾、連結與分隔線 */
+  .md-content a { color: #0366d6; text-decoration: none; }
+  .md-content a:hover { text-decoration: underline; }
+  .md-content strong { font-weight: 600; }
+  .md-content hr { height: 0.25em; padding: 0; margin: 24px 0; background-color: #e1e4e8; border: 0; }
+
+  /* 列表與引用 */
+  .md-content ul { list-style-type: disc; padding-left: 2em; }
+  .md-content ol { list-style-type: decimal; padding-left: 2em; }
+
+  /* 子層級清單符號自動切換 */
+  .md-content ul ul { list-style-type: circle; }
+  .md-content ol ol { list-style-type: lower-alpha; }
+
+  .md-content ul, .md-content ol { padding-left: 2em; }
+  .md-content li + li { margin-top: 0.25em; }
+  .md-content blockquote { border-left: 0.25em solid #dfe2e5; padding: 0 1em; color: #6a737d; }
+  .md-content blockquote > :first-child { margin-top: 0; }
+  .md-content blockquote > :last-child { margin-bottom: 0; }
+
+  /* 表格 (響應式防破版) */
+  .md-content table { display: block; width: 100%; overflow: auto; border-collapse: collapse; }
+  .md-content table th { font-weight: 600; }
+  .md-content table th, .md-content table td { border: 1px solid #dfe2e5; padding: 6px 13px; }
+  .md-content table tr { background-color: #fff; border-top: 1px solid #c6cbd1; }
+  .md-content table tr:nth-child(2n) { background-color: #f6f8fa; }
+
+  /* 程式碼與圖片 */
+  .md-content img { max-width: 100%; box-sizing: content-box; background-color: #fff; }
+  .md-content code, .md-content pre { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 85%; }
+  .md-content code { background-color: rgba(27,31,35,0.05); padding: 0.2em 0.4em; border-radius: 3px; }
+  .md-content pre { background-color: #f6f8fa; padding: 16px; overflow: auto; border-radius: 6px; }
+  .md-content pre code { background: transparent; padding: 0; font-size: 100%; white-space: pre; word-break: normal; border: 0; }
+
+  /*code 設計*/
+ .md-content pre { position: relative; }
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #57606a;
+  background-color: rgba(27,31,35,0.05);
+  color: #f6f8fa;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s;
 }
 
-/* 標題二：## 你的標題 */
-.markdown-body h2 {
-  font-size: 1.45rem;
-  color: #1e293b;
-  margin-top: 36px;
-  margin-bottom: 16px;
+.md-content pre:hover .copy-btn { opacity: 1; }
+.copy-btn:hover { background-color: #f3f4f6; color: #24292e; }
+
+/* 成功複製時變綠色 */
+.copy-btn.copied {
+  color: #1a7f37;
+  border-color: #1a7f37;
+  }
+
+.md-content pre {
+  position: relative;
+  padding-top: 36px; /* 留出頂部欄位空間，防止文字遮擋 */
+}
+
+/* 語言標籤 (左上角) */
+.code-lang {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 12px;
+  font-family: -apple-system, sans-serif;
   font-weight: 600;
-  border-bottom: 2px solid #f1f5f9; /* 下方淡淡的分割線 */
-  padding-bottom: 8px;
+  color: #f0f6fc;
+  text-transform: lowercase;
+  user-select: none;
 }
 
-/* 標題三：### 你的次標題 */
-.markdown-body h3 {
-  font-size: 1.2rem;
-  color: #334155;
-  margin-top: 28px;
-  margin-bottom: 12px;
-  font-weight: 600;
-}
 
-/* 段落文字：一般內文 */
-.markdown-body p {
-  margin-bottom: 20px;
-  text-align: justify;     /* 文字左右對齊 */
-}
 
-/* 強調粗體：**粗體字** */
-.markdown-body strong {
-  color: #6a1919;          /* 讓粗體字自動帶上你的主題經典橘色 */
-  font-weight: 600;
-}
 
-/* 無序列表：- 項目 */
-.markdown-body ul {
-  list-style-type: disc;
-  padding-left: 24px;
-  margin-bottom: 20px;
-}
-
-/* 有序列表：1. 項目 */
-.markdown-body ol {
-  list-style-type: decimal;
-  padding-left: 24px;
-  margin-bottom: 20px;
-}
-
-.markdown-body li {
-  margin-bottom: 8px;
-}
-
-/* 程式碼區塊或行內代碼：`code` */
-.markdown-body code {
-  background: #d8dce0;
-  color: #000000;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: monospace;
-  font-size: 0.9em;
-  margin: 0 4px;
-}
-
-/* 引用區塊：> 這是引用 */
-.markdown-body blockquote {
-  margin: 20px 0;
-  padding: 12px 20px;
-  background-color: #faf9f6;
-  border-left: 4px solid #ff7a00; /* 左側橘色質感邊框 */
-  color: #0b203e;
-  border-radius: 0 8px 8px 0;
-}
 </style>
+<script>
+function getLanguage(pre: HTMLElement, code: HTMLElement | null): string {
+  // 1. 優先檢查常見的 HTML data 屬性 (如 Shiki / Astro / MDX)
+  const dataLang = 
+    code?.getAttribute('data-language') || 
+    pre.getAttribute('data-language') ||
+    code?.getAttribute('data-lang') || 
+    pre.getAttribute('data-lang') ||
+    code?.getAttribute('lang') || 
+    pre.getAttribute('lang');
+    
+  if (dataLang) return dataLang;
+
+  // 2. 檢查 Class (涵蓋 code, pre, 以及 parent div)
+  const parentClass = pre.parentElement?.className || '';
+  const combinedClass = `${parentClass} ${pre.className} ${code?.className || ''}`;
+  
+  // 匹配 language-bash, lang-bash, highlight-source-bash 等
+  const match = combinedClass.match(/(?:lang|language|highlight-source)-([\w-]+)/i);
+  if (match) return match[1];
+
+  return '';
+}
+
+function initCodeBlocks() {
+  const COPY_ICON = `<svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+  const CHECK_ICON = `<svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+  document.querySelectorAll('.md-content pre').forEach((pre) => {
+    const preEl = pre as HTMLElement;
+    if (preEl.querySelector('.copy-btn')) return; // 避免重複初始化
+
+    const codeEl = preEl.querySelector('code');
+    const language = getLanguage(preEl, codeEl);
+    const codeText = codeEl?.textContent || preEl.textContent || '';
+
+    // 1. 渲染語言名稱
+    if (language) {
+      const langTag = document.createElement('span');
+      langTag.className = 'code-lang';
+      langTag.textContent = language;
+      preEl.appendChild(langTag);
+    }
+
+    // 2. 渲染複製按鈕
+    const button = document.createElement('button');
+    button.className = 'copy-btn';
+    button.ariaLabel = 'Copy code';
+    button.innerHTML = COPY_ICON;
+
+    button.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(codeText);
+      button.innerHTML = CHECK_ICON;
+      button.classList.add('copied');
+
+      setTimeout(() => {
+        button.innerHTML = COPY_ICON;
+        button.classList.remove('copied');
+      }, 2000);
+    });
+
+    preEl.appendChild(button);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCodeBlocks);
+} else {
+  initCodeBlocks();
+}
+</script>
