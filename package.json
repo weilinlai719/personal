@@ -11,7 +11,9 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "start": ".vercel/output",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "astro": "astro"
   }
 }
