@@ -13,5 +13,6 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
-  }
+  },
+  "type": "module"
 }
