@@ -1,7 +1,7 @@
 ---
 // src/pages/personal/post/edit.astro
 import MainLayout from '../../layout/mainlayout.astro';
-export const prerender = true;
+export const prerender = false;
 ---
 
 <style is:global>
@@ -265,12 +265,10 @@ export const prerender = true;
       const res = await fetch(`${API_BASE_URL}/api/posts`);
       const data = await res.json();
       
-      // 【唯一改動點】在這裡先過濾掉所有沒有 id 的貼文，防範空資料
       const validPosts = data.success && data.posts 
         ? data.posts.filter((post: any) => post.id) 
         : [];
 
-      // 改用 validPosts 來進行長度判斷與畫面渲染
       if (validPosts.length > 0) {
         const sortedPosts = validPosts.reverse();
         postsListContainer.innerHTML = sortedPosts.map((post: any) => {
@@ -315,18 +313,27 @@ export const prerender = true;
       const id = editIdInput.value;
       const hashtag = hashtagInput.value; 
 
+      // 💡 取得已存入 localStorage 的管理員密碼
+      const adminKey = localStorage.getItem("admin_key") || "";
+
       try {
         let res;
         if (isEditing) {
           res = await fetch(`${API_BASE_URL}/api/post/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${adminKey}` // 💡 加入授權 Header
+            },
             body: JSON.stringify({ name, content, image, hashtag })
           });
         } else {
           res = await fetch(`${API_BASE_URL}/api/post`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${adminKey}` // 💡 加入授權 Header
+            },
             body: JSON.stringify({ name, content, image, hashtag })
           });
         }
@@ -337,7 +344,11 @@ export const prerender = true;
           resetForm();
           fetchPosts();
         } else {
-          alert('操作失敗: ' + data.error);
+          alert('操作失敗: ' + (data.error || '未授權，請確認密碼是否正確'));
+          if(data.error === '未授權操作，拒絕存取！') {
+            localStorage.removeItem("admin_key");
+            location.reload(); // 若密碼錯誤/過期則強制重整要求重新輸入
+          }
         }
       } catch (err) {
         alert('連線失敗，請稍後再試');
@@ -371,15 +382,24 @@ export const prerender = true;
 
   (window as any).deletePost = async (id: string) => {
     if (!confirm(`確定要刪除編號 #${id} 的貼文嗎？`)) return;
+    
+    // 💡 取得已存入 localStorage 的管理員密碼
+    const adminKey = localStorage.getItem("admin_key") || "";
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/post/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/api/post/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${adminKey}` // 💡 加入授權 Header
+        }
+      });
       const data = await res.json();
       if (data.success) {
         alert('文章已成功刪除！');
         if (isEditing && editIdInput?.value === id) resetForm();
         fetchPosts();
       } else {
-        alert('刪除失敗: ' + data.error);
+        alert('刪除失敗: ' + (data.error || '未授權，請確認密碼是否正確'));
       }
     } catch (err) {
       alert('連線失敗，無法刪除');
@@ -401,5 +421,24 @@ export const prerender = true;
 
   if (btnCancelEdit) btnCancelEdit.addEventListener('click', resetForm);
 
+  // 💡 這裡的 SECRET_KEY 必須與你後端 .env 裡面設定的 ADMIN_SECRET 一模一樣！
+  // 假設後端設定的密碼為 "admin"，那就維持不變；如果後端改成了 "mySuperAdminPass123"，這裡也要改！
+  const SECRET_KEY = "admin"; 
+
+  function checkAuth() {
+    let userKey = localStorage.getItem("admin_key");
+    if (userKey !== SECRET_KEY) {
+      userKey = prompt("請輸入管理員密碼：");
+      if (userKey === SECRET_KEY) {
+        localStorage.setItem("admin_key", userKey);
+      } else {
+        alert("密碼錯誤，拒絕存取！");
+        window.location.href = "/"; // 密碼錯誤退回首頁
+      }
+    }
+  }
+
+  // 進入頁面立即執行檢查
+  checkAuth();
   fetchPosts();
 </script>
