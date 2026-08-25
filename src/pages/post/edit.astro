@@ -10,7 +10,7 @@ export const prerender = false;
   
   /* 📝 表單容器外觀 */
   .form-container {
-     background: #ffffff;
+    background: #ffffff;
     border-radius: 16px;
     border: 1px solid #f0ede9;
     padding: 24px;
@@ -22,8 +22,8 @@ export const prerender = false;
   .form-container h3 { margin-top: 0; margin-bottom: 24px; color: #2c3e50; font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
   .form-group { margin-bottom: 20px; }
   
-  /* 🎯 填入框與文字域：精準限制寬度為 60% */
-  input[type="text"], textarea { 
+  /* 🎯 填入框與文字域 */
+  input[type="text"], input[type="password"], textarea { 
     width: 100%; padding: 14px 18px; border: 1px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; background-color: #fff; transition: all 0.3s ease; font-size: 1rem; color: #333;
   }
   input:focus, textarea:focus { border-color: #e67e22; box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1); outline: none; }
@@ -64,7 +64,6 @@ export const prerender = false;
   
   .card-main { flex: 1; padding-right: 20px; }
   
-  /* 標題與左側橘色直線 */
   .post-card .post-title { 
     font-size: 1.4rem; 
     font-weight: 800; 
@@ -83,7 +82,6 @@ export const prerender = false;
     border-radius: 4px; 
   }
 
-  /* 標籤群組 (日期、ID) */
   .post-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
   .meta-badge { 
     background-color: #fdf5ee; 
@@ -97,13 +95,9 @@ export const prerender = false;
     gap: 6px;
   }
 
-  /* 貼文內文 */
   .post-summary { font-size: 1.05rem; color: #4a5568; margin: 0; line-height: 1.6; }
-  
-  /* 貼文內圖片 */
   .post-img { max-width: 100%; max-height: 250px; border-radius: 12px; margin-bottom: 15px; object-fit: cover; display: block; }
 
-  /* 右側管理按鈕區（簡潔合併） */
   .card-action-zone { 
     display: flex; 
     flex-direction: column; 
@@ -125,17 +119,35 @@ export const prerender = false;
   .btn-edit:hover { background-color: #fae8d8; }
   .btn-delete { background-color: #fee2e2; color: #ef4444; }
   .btn-delete:hover { background-color: #fecaca; }
-    .detail-container {
+  .detail-container {
     max-width: 800px;
     margin: 40px auto;
     padding: 0 24px;
     display: flex;
     flex-direction: column;
-    gap: 24px; /* 外層各區塊嚴格間距，絕不疊加 */
+    gap: 24px;
   }
 </style>
 
 <MainLayout title="文章管理後台">
+
+<!-- 🔒 管理員身分驗證對話框 (Modal) -->
+<div id="auth-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center;">
+  <div style="background: #ffffff; padding: 32px; border-radius: 20px; max-width: 380px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+    <div style="font-size: 2.5rem; margin-bottom: 12px;">🔒</div>
+    <h3 style="margin: 0 0 8px 0; color: #1e293b; font-size: 1.3rem;">管理員解鎖</h3>
+    <p style="color: #64748b; font-size: 0.9rem; margin: 0 0 20px 0;">請輸入管理員密碼以進入後台</p>
+    
+    <input type="password" id="admin-pass-input" placeholder="請輸入密碼..." style="margin-bottom: 12px; text-align: center;" />
+    <div id="auth-error-msg" style="color: #ef4444; font-size: 0.85rem; display: none; margin-bottom: 12px;">❌ 密碼錯誤，請重新輸入</div>
+    
+    <div style="display: flex; gap: 10px; margin-top: 8px;">
+      <button id="btn-auth-submit" style="flex: 1; background: #e67e22; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;">解鎖進入</button>
+      <a href="/" style="flex: 1; background: #f1f5f9; color: #475569; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; display: inline-block;">返回首頁</a>
+    </div>
+  </div>
+</div>
+
 <div class="detail-container">
   <div class="form-container">
     <h3 id="form-title">✨ 發布新動態</h3>
@@ -144,27 +156,26 @@ export const prerender = false;
       <input type="hidden" id="post-image-url" /> 
 
       <div class="form-group">
-<div class="form-group">
-  <input 
-    type="text" 
-    id="post-name" 
-    value="Weilin" 
-    placeholder="署名" 
-    required 
-  />
-</div>      </div>
+        <input 
+          type="text" 
+          id="post-name" 
+          value="Weilin" 
+          placeholder="署名" 
+          required 
+        />
+      </div>
       
       <div class="form-group">
         <textarea id="post-content" rows="4" placeholder="內文" required></textarea>
       </div>
-       <div class="form-group">
+      <div class="form-group">
          <input 
-         type="text" 
-        id="post-hashtag" 
-        value="posts" 
-        placeholder="hashtag" 
-        required 
-      />
+          type="text" 
+          id="post-hashtag" 
+          value="posts" 
+          placeholder="hashtag" 
+          required 
+        />
       </div>
       <div class="form-group">
         <label style="font-weight: 600; color: #4a5568; font-size: 0.95rem; display: block; margin-bottom: 8px;">分享圖片（選填）</label>
@@ -195,6 +206,13 @@ export const prerender = false;
   const API_BASE_URL = 'https://words7000.onrender.com';
   const IMGBB_API_KEY = '54770dda83053262ce876d71a4c807f8'; 
 
+
+
+  const authModal = document.getElementById('auth-modal') as HTMLElement | null;
+  const adminPassInput = document.getElementById('admin-pass-input') as HTMLInputElement | null;
+  const authErrorMsg = document.getElementById('auth-error-msg') as HTMLElement | null;
+  const btnAuthSubmit = document.getElementById('btn-auth-submit') as HTMLButtonElement | null;
+
   const postForm = document.getElementById('post-form') as HTMLFormElement | null;
   const postsListContainer = document.getElementById('posts-management-list') as HTMLElement | null;
   const formTitle = document.getElementById('form-title') as HTMLElement | null;
@@ -212,6 +230,62 @@ export const prerender = false;
   const btnRemoveImg = document.getElementById('btn-remove-img') as HTMLButtonElement | null;
 
   let isEditing = false;
+
+  // 🔐 驗證邏輯：使用 Modal 代替 Prompt
+// 🚀 1. 進入頁面時檢查本地是否有憑證 (Token)
+  async function checkAuth() {
+    const userToken = localStorage.getItem("admin_key");
+    
+    if (!userToken) {
+      if (authModal) authModal.style.display = 'flex';
+      if (adminPassInput) adminPassInput.focus();
+      return;
+    }
+
+    // 選擇性：你可以透過一個後端 API 驗證這個 token 是否有效
+    // 如果 token 存在，先暫時放行，讓後端 API 的 Authorization 去把關
+    if (authModal) authModal.style.display = 'none';
+    fetchPosts();
+  }
+
+  // 🔐 2. 點擊解鎖時，把密碼送到後端 API 驗證
+  if (btnAuthSubmit && adminPassInput) {
+    btnAuthSubmit.addEventListener('click', async () => {
+      const inputVal = adminPassInput.value;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: inputVal })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // 後端驗證成功，儲存後端發回的加密 Token 或憑證
+          localStorage.setItem("admin_key", data.token || "authenticated");
+          document.cookie = "admin_session=valid_session_token; path=/; max-age=86400";
+
+          if (authModal) authModal.style.display = 'none';
+          if (authErrorMsg) authErrorMsg.style.display = 'none';
+          fetchPosts();
+        } else {
+          if (authErrorMsg) authErrorMsg.style.display = 'block';
+          adminPassInput.value = '';
+        }
+      } catch (err) {
+        alert("無法連線至伺服器驗證密碼");
+      }
+    });
+
+    adminPassInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        btnAuthSubmit.click();
+      }
+    });
+  }
+
   if (fileInput) {
     fileInput.addEventListener('change', async (e) => {
       const target = e.target as HTMLInputElement;
@@ -239,11 +313,11 @@ export const prerender = false;
           if (formPreviewImg) formPreviewImg.src = uploadedUrl;
           if (previewContainer) previewContainer.style.display = 'block';
         } else {
-          alert('圖片上傳失敗，請確認你的 ImgBB API Key 是否填寫正確');
+          alert('圖片上傳失敗');
           if (uploadStatus) uploadStatus.innerText = '上傳失敗';
         }
       } catch (err) {
-        alert('上傳至 ImgBB 時發生連線錯誤');
+        alert('上傳時發生連線錯誤');
         if (uploadStatus) uploadStatus.innerText = '連線錯誤';
       }
     });
@@ -285,7 +359,6 @@ export const prerender = false;
                 ${imgHtml}
                 <div class="post-summary" style="white-space: pre-wrap;">${post.content}</div>
                 <span class="hash-tag"># ${post.hashtag || "posts" } </span>
-
               </div>
               <div class="card-action-zone">
                 <button class="btn-action btn-edit" onclick="window.startEdit('${post.id}', '${encodeURIComponent(post.name)}', '${encodeURIComponent(post.content)}', '${post.image || ''}')">修改</button>
@@ -312,8 +385,6 @@ export const prerender = false;
       const image = imageUrlInput.value; 
       const id = editIdInput.value;
       const hashtag = hashtagInput.value; 
-
-      // 💡 取得已存入 localStorage 的管理員密碼
       const adminKey = localStorage.getItem("admin_key") || "";
 
       try {
@@ -323,7 +394,7 @@ export const prerender = false;
             method: 'PUT',
             headers: { 
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${adminKey}` // 💡 加入授權 Header
+              'Authorization': `Bearer ${adminKey}`
             },
             body: JSON.stringify({ name, content, image, hashtag })
           });
@@ -332,7 +403,7 @@ export const prerender = false;
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${adminKey}` // 💡 加入授權 Header
+              'Authorization': `Bearer ${adminKey}`
             },
             body: JSON.stringify({ name, content, image, hashtag })
           });
@@ -344,10 +415,10 @@ export const prerender = false;
           resetForm();
           fetchPosts();
         } else {
-          alert('操作失敗: ' + (data.error || '未授權，請確認密碼是否正確'));
+          alert('操作失敗: ' + (data.error || '未授權'));
           if(data.error === '未授權操作，拒絕存取！') {
             localStorage.removeItem("admin_key");
-            location.reload(); // 若密碼錯誤/過期則強制重整要求重新輸入
+            location.reload();
           }
         }
       } catch (err) {
@@ -382,15 +453,13 @@ export const prerender = false;
 
   (window as any).deletePost = async (id: string) => {
     if (!confirm(`確定要刪除編號 #${id} 的貼文嗎？`)) return;
-    
-    // 💡 取得已存入 localStorage 的管理員密碼
     const adminKey = localStorage.getItem("admin_key") || "";
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/post/${id}`, { 
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${adminKey}` // 💡 加入授權 Header
+          'Authorization': `Bearer ${adminKey}`
         }
       });
       const data = await res.json();
@@ -399,7 +468,7 @@ export const prerender = false;
         if (isEditing && editIdInput?.value === id) resetForm();
         fetchPosts();
       } else {
-        alert('刪除失敗: ' + (data.error || '未授權，請確認密碼是否正確'));
+        alert('刪除失敗: ' + (data.error || '未授權'));
       }
     } catch (err) {
       alert('連線失敗，無法刪除');
@@ -421,24 +490,6 @@ export const prerender = false;
 
   if (btnCancelEdit) btnCancelEdit.addEventListener('click', resetForm);
 
-  // 💡 這裡的 SECRET_KEY 必須與你後端 .env 裡面設定的 ADMIN_SECRET 一模一樣！
-  // 假設後端設定的密碼為 "admin"，那就維持不變；如果後端改成了 "mySuperAdminPass123"，這裡也要改！
-  const SECRET_KEY = "admin"; 
-
-  function checkAuth() {
-    let userKey = localStorage.getItem("admin_key");
-    if (userKey !== SECRET_KEY) {
-      userKey = prompt("請輸入管理員密碼：");
-      if (userKey === SECRET_KEY) {
-        localStorage.setItem("admin_key", userKey);
-      } else {
-        alert("密碼錯誤，拒絕存取！");
-        window.location.href = "/"; // 密碼錯誤退回首頁
-      }
-    }
-  }
-
-  // 進入頁面立即執行檢查
+  // 🚀 執行驗證檢查
   checkAuth();
-  fetchPosts();
 </script>
