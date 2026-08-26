@@ -196,7 +196,6 @@ export const prerender = false;
 
 <script>
   const API_BASE_URL = 'https://words7000.onrender.com';
-  const IMGBB_API_KEY = '54770dda83053262ce876d71a4c807f8'; 
 
   const authModal = document.getElementById('auth-modal') as HTMLElement | null;
   const adminPassInput = document.getElementById('admin-pass-input') as HTMLInputElement | null;
@@ -280,7 +279,6 @@ export const prerender = false;
 
         if (data.success) {
           localStorage.setItem("admin_key", data.token || "authenticated");
-          document.cookie = "admin_session=valid_session_token; path=/; max-age=86400";
 
           if (authModal) authModal.style.display = 'none';
           if (authErrorMsg) authErrorMsg.style.display = 'none';
@@ -304,43 +302,47 @@ export const prerender = false;
     });
   }
 
-  if (fileInput) {
-    fileInput.addEventListener('change', async (e) => {
-      const target = e.target as HTMLInputElement;
-      if (!target.files || target.files.length === 0) return;
+ if (fileInput) {
+  fileInput.addEventListener('change', async (e) => {
+    const target = e.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
 
-      const file = target.files[0];
-      if (uploadStatus) uploadStatus.innerText = '正在上傳圖片至 ImgBB... ⏳';
+    const file = target.files[0];
+    if (uploadStatus) uploadStatus.innerText = '正在上傳圖片... ⏳';
 
-      const formData = new FormData();
-      formData.append('image', file);
+    const formData = new FormData();
+    formData.append('image', file);
 
-      try {
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-          method: 'POST',
-          body: formData
-        });
+    const adminKey = localStorage.getItem("admin_key") || "";
 
-        const result = await response.json();
-        
-        if (result.success && result.data && result.data.url) {
-          const uploadedUrl = result.data.url; 
-          
-          if (imageUrlInput) imageUrlInput.value = uploadedUrl;
-          if (uploadStatus) uploadStatus.innerText = '圖片上傳成功！';
-          if (formPreviewImg) formPreviewImg.src = uploadedUrl;
-          if (previewContainer) previewContainer.style.display = 'block';
-        } else {
-          alert('圖片上傳失敗');
-          if (uploadStatus) uploadStatus.innerText = '上傳失敗';
-        }
-      } catch (err) {
-        alert('上傳時發生連線錯誤');
-        if (uploadStatus) uploadStatus.innerText = '連線錯誤';
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/upload-image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${adminKey}`
+        },
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.url) {
+        const uploadedUrl = result.url;
+
+        if (imageUrlInput) imageUrlInput.value = uploadedUrl;
+        if (uploadStatus) uploadStatus.innerText = '圖片上傳成功！';
+        if (formPreviewImg) formPreviewImg.src = uploadedUrl;
+        if (previewContainer) previewContainer.style.display = 'block';
+      } else {
+        alert('圖片上傳失敗');
+        if (uploadStatus) uploadStatus.innerText = '上傳失敗';
       }
-    });
-  }
-
+    } catch (err) {
+      alert('上傳時發生連線錯誤');
+      if (uploadStatus) uploadStatus.innerText = '連線錯誤';
+    }
+  });
+}
   if (btnRemoveImg) {
     btnRemoveImg.addEventListener('click', () => {
       if (imageUrlInput) imageUrlInput.value = '';
