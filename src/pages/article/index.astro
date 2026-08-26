@@ -4,14 +4,11 @@ import MainLayout from '../../layout/mainlayout.astro';
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 
-// 👑 動態獲取所有內容集合文章
 const allArticles = await getCollection('article');
 
-// 2. 👑 加入自訂排序：按照 Frontmatter 中的 date 字串進行倒序排列（新到舊）
 allArticles.sort((a, b) => {
   const dateA = a.data.date || '';
   const dateB = b.data.date || '';
-  // 倒序排列：最新的排在前面
   return dateB.localeCompare(dateA);
 });
 ---
@@ -57,7 +54,7 @@ allArticles.sort((a, b) => {
 </MainLayout>
 
 <style is:global>
-  /* ================= 🌸 核心佈局與視覺語彙 ================= */
+ 
   .science-archive-container {
     max-width: 850px; 
     margin: 40px auto; 
@@ -84,7 +81,6 @@ allArticles.sort((a, b) => {
     display: block;
   }
 
-  /* 🎯 文章卡片主體 */
   .custom-science-card {
     display: flex;
     justify-content: space-between;
@@ -103,7 +99,6 @@ allArticles.sort((a, b) => {
     border-color: #e2ded9;
   }
 
-  /* 📝 左側內容排版 */
   .card-left-content {
     flex: 1;
     padding: 24px;
@@ -122,7 +117,7 @@ allArticles.sort((a, b) => {
   .orange-bar {
     width: 4px;
     height: 24px;
-    background-color: #ff7a00; /* 經典經典橘條 */
+    background-color: #ff7a00;
     border-radius: 2px;
     flex-shrink: 0;
     margin-top: 4px;
@@ -136,7 +131,6 @@ allArticles.sort((a, b) => {
     line-height: 1.4;
   }
 
-  /* 🏷️ 標籤與 Meta 樣式 */
   .meta-wrapper {
     display: flex;
     gap: 10px;
@@ -165,35 +159,31 @@ allArticles.sort((a, b) => {
     line-height: 1.5;
   }
 
-  /* 👑 右側箭頭貨真價實的極簡美學 */
   .card-right-arrow {
     width: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #faf9f6; /* 溫和的淺灰底色 */
+    background: #fe9f73; 
     border-left: 1px solid #fcfbfa;
     transition: all 0.3s ease;
     flex-shrink: 0;
   }
 
-  /* 懸停時，右側箭頭區塊背景優雅轉橘 */
   .custom-science-card:hover .card-right-arrow {
     background: #ff7a00;
   }
 
-  /* 箭頭骨架 */
   .arrow-shape {
     display: block;
     width: 10px;
     height: 10px;
-    border-top: 2.5px solid #b5b5b5;
-    border-right: 2.5px solid #b5b5b5;
+    border-top: 2.5px solid #1c1a1a;
+    border-right: 2.5px solid #1c1a1a;
     transform: rotate(45deg);
     transition: all 0.3s ease;
   }
 
-  /* 懸停時，箭頭變白並向右微彈動 */
   .custom-science-card:hover .arrow-shape {
     border-color: #ffffff;
     transform: rotate(45deg) translate(2px, -2px);

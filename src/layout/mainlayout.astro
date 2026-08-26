@@ -10,15 +10,12 @@ const { title = "weilinlai的網站" } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <link rel="icon" href="/images/circle-crop.png" type="image/x-icon"  /> 
-    
 </head>
 <body>
     <Header />
-
     <main class="main-container">
         <slot />
-    </main>
-    
+    </main>  
     <Footer />
 </body>
 </html>
@@ -29,7 +26,6 @@ const { title = "weilinlai的網站" } = Astro.props;
         margin: 0;
         padding: 0;
     }
-
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background-color: #f4f6f9;
@@ -38,7 +34,6 @@ const { title = "weilinlai的網站" } = Astro.props;
         flex-direction: column;
         min-height: 100vh;
     }
-
     .main-container {
         flex: 1;
         width: 100%;

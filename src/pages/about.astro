@@ -64,7 +64,6 @@ import MainLayout from '../layout/mainlayout.astro';
 </MainLayout>
 
 <style>
-    /* 頁面主外殼排版 */
     .about-page-wrapper {
         max-width: 680px;
         margin: 4rem auto;
@@ -75,7 +74,6 @@ import MainLayout from '../layout/mainlayout.astro';
         text-align: center;
     }
 
-   /* 1. 外層容器：負責 Hover 放大效果 */
     .avatar-flip-card {
         width: 110px;
         height: 110px;
@@ -83,7 +81,6 @@ import MainLayout from '../layout/mainlayout.astro';
         cursor: pointer;
         user-select: none;
         margin-bottom: 2rem;
-        /* 滑鼠懸停時微幅放大外層 */
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -91,7 +88,6 @@ import MainLayout from '../layout/mainlayout.astro';
         transform: scale(1.08);
     }
 
-    /* 2. 內層旋轉容器：負責點擊 3D 翻牌效果 */
     .avatar-flip-inner {
         position: relative;
         width: 100%;
@@ -102,12 +98,10 @@ import MainLayout from '../layout/mainlayout.astro';
         -webkit-transform-style: preserve-3d;
     }
 
-    /* 當點擊加上 .flipped 類別時才旋轉 180 度 */
     .avatar-flip-card.flipped .avatar-flip-inner {
         transform: rotateY(180deg);
     }
 
-    /* 3. 正反面頭像基礎設定 */
     .about-avatar {
         position: absolute;
         top: 0;
@@ -120,7 +114,6 @@ import MainLayout from '../layout/mainlayout.astro';
         opacity: 1 !important;
         visibility: visible !important;
         
-        /* 嚴格隱藏背面與啟動 GPU 加速 */
         -webkit-backface-visibility: hidden !important;
         backface-visibility: hidden !important;
         
@@ -128,23 +121,19 @@ import MainLayout from '../layout/mainlayout.astro';
         transition: box-shadow 0.4s ease;
     }
 
-    /* 正面 (預設 0 度) */
     .avatar-front {
         z-index: 2;
         transform: rotateY(0deg) translateZ(1px);
     }
 
-    /* 反面 (預設 180 度) */
     .avatar-back {
         transform: rotateY(180deg) translateZ(1px);
     }
 
-    /* Hover 時順便提升陰影感 */
     .avatar-flip-card:hover .about-avatar {
         box-shadow: 0 8px 20px var(--shadow-color1, rgba(0, 0, 0, 0.1));
     }
 
-    /* 文字設定 */
     .author-name {
         font-size: 1.8rem;
         font-weight: 600;
@@ -169,7 +158,6 @@ import MainLayout from '../layout/mainlayout.astro';
         margin-bottom: 0.5rem;
     }
 
-    /* 社群按鈕外層容器 */
     .about-social-networks {
         display: flex;
         justify-content: center;
@@ -181,7 +169,6 @@ import MainLayout from '../layout/mainlayout.astro';
         margin-top: 1rem;
     }
 
-    /* 卡片式按鈕 */
     .social-button-card {
         text-decoration: none;
         display: inline-flex;
@@ -243,7 +230,6 @@ import MainLayout from '../layout/mainlayout.astro';
         color: var(--text-color, #171717);
     }
     
-    /* 📱 專屬手機版排版修復 */
     @media (max-width: 768px) {
         header, .navbar {
             position: relative;
@@ -283,18 +269,15 @@ import MainLayout from '../layout/mainlayout.astro';
 </style>
 
 <script>
-    // 💡 頭像翻牌初始化事件
     function setupAvatarFlip() {
         const flipCard = document.getElementById('avatar-flip-card');
         if (flipCard) {
-            // 避免重複綁定 listener
             flipCard.onclick = () => {
                 flipCard.classList.toggle('flipped');
             };
         }
     }
 
-    // 複製 Discord ID 功能 [cite: 39]
     function setupDiscordCopy() {
         const discordBtn = document.querySelector('.discord-copy-btn') as HTMLButtonElement | null;
         const discordText = document.querySelector('.discord-text') as HTMLSpanElement | null;
@@ -326,7 +309,6 @@ import MainLayout from '../layout/mainlayout.astro';
         setupDiscordCopy();
     }
 
-    // 初始化綁定
     initPageScripts();
     document.addEventListener('DOMContentLoaded', initPageScripts);
     document.addEventListener('astro:page-load', initPageScripts);

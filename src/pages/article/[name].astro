@@ -26,7 +26,6 @@ const { title, date, subject } = entry.data;
           {subject && <span class="meta-pill">{subject}</span>}
         </div>
       </header>
-      <!-- 乾淨的內容容器 -->
       <div class="md-content">
         <Content />
       </div>
@@ -125,8 +124,6 @@ const { title, date, subject } = entry.data;
 
 .md-content pre:hover .copy-btn { opacity: 1; }
 .copy-btn:hover { background-color: #f3f4f6; color: #24292e; }
-
-/* 成功複製時變綠色 */
 .copy-btn.copied {
   color: #1a7f37;
   border-color: #1a7f37;
@@ -134,10 +131,9 @@ const { title, date, subject } = entry.data;
 
 .md-content pre {
   position: relative;
-  padding-top: 36px; /* 留出頂部欄位空間，防止文字遮擋 */
+  padding-top: 36px;
 }
 
-/* 語言標籤 (左上角) */
 .code-lang {
   position: absolute;
   top: 8px;
@@ -156,7 +152,6 @@ const { title, date, subject } = entry.data;
 </style>
 <script>
 function getLanguage(pre: HTMLElement, code: HTMLElement | null): string {
-  // 1. 優先檢查常見的 HTML data 屬性 (如 Shiki / Astro / MDX)
   const dataLang = 
     code?.getAttribute('data-language') || 
     pre.getAttribute('data-language') ||
@@ -167,11 +162,9 @@ function getLanguage(pre: HTMLElement, code: HTMLElement | null): string {
     
   if (dataLang) return dataLang;
 
-  // 2. 檢查 Class (涵蓋 code, pre, 以及 parent div)
   const parentClass = pre.parentElement?.className || '';
   const combinedClass = `${parentClass} ${pre.className} ${code?.className || ''}`;
   
-  // 匹配 language-bash, lang-bash, highlight-source-bash 等
   const match = combinedClass.match(/(?:lang|language|highlight-source)-([\w-]+)/i);
   if (match) return match[1];
 
@@ -184,13 +177,12 @@ function initCodeBlocks() {
 
   document.querySelectorAll('.md-content pre').forEach((pre) => {
     const preEl = pre as HTMLElement;
-    if (preEl.querySelector('.copy-btn')) return; // 避免重複初始化
+    if (preEl.querySelector('.copy-btn')) return; 
 
     const codeEl = preEl.querySelector('code');
     const language = getLanguage(preEl, codeEl);
     const codeText = codeEl?.textContent || preEl.textContent || '';
 
-    // 1. 渲染語言名稱
     if (language) {
       const langTag = document.createElement('span');
       langTag.className = 'code-lang';
@@ -198,7 +190,6 @@ function initCodeBlocks() {
       preEl.appendChild(langTag);
     }
 
-    // 2. 渲染複製按鈕
     const button = document.createElement('button');
     button.className = 'copy-btn';
     button.ariaLabel = 'Copy code';

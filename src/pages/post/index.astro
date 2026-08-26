@@ -14,7 +14,6 @@ import MainLayout from '../../layout/mainlayout.astro';
 </MainLayout>
 
 <style is:global>
-  /* 基礎重設，防止與外層 Layout 衝突 */
   .board-container *, .board-container *::before, .board-container *::after {
     box-sizing: border-box;
   }
@@ -32,7 +31,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     font-weight: 700;
   }
 
-  /* 貼文列表外層 */
   .posts-list {
     display: flex;
     flex-direction: column;
@@ -46,7 +44,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     font-size: 1.05rem;
   }
 
-  /* 🌸 NixOS 網誌風卡片框框 */
   .post-card-link {
     text-decoration: none;
     color: inherit;
@@ -55,7 +52,7 @@ import MainLayout from '../../layout/mainlayout.astro';
 
   .post-card { 
     background: #ffffff; 
-    border-radius: 20px; /* 優雅的大圓角 */
+    border-radius: 20px; 
     box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06); 
     border: 1px solid #f0ede9; 
     display: flex; 
@@ -73,33 +70,28 @@ import MainLayout from '../../layout/mainlayout.astro';
     box-shadow: 0 12px 32px rgba(160, 140, 130, 0.12);
   }
 
-  /* 當卡片有圖片時，將內襯歸零讓圖片完美貼邊 */
   .post-card.has-image {
     padding: 0 0 0 32px; 
   }
 
-  /* 左側文字主體區 */
   .card-left {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 12px; 
-    min-width: 0; /* 防止文字爆開 */
+    min-width: 0;
   }
 
-  /* 當有圖片時，補回文字區的上下內襯 */
   .post-card.has-image .card-left {
     padding: 24px 24px 24px 0;
   }
 
-  /* 標題列：包含橘色立柱與發文者名字 */
   .title-wrapper {
     display: flex;
     align-items: center;
     gap: 10px;
   }
 
-  /* 左側經典橘色垂直小立柱 */
   .orange-bar {
     width: 4px;
     height: 22px;
@@ -116,7 +108,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     line-height: 1.2;
   }
 
-  /* 時間與 ID 小標籤列 */
   .meta-wrapper {
     display: flex;
     flex-wrap: wrap;
@@ -135,7 +126,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     font-weight: 500;
   }
 
-  /* 貼文內文 */
 .post-body {
   font-size: 1.05rem;
   color: #475569;
@@ -147,7 +137,6 @@ import MainLayout from '../../layout/mainlayout.astro';
   text-overflow: ellipsis;
 }
 
-  /* 底部標籤 */
   .tag-wrapper {
     display: flex;
   }
@@ -174,7 +163,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     display: block;
   }
 
-  /* ➡️ 右側獨立箭頭區塊 */
   .card-right-arrow {
     width: 46px;
     height: 90px; 
@@ -188,7 +176,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     transition: background-color 0.2s;
   }
 
-  /* 當有圖片時，讓右側箭頭絕對定位浮動在桌機版右側 */
   .post-card.has-image .card-right-arrow {
     position: absolute;
     right: 20px;
@@ -204,7 +191,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     background-color: #fbe6d4; 
   }
 
-  /* 純 CSS 繪製精緻箭頭 > */
   .arrow-shape {
     border: solid #b87333;
     border-width: 0 2.5px 2.5px 0;
@@ -213,9 +199,6 @@ import MainLayout from '../../layout/mainlayout.astro';
     transform: rotate(-45deg);
   }
 
-  /* =======================================================
-     📱 核心拯救：手機版 RWD 響應式佈局彈性調整 (螢幕寬度 768px 以下)
-     ======================================================= */
   @media (max-width: 768px) {
     .board-container {
       margin: 20px auto;
@@ -227,41 +210,34 @@ import MainLayout from '../../layout/mainlayout.astro';
       margin-bottom: 20px;
     }
 
-    /* 1. 當有圖片時，手機版強制轉為「上下堆疊」排版，絕不壓扁文字 */
     .post-card.has-image {
       flex-direction: column;
       align-items: stretch;
-      padding: 0 0 16px 0; /* 圖片塞滿上方，下方文字留白 */
+      padding: 0 0 16px 0; 
     }
 
-    /* 2. 有圖片時，下方文字主體的內襯間距修正 */
     .post-card.has-image .card-left {
       padding: 20px 20px 0 20px;
     }
-
-    /* 3. 圖片外殼在手機版變成完美的上方橫幅 (Banner) */
     .card-img-wrapper {
       width: 100% !important;
-      height: 180px; /* 給予固定高度，寬度隨螢幕自動伸展 */
-      order: -1; /* 透過 flex 屬性，魔法般的將圖片提到最上方展示 */
+      height: 180px; 
+      order: -1; 
     }
 
-    /* 4. 有圖片時的右側箭頭：移出絕對定位，轉為右下角精緻的圓形鈕 */
     .post-card.has-image .card-right-arrow {
       position: relative;
       right: auto;
       top: auto;
       transform: none;
-      margin: 12px 20px 0 auto; /* 自動推至右下角 */
-      width: 36px;
+      margin: 12px 20px 0 auto; 
       height: 36px;
-      border-radius: 50%; /* 變成漂亮的圓形小雷達 */
+      border-radius: 50%; 
       box-shadow: 0 2px 8px rgba(184, 115, 51, 0.1);
     }
     .post-card {
       height: auto; 
     }
-    /* 5. 無圖片時的純文字卡片箭頭稍微矮一點點，讓排版更精緻 */
     .card-right-arrow {
       height: 70px;
       margin-left: 12px;
@@ -279,18 +255,15 @@ import MainLayout from '../../layout/mainlayout.astro';
       const res = await fetch(`${API_BASE_URL}/api/posts`);
       const data = await res.json();
       
-      // 【核心修改】先篩選出有 id 的貼文，如果沒有資料就給空陣列
       const validPosts = data.success && data.posts 
         ? data.posts.filter((post: any) => post.id) 
         : [];
 
-      // 改用過濾後的 validPosts 來判斷與渲染
       if (validPosts.length > 0) {
         const reversedPosts = validPosts.reverse();
         postsContainer.innerHTML = reversedPosts.map((post: any) => {
           const dateStr = post.time;
 
-          // 檢查有無圖片
           const hasImg = !!post.image;
           const cardClass = hasImg ? 'post-card has-image' : 'post-card';
           const imgHtml = hasImg 
@@ -336,7 +309,6 @@ import MainLayout from '../../layout/mainlayout.astro';
           `;
         }).join('');
       } else {
-        // 如果原本有貼文，但過濾完後一則都不剩，也會正確顯示這個提示
         postsContainer.innerHTML = `<div class="loading-text">目前尚未有任何動態</div>`;
       }
     } catch (err) {

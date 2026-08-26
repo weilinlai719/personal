@@ -2,7 +2,6 @@
 // src/components/header.astro
 const pathname = Astro.url.pathname;
 
-// 判斷目前是否在該頁面
 const isAbout = pathname.includes('/about');
 const ispost = pathname.includes('/post');
 const isarticle = pathname.includes('/article');
@@ -63,9 +62,6 @@ const isarticle = pathname.includes('/article');
 </header>
 
 <style> 
-  /* =======================================================
-     ☀️ 桌機版核心樣式 (100% 繼承原版毛玻璃風格)
-     ======================================================= */
   .navbar {
     background: var(--header-bg, rgba(255, 255, 255, 0.65));
     backdrop-filter: blur(10px);
@@ -191,7 +187,6 @@ const isarticle = pathname.includes('/article');
     color: #171717;
   }
 
-  /* 📱 手機版漢堡按鈕核心結構 */
   .menu-toggle {
     display: none;
     flex-direction: column;
@@ -213,7 +208,6 @@ const isarticle = pathname.includes('/article');
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* 🍔 漢堡按鈕變形為精緻 X 效果 */
   .menu-toggle.is-active .hamburger-bar:nth-child(1) {
     transform: translateY(6.5px) rotate(45deg);
   }
@@ -226,7 +220,7 @@ const isarticle = pathname.includes('/article');
   }
 
   /* =======================================================
-     💻 電腦版媒體查詢 (min-width: 769px) 懸浮機制
+     💻 電腦版 (min-width: 769px)
      ======================================================= */
   @media screen and (min-width: 769px) {
     .dropdown {
@@ -255,14 +249,13 @@ const isarticle = pathname.includes('/article');
   }
 
   /* =======================================================
-     📱 手機版 RWD 自動適應升級 (max-width: 768px)
+     📱 手機版  (max-width: 768px)
      ======================================================= */
   @media screen and (max-width: 768px) {
     .menu-toggle {
       display: flex;
     }
 
-    /* 手機版導覽下拉抽屜選單面板 */
     .nav-menu {
       position: absolute;
       top: 4rem;
@@ -275,7 +268,6 @@ const isarticle = pathname.includes('/article');
       padding: 5px 20px 24px 20px;
       border-radius: 12px;
 
-      /* 預設隱藏 */
       display: none;
       flex-direction: column;
       z-index: 1500;
@@ -283,7 +275,6 @@ const isarticle = pathname.includes('/article');
       overflow-y: auto;
     }
 
-    /* 當漢堡點擊啟用時，強勢轉為顯現狀態 */
     .nav-menu.is-active {
       display: flex !important;
     }
@@ -302,7 +293,6 @@ const isarticle = pathname.includes('/article');
       font-size: 1.05rem;
     }
 
-    /* 手機版就地手風琴拉開摺疊 */
     .dropdown {
       display: flex;
       flex-direction: column;
@@ -321,7 +311,6 @@ const isarticle = pathname.includes('/article');
       margin-top: 6px;
       border-left: 2px solid #e5e7eb;
 
-      /* 手機預設收合 */
       display: none;
       flex-direction: column;
       gap: 6px;
@@ -344,7 +333,6 @@ const isarticle = pathname.includes('/article');
 </style>
 
 <script>
-  // 🔥 【核心修正】將點擊事件處理函數定義在全域範疇，徹底解決 removeEventListener 記憶體位址不一致造成的重疊 bug
   
   function toggleMobileMenu(e: Event) {
     e.stopPropagation();
@@ -356,7 +344,7 @@ const isarticle = pathname.includes('/article');
   }
 
   function handleDropdownToggle(e: Event) {
-    if (window.innerWidth > 768) return; // 桌機版回歸 CSS :hover 控管
+    if (window.innerWidth > 768) return; 
 
     e.preventDefault();
     e.stopPropagation();
@@ -368,7 +356,6 @@ const isarticle = pathname.includes('/article');
     if (currentContent) {
       const isCurrentlyActive = currentContent.classList.contains('is-active');
 
-      // 關閉其他無關的手機下拉清單
       document.querySelectorAll('.dropdown-content').forEach((c) => {
         if (c !== currentContent) c.classList.remove('is-active');
       });
@@ -376,7 +363,6 @@ const isarticle = pathname.includes('/article');
         if (t !== currentTrigger) t.classList.remove('is-active');
       });
 
-      // 切換當前狀態
       if (isCurrentlyActive) {
         currentContent.classList.remove('is-active');
         currentTrigger.classList.remove('is-active');
@@ -389,7 +375,6 @@ const isarticle = pathname.includes('/article');
 
   function closeAllMenusSafely(e: MouseEvent) {
     const target = e.target as HTMLElement;
-    // 如果使用者點擊的地方不在選單容器內部，全面自動收合
     if (!target.closest('.nav-container')) {
       document.getElementById('menuToggle')?.classList.remove('is-active');
       document.getElementById('navMenu')?.classList.remove('is-active');
@@ -398,29 +383,24 @@ const isarticle = pathname.includes('/article');
     }
   }
 
-  // 系統集成初始化機制
   function initNavigationSystem() {
     const menuToggle = document.getElementById('menuToggle');
     const dropdownTriggers = document.querySelectorAll('.dropdown-trigger');
 
-    // 1. 強固漢堡按鈕監聽 (先清除防重疊，再掛載)
     if (menuToggle) {
       menuToggle.removeEventListener('click', toggleMobileMenu);
       menuToggle.addEventListener('click', toggleMobileMenu);
     }
 
-    // 2. 強固下拉按鈕監聽
     dropdownTriggers.forEach((trigger) => {
       trigger.removeEventListener('click', handleDropdownToggle);
       trigger.addEventListener('click', handleDropdownToggle);
     });
 
-    // 3. 空白處關閉機制
     document.removeEventListener('click', closeAllMenusSafely);
     document.addEventListener('click', closeAllMenusSafely);
   }
 
-  // 自動因應視窗大小調整清理殘留樣式
   window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
       document.getElementById('menuToggle')?.classList.remove('is-active');
@@ -430,7 +410,6 @@ const isarticle = pathname.includes('/article');
     }
   });
 
-  // 完全適應 Astro 客戶端動態加載生命週期
   initNavigationSystem();
   document.addEventListener('astro:page-load', initNavigationSystem);
 </script>

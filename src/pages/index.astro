@@ -4,28 +4,341 @@ import MainLayout from '../layout/mainlayout.astro';
 ---
 
 <MainLayout title="Weilin Lai - 首頁">
-    <div class="hero-box">
-        <h1>Welcome!</h1>
-        <p>點擊上方選單開始探索</p>
+    <div class="home">
+        <div class="particles" aria-hidden="true"></div>
+
+        <section class="hero-box">
+            <div class="hero-content">
+                <span class="eyebrow">weilinlai</span>
+                                <div class="magnetic-group">
+                    <h1 class="title-text">Welcome!</h1>
+                    <div class="game-message" aria-hidden="true"></div>
+                </div>
+
+                <button class="explore" type="button" aria-label="開始探索網站">
+                    <span>點擊上方選單開始探索</span>
+                    <span class="arrow" aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
     </div>
 </MainLayout>
 
+<script>
+    const home = document.querySelector<HTMLElement>('.home');
+    const heroBox = document.querySelector<HTMLElement>('.hero-box');
+    const magneticGroup = document.querySelector<HTMLElement>('.magnetic-group');
+    const titleText = document.querySelector<HTMLElement>('.title-text');
+    const gameMsg = document.querySelector<HTMLElement>('.game-message');
+    const particles = document.querySelector<HTMLElement>('.particles');
+    const explore = document.querySelector<HTMLButtonElement>('.explore');
+
+    if (home && heroBox && magneticGroup && titleText && particles && explore && gameMsg) {
+        const createFloatingParticle = () => {
+            const particle = document.createElement('span');
+            particle.className = 'particle';
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * -10}s`;
+            particle.style.animationDuration = `${8 + Math.random() * 10}s`;
+            particle.style.setProperty('--drift', `${-20 + Math.random() * 40}px`);
+            particles.appendChild(particle);
+        };
+
+        for (let i = 0; i < 30; i++) {
+            createFloatingParticle();
+        }
+
+        let raf = 0;
+        let pointerX = window.innerWidth / 2;
+        let pointerY = window.innerHeight / 2;
+
+        let lastMouseX = pointerX;
+        let lastMouseY = pointerY;
+        let isFirstMove = true; 
+
+        const createTrailSegment = (startX: number, startY: number, endX: number, endY: number) => {
+            const dx = endX - startX;
+            const dy = endY - startY;
+            const distance = Math.hypot(dx, dy);
+
+            if (distance < 1) return;
+
+            const angle = Math.atan2(dy, dx);
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+
+            trail.style.left = `${startX}px`;
+            trail.style.top = `${startY}px`;
+            trail.style.width = `${distance}px`;
+            trail.style.transform = `rotate(${angle}rad)`;
+
+            document.body.appendChild(trail);
+
+            setTimeout(() => {
+                trail.remove();
+            }, 1000);
+        };
+
+        const update = () => {
+            raf = 0;
+            const rect = home.getBoundingClientRect();
+            const mouseX = pointerX - rect.left;
+            const mouseY = pointerY - rect.top;
+
+            home.style.setProperty('--mouse-x', `${mouseX}px`);
+            home.style.setProperty('--mouse-y', `${mouseY}px`);
+
+            if (isFirstMove) {
+                lastMouseX = pointerX;
+                lastMouseY = pointerY;
+                isFirstMove = false;
+            }
+            createTrailSegment(lastMouseX, lastMouseY, pointerX, pointerY);
+            lastMouseX = pointerX;
+            lastMouseY = pointerY;
+
+            const groupRect = magneticGroup.getBoundingClientRect();
+            const centerX = groupRect.left + groupRect.width / 2;
+            const centerY = groupRect.top + groupRect.height / 2;
+            const distanceX = pointerX - centerX;
+            const distanceY = pointerY - centerY;
+            const distance = Math.hypot(distanceX, distanceY);
+
+            if (distance < 280) {
+                const strength = (1 - distance / 280) * 10;
+                magneticGroup.style.transform = `translate(${distanceX / 280 * strength}px, ${distanceY / 280 * strength}px)`;
+            } else {
+                magneticGroup.style.transform = 'translate(0, 0)';
+            }
+
+            const centerXAxis = window.innerWidth / 2;
+            const centerYAxis = window.innerHeight / 2;
+            const tiltX = (pointerX - centerXAxis) / centerXAxis;
+            const tiltY = (pointerY - centerYAxis) / centerYAxis;
+
+            particles.style.transform = `translate(${tiltX * -40}px, ${tiltY * -40}px)`;
+            heroBox.style.transform = `rotateY(${tiltX * 6}deg) rotateX(${-tiltY * 6}deg)`;
+        };
+
+        window.addEventListener('pointermove', (event) => {
+            pointerX = event.clientX;
+            pointerY = event.clientY;
+            if (!raf) raf = requestAnimationFrame(update);
+        }, { passive: true });
+
+        explore.addEventListener('click', () => {
+            explore.classList.add('clicked');
+            setTimeout(() => explore.classList.remove('clicked'), 500);
+        });
+
+        let gameState = 0; 
+
+        magneticGroup.addEventListener('mouseenter', () => {
+            if (gameState === 0) {
+                gameMsg.textContent = "↓ Don't catch me :)";
+                gameMsg.style.opacity = '1';
+                gameMsg.style.transform = 'translate(-50%, 0)';
+            }
+        });
+
+        magneticGroup.addEventListener('mouseleave', () => {
+            if (gameState === 0) {
+                gameMsg.style.opacity = '0';
+                gameMsg.style.transform = 'translate(-50%, -10px)';
+            }
+        });
+
+        magneticGroup.addEventListener('click', () => {
+            titleText.style.transform = 'scale(0.9)';
+            setTimeout(() => titleText.style.transform = 'scale(1)', 150);
+
+            if (gameState === 0) {
+                gameState = 1;
+                gameMsg.textContent = "You found me.";
+                gameMsg.style.opacity = '1';
+                gameMsg.style.transform = 'translate(-50%, 0)';
+                gameMsg.style.color = '#00d2ff'; 
+            } else if (gameState === 1) {
+                gameState = 2;
+                gameMsg.textContent = "Okay, that's enough :)";
+                gameMsg.style.color = '#ff007f';
+            } else if (gameState === 2) {
+                gameState = 0;
+                gameMsg.style.opacity = '0';
+                gameMsg.style.transform = 'translate(-50%, -10px)';
+                setTimeout(() => {
+                    gameMsg.style.color = 'var(--secondary-text-color, #888)';
+                }, 300);
+            }
+        });
+    }
+</script>
+
 <style>
+    .home {
+        --mouse-x: 50%;
+        --mouse-y: 35%;
+        position: relative;
+        min-height: calc(100vh - 80px);
+        overflow: hidden;
+        isolation: isolate;
+        background: radial-gradient(
+            420px circle at var(--mouse-x) var(--mouse-y),
+            rgba(255, 255, 255, 0.72),
+            transparent 68%
+        );
+        perspective: 1000px; 
+    }
+
     .hero-box {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 80px);
+        padding: 2rem;
+        text-align: center;
+        transform-style: preserve-3d;
+        will-change: transform;
+        transition: transform 0.1s ease-out;
+    }
+
+    .hero-content {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        min-height: 40vh;
-        text-align: center;
+        transform: translateY(-3vh);
+        animation: hero-in 900ms cubic-bezier(.22, 1, .36, 1) both;
     }
-    h1 { 
-        font-size: 2rem; 
-        font-weight: 600; 
-        margin-bottom: 1rem; 
-        color: var(--text-color); 
+
+    .eyebrow {
+        margin-bottom: 0.85rem;
+        color: var(--secondary-text-color, #888);
+        font-size: 0.72rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        opacity: 0.55;
     }
-    p { 
-        color: var(--secondary-text-color); 
+
+    .magnetic-group {
+        position: relative;
+        display: inline-block;
+        will-change: transform;
+        transition: transform 150ms ease-out;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    h1.title-text {
+        margin: 0;
+        color: var(--text-color, #222);
+        font-size: clamp(2.2rem, 5vw, 3.2rem);
+        font-weight: 600;
+        letter-spacing: -0.035em;
+        transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .game-message {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translate(-50%, -10px);
+        margin-top: 5px;
+        font-size: 0.95rem;
+        color: var(--secondary-text-color, #888);
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+    }
+
+    .explore {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        padding: 0.45rem 0;
+        border: 0;
+        border-bottom: 1px solid transparent;
+        background: transparent;
+        color: var(--secondary-text-color, #666);
+        font: inherit;
+        cursor: pointer;
+        transition: color 220ms ease, border-color 220ms ease, gap 220ms ease;
+    }
+
+    .explore .arrow { display: inline-block; transition: transform 220ms ease; }
+    .explore:hover { color: var(--text-color, #222); border-color: currentColor; gap: 0.75rem; }
+    .explore:hover .arrow { transform: translateX(4px); }
+    .explore.clicked .arrow { transform: translateX(9px); }
+
+    .particles {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        will-change: transform;
+        transition: transform 0.1s ease-out;
+    }
+
+    :global(.particle) {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: var(--text-color, #333333);
+        opacity: 0.25;
+        pointer-events: none;
+        animation: float 9s ease-in-out infinite;
+    }
+
+    :global(.cursor-trail) {
+        position: fixed; 
+        transform-origin: left center; 
+        pointer-events: none;
+        z-index: 9999; 
+        border-radius: 10px; 
+        animation: trail-shrink 1s forwards cubic-bezier(0.1, 0.9, 0.2, 1);
+    }
+
+    @keyframes trail-shrink {
+        0% {
+            opacity: 0.55;
+            height: 8px; 
+            margin-top: -4px; 
+            background-color: #00d2ff; 
+        }
+        100% {
+            opacity: 0;
+            height: 0px; 
+            margin-top: 0px; 
+            background-color: #ff007f; 
+        }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translate3d(0, 0, 0); }
+        50% { transform: translate3d(var(--drift), -30px, 0); }
+    }
+
+    @keyframes hero-in {
+        from { opacity: 0; transform: translateY(calc(-3vh + 14px)); }
+        to { opacity: 1; transform: translateY(-3vh); }
+    }
+
+    @media (max-width: 600px) {
+        .home, .hero-box { min-height: calc(100vh - 64px); }
+        .hero-content { transform: translateY(-5vh); }
+        h1.title-text { font-size: 2.35rem; }
+        .explore { font-size: 0.9rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hero-content, .hero-box, .particles { animation: none; transform: none !important; transition: none; }
+        :global(.particle), :global(.cursor-trail) { display: none; }
+        h1.title-text, .explore .arrow { transition: none; }
     }
 </style>
