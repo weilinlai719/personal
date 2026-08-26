@@ -243,10 +243,28 @@ export const prerender = false;
       if (adminPassInput) adminPassInput.focus();
       return;
     }
-    if (authModal) authModal.style.display = 'none';
-    fetchPosts();
-  }
 
+    // 💡 發送請求給後端驗證 token 是否依然有效
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/verify`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${userToken}`
+        }
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        if (authModal) authModal.style.display = 'none';
+        fetchPosts();
+      } else {
+        // 💡 Token 在試算表中已被刪除或過期
+        showAuthModal('Token 已失效，請重新登入');
+      }
+    } catch (err) {
+      showAuthModal('驗證失敗，請重新登入');
+    }
+  }
   if (btnAuthSubmit && adminPassInput) {
     btnAuthSubmit.addEventListener('click', async () => {
       const inputVal = adminPassInput.value;
