@@ -1,14 +1,11 @@
 ---
-// src/pages/personal/post/edit.astro
 import MainLayout from '../../layout/mainlayout.astro';
 export const prerender = false;
 ---
 
 <style is:global>
-  /* ================= 🌸 核心視覺與外觀優化 ================= */
   h2 { color: #2c3e50; font-size: 1.5rem; margin-top: 35px; margin-bottom: 20px; font-weight: 700; }
   
-  /* 📝 表單容器外觀 */
   .form-container {
     background: #ffffff;
     border-radius: 16px;
@@ -22,13 +19,11 @@ export const prerender = false;
   .form-container h3 { margin-top: 0; margin-bottom: 24px; color: #2c3e50; font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
   .form-group { margin-bottom: 20px; }
   
-  /* 🎯 填入框與文字域 */
   input[type="text"], input[type="password"], textarea { 
     width: 100%; padding: 14px 18px; border: 1px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; background-color: #fff; transition: all 0.3s ease; font-size: 1rem; color: #333;
   }
   input:focus, textarea:focus { border-color: #e67e22; box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1); outline: none; }
   
-  /* 📁 上傳按鈕與預覽區 */
   .file-upload-wrapper { display: flex; align-items: center; gap: 15px; margin-top: 8px; }
   .btn-file-select { background-color: #fdf5ee; color: #d35400; border: 1px dashed #e67e22; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
   .btn-file-select:hover { background-color: #fae8d8; }
@@ -37,13 +32,11 @@ export const prerender = false;
   .preview-img { max-height: 160px; border-radius: 12px; border: 1px solid #e2e8f0; object-fit: cover; }
   .btn-remove-preview { position: absolute; top: -10px; right: -10px; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
 
-  /* 按鈕控制區 */
   .btn-submit { background: #e67e22; color: white; border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: background 0.2s; }
   .btn-submit:hover { background: #d35400; }
   .btn-cancel { background: #a0aec0; color: white; border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1rem; margin-left: 10px; transition: background 0.2s; }
   .btn-cancel:hover { background: #718096; }
 
-  /* ================= 🌸 簡潔方格貼文卡片樣式 ================= */
   #posts-management-list {
     display: flex;
     flex-direction: column;
@@ -205,8 +198,6 @@ export const prerender = false;
   const API_BASE_URL = 'https://words7000.onrender.com';
   const IMGBB_API_KEY = '54770dda83053262ce876d71a4c807f8'; 
 
-
-
   const authModal = document.getElementById('auth-modal') as HTMLElement | null;
   const adminPassInput = document.getElementById('admin-pass-input') as HTMLInputElement | null;
   const authErrorMsg = document.getElementById('auth-error-msg') as HTMLElement | null;
@@ -230,10 +221,24 @@ export const prerender = false;
 
   let isEditing = false;
 
+  function showAuthModal(errorMsg?: string) {
+    localStorage.removeItem("admin_key");
+    if (authErrorMsg) {
+      authErrorMsg.innerText = errorMsg ? `❌ ${errorMsg}` : '❌ 驗證過期或密碼錯誤，請重新輸入';
+      authErrorMsg.style.display = 'block';
+    }
+    if (adminPassInput) {
+      adminPassInput.value = '';
+      adminPassInput.focus();
+    }
+    if (authModal) authModal.style.display = 'flex';
+  }
+
   async function checkAuth() {
     const userToken = localStorage.getItem("admin_key");
     
     if (!userToken) {
+      if (authErrorMsg) authErrorMsg.style.display = 'none';
       if (authModal) authModal.style.display = 'flex';
       if (adminPassInput) adminPassInput.focus();
       return;
@@ -263,7 +268,10 @@ export const prerender = false;
           if (authErrorMsg) authErrorMsg.style.display = 'none';
           fetchPosts();
         } else {
-          if (authErrorMsg) authErrorMsg.style.display = 'block';
+          if (authErrorMsg) {
+            authErrorMsg.innerText = '❌ 密碼錯誤，請重新輸入';
+            authErrorMsg.style.display = 'block';
+          }
           adminPassInput.value = '';
         }
       } catch (err) {
@@ -407,11 +415,8 @@ export const prerender = false;
           resetForm();
           fetchPosts();
         } else {
-          alert('操作失敗: ' + (data.error || '未授權'));
-          if(data.error === '未授權操作，拒絕存取！') {
-            localStorage.removeItem("admin_key");
-            location.reload();
-          }
+          alert('操作失敗: ' + (data.error || '未授權或驗證已過期'));
+          showAuthModal(data.error || '驗證過期，請重新輸入密碼');
         }
       } catch (err) {
         alert('連線失敗，請稍後再試');
@@ -460,7 +465,8 @@ export const prerender = false;
         if (isEditing && editIdInput?.value === id) resetForm();
         fetchPosts();
       } else {
-        alert('刪除失敗: ' + (data.error || '未授權'));
+        alert('刪除失敗: ' + (data.error || '未授權或驗證已過期'));
+        showAuthModal(data.error || '驗證過期，請重新輸入密碼');
       }
     } catch (err) {
       alert('連線失敗，無法刪除');
