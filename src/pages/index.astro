@@ -10,15 +10,15 @@ import MainLayout from '../layout/mainlayout.astro';
         <section class="hero-box">
             <div class="hero-content">
                 <span class="eyebrow">weilinlai</span>
-                                <div class="magnetic-group">
+                <div class="magnetic-group">
                     <h1 class="title-text">Welcome!</h1>
                     <div class="game-message" aria-hidden="true"></div>
                 </div>
 
-                <button class="explore" type="button" aria-label="開始探索網站">
+                <a class="explore" href="/about" aria-label="開始探索網站">
                     <span>點擊上方選單開始探索</span>
                     <span class="arrow" aria-hidden="true">→</span>
-                </button>
+                </a>
             </div>
         </section>
     </div>
@@ -31,7 +31,7 @@ import MainLayout from '../layout/mainlayout.astro';
     const titleText = document.querySelector<HTMLElement>('.title-text');
     const gameMsg = document.querySelector<HTMLElement>('.game-message');
     const particles = document.querySelector<HTMLElement>('.particles');
-    const explore = document.querySelector<HTMLButtonElement>('.explore');
+    const explore = document.querySelector<HTMLAnchorElement>('.explore');
 
     if (home && heroBox && magneticGroup && titleText && particles && explore && gameMsg) {
         const createFloatingParticle = () => {
@@ -79,9 +79,42 @@ import MainLayout from '../layout/mainlayout.astro';
                 trail.remove();
             }, 1000);
         };
+        let isWarping = false;
+        const trigger3DWarp = (targetUrl?: string) => {
+            if (isWarping) return;
+            isWarping = true;
+
+            home.classList.add('warp-out');
+
+            if (targetUrl) {
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 500);
+            }
+        };
+
+       const headerLinks = document.querySelectorAll<HTMLAnchorElement>('header a, nav a');
+headerLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+
+        if (href && href !== '#' && !href.startsWith('javascript:')) {
+            const targetPath = new URL(link.href, window.location.origin).pathname;
+            const currentPath = window.location.pathname;
+            if (targetPath === currentPath) {
+                return;
+            }
+
+            e.preventDefault();
+            trigger3DWarp(link.href);
+        }
+    });
+});
 
         const update = () => {
             raf = 0;
+            if (isWarping) return;
+
             const rect = home.getBoundingClientRect();
             const mouseX = pointerX - rect.left;
             const mouseY = pointerY - rect.top;
@@ -97,7 +130,6 @@ import MainLayout from '../layout/mainlayout.astro';
             createTrailSegment(lastMouseX, lastMouseY, pointerX, pointerY);
             lastMouseX = pointerX;
             lastMouseY = pointerY;
-
             const groupRect = magneticGroup.getBoundingClientRect();
             const centerX = groupRect.left + groupRect.width / 2;
             const centerY = groupRect.top + groupRect.height / 2;
@@ -127,10 +159,11 @@ import MainLayout from '../layout/mainlayout.astro';
             if (!raf) raf = requestAnimationFrame(update);
         }, { passive: true });
 
-        explore.addEventListener('click', () => {
-            explore.classList.add('clicked');
-            setTimeout(() => explore.classList.remove('clicked'), 500);
-        });
+        explore.addEventListener('click', (e) => {
+        e.preventDefault(); 
+        explore.classList.add('clicked');
+        trigger3DWarp(explore.href); 
+     });
 
         let gameState = 0; 
 
@@ -201,8 +234,8 @@ import MainLayout from '../layout/mainlayout.astro';
         padding: 2rem;
         text-align: center;
         transform-style: preserve-3d;
-        will-change: transform;
-        transition: transform 0.1s ease-out;
+        will-change: transform, opacity;
+        transition: transform 0.1s ease-out, opacity 0.5s ease;
     }
 
     .hero-content {
@@ -210,7 +243,7 @@ import MainLayout from '../layout/mainlayout.astro';
         flex-direction: column;
         align-items: center;
         transform: translateY(-3vh);
-        animation: hero-in 900ms cubic-bezier(.22, 1, .36, 1) both;
+        animation: hero-in 1800ms cubic-bezier(.22, 1, .36, 1) both;
     }
 
     .eyebrow {
@@ -267,21 +300,21 @@ import MainLayout from '../layout/mainlayout.astro';
         color: var(--secondary-text-color, #666);
         font: inherit;
         cursor: pointer;
+        text-decoration: none;
         transition: color 220ms ease, border-color 220ms ease, gap 220ms ease;
     }
 
     .explore .arrow { display: inline-block; transition: transform 220ms ease; }
     .explore:hover { color: var(--text-color, #222); border-color: currentColor; gap: 0.75rem; }
     .explore:hover .arrow { transform: translateX(4px); }
-    .explore.clicked .arrow { transform: translateX(9px); }
 
     .particles {
         position: absolute;
         inset: 0;
         z-index: 1;
         pointer-events: none;
-        will-change: transform;
-        transition: transform 0.1s ease-out;
+        will-change: transform, opacity;
+        transition: transform 0.1s ease-out, opacity 0.5s ease;
     }
 
     :global(.particle) {
@@ -296,12 +329,24 @@ import MainLayout from '../layout/mainlayout.astro';
     }
 
     :global(.cursor-trail) {
-        position: fixed; 
+        position: fixed;
         transform-origin: left center; 
         pointer-events: none;
         z-index: 9999; 
         border-radius: 10px; 
         animation: trail-shrink 1s forwards cubic-bezier(0.1, 0.9, 0.2, 1);
+    }
+
+    .home.warp-out .hero-box {
+        transform: translateZ(600px) scale(3.5) !important;
+        opacity: 0;
+        transition: transform 500ms cubic-bezier(0.7, 0, 0.84, 0), opacity 400ms ease-in;
+    }
+
+    .home.warp-out .particles {
+        transform: scale(2.8) !important;
+        opacity: 0;
+        transition: transform 500ms cubic-bezier(0.7, 0, 0.84, 0), opacity 400ms ease-in;
     }
 
     @keyframes trail-shrink {
@@ -325,7 +370,7 @@ import MainLayout from '../layout/mainlayout.astro';
     }
 
     @keyframes hero-in {
-        from { opacity: 0; transform: translateY(calc(-3vh + 14px)); }
+        from { opacity: 0; transform: translateY(calc(-3vh + 30px)); }
         to { opacity: 1; transform: translateY(-3vh); }
     }
 
