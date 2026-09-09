@@ -1,0 +1,440 @@
+/* =========================================================
+   style.css — 全站共用樣式
+   統一從 about.astro / cui.astro / index.astro(article,post) /
+   [name].astro / [id].astro / edit.astro 中抽出的重複樣式與色票
+   ========================================================= */
+
+/* ---------- 0. 全站基礎樣式 ----------
+   原本這段寫在 _id_.astro（貼文詳細頁）自己的 <style is:global> 裡，
+   代表「body 的基礎樣式」只有在造訪貼文詳細頁時才會生效，其他頁面不受影響 ——
+   這種全站基礎樣式應該放在共用的 style.css，而不是單一頁面元件裡。 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f4f6f9;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ---------- 1. 全站色票 / 設計變數 ---------- */
+:root {
+  /* 文字色 */
+  --text-color: #1e293b;
+  --secondary-text-color: #64748b;
+
+  /* 背景 / 邊框 */
+  --bg-color: #ffffff;
+  --border-color: #e2e8f0;
+
+  /* 卡片 */
+  --card-bg: #ffffff;
+  --card-border: #f0ede9;
+  --card-radius: 16px;
+  --card-radius-lg: 20px;
+
+  /* 主題橘色（原本散落 #e67e22 / #ff6f3d / #fe9f73 / #ff9e68 等多種色號，統一如下） */
+  --accent-color: #e67e22;
+  --accent-color-dark: #b87333;   /* meta pill 文字、back-btn 文字 */
+  --accent-color-strong: #d35400; /* 按鈕 hover 等更深的強調色 */
+  --accent-color-light: #fdf5ee;  /* 淺色底（meta pill、次要按鈕底） */
+  --accent-color-lighter: #fbe6d4;
+
+  /* 中性底色（hashtag 等） */
+  --muted-bg: #f1f5f9;
+  --muted-text: #64748b;
+
+  /* 危險色（刪除等操作） */
+  --danger-color: #ef4444;
+  --danger-bg: #fee2e2;
+  --danger-bg-hover: #fecaca;
+}
+
+/* ---------- 2. 版面容器 ---------- */
+/* 貼文系列詳細頁共用容器（post/[id].astro、post/edit.astro 兩份原本定義完全相同） */
+.detail-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 列表頁標題（貼文列表 / 文章列表原始碼數值完全相同，故共用） */
+.page-title {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 32px;
+  font-weight: 700;
+}
+
+/* 列表頁外層容器（原本 article 的 .science-archive-container 與 post 的 .board-container 定義完全相同，統一於此） */
+.list-page-container {
+  max-width: 850px;
+  margin: 40px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.list-page-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 讀取中提示文字 */
+.loading-text {
+  text-align: center;
+  color: #888;
+  padding: 40px 0;
+  font-size: 1.05rem;
+}
+
+/* 返回列表按鈕（原本 _id_.astro 定義，[name].astro 有用到但缺少樣式來源，一併集中於此） */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  text-decoration: none;
+  color: var(--accent-color-dark);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+.back-btn:hover {
+  color: var(--accent-color);
+}
+
+/* ---------- 3. 標題列（橘色色塊 + 標題文字），詳細頁 / 卡片列表共用 ---------- */
+.title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.orange-bar {
+  width: 4px;
+  height: 22px;
+  background-color: var(--accent-color);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* 卡片列表用的標題文字（原 article 的 .card-main-title、post 列表的 .post-author 統一於此） */
+.list-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* 詳細頁用的大標題（原 [name].astro 的 .article-main-title、[id].astro 的 .post-author-title 統一於此） */
+.detail-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* ---------- 4. Meta 標籤（日期、ID 等） ---------- */
+.meta-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--accent-color-light);
+  color: var(--accent-color-dark);
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Hashtag（post 列表 / edit 管理列表共用） */
+.tag-wrapper {
+  display: flex;
+}
+
+.hash-tag {
+  background-color: var(--muted-bg);
+  color: var(--muted-text);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* 摘要文字：原 article 的 .card-summary、post 列表的 .post-body、edit 的 .post-summary 統一於此 */
+.card-excerpt {
+  font-size: 1rem;
+  color: var(--secondary-text-color);
+  margin: 0;
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 5. 列表卡片（文章列表 / 貼文列表共用的「可點擊卡片」樣式） ---------- */
+.list-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.list-card {
+  background: var(--card-bg);
+  border-radius: var(--card-radius-lg);
+  border: 1px solid var(--card-border);
+  /* 原始碼 post/index.astro 確認值，跟通用的 --card-shadow 變數不同，故寫死 */
+  box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 24px 32px;
+  /* 原始碼是不分有無圖片、所有卡片都固定 180px，
+     這樣每張卡片（含圖片）才會等高；改成 min-height 而不設 height 是我先前的疏漏 */
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.list-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(160, 140, 130, 0.12);
+}
+
+.list-card-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* 含圖片變體（目前僅貼文列表使用） */
+.list-card.has-image {
+  padding: 0 0 0 32px;
+}
+.list-card.has-image .list-card-left {
+  padding: 24px 24px 24px 0;
+}
+
+.list-card-img-wrapper {
+  width: 260px;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+.list-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.list-card-arrow {
+  width: 46px;
+  height: 90px;
+  background-color: var(--accent-color-light);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 24px;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+}
+.list-card:hover .list-card-arrow {
+  background-color: var(--accent-color-lighter);
+}
+.list-card.has-image .list-card-arrow {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0;
+  z-index: 2;
+  background-color: rgba(253, 245, 238, 0.9);
+  box-shadow: 0 4px 12px rgba(184, 115, 51, 0.15);
+}
+
+.arrow-shape {
+  border: solid var(--accent-color-dark);
+  border-width: 0 2.5px 2.5px 0;
+  display: inline-block;
+  padding: 4px;
+  transform: rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+  .list-card.has-image {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 0 16px 0;
+  }
+  .list-card.has-image .list-card-left {
+    padding: 20px 20px 0 20px;
+  }
+  .list-card-img-wrapper {
+    width: 100% !important;
+    height: 180px;
+    order: -1;
+  }
+  .list-card.has-image .list-card-arrow {
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin: 12px 20px 0 auto;
+    height: 36px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(184, 115, 51, 0.1);
+  }
+  /* 原始碼不分有無圖片，所有 .list-card 手機版都 reset 成 auto 高度 */
+  .list-card {
+    height: auto;
+  }
+  /* 沒有圖片的卡片，箭頭手機版縮小、間距內縮（原本遺漏這條） */
+  .list-card-arrow {
+    height: 70px;
+    margin-left: 12px;
+  }
+}
+
+/* ---------- 6. 按鈕（統一 edit.astro 的 btn-submit/btn-cancel/btn-edit/btn-delete/btn-file-select） ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+}
+
+.btn-primary {
+  background: var(--accent-color);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--accent-color-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+.btn-secondary {
+  background: #a0aec0;
+  color: #fff;
+}
+.btn-secondary:hover {
+  background: #718096;
+}
+
+.btn-outline {
+  background: var(--accent-color-light);
+  color: var(--accent-color-dark);
+  border: 1px dashed var(--accent-color);
+}
+.btn-outline:hover {
+  background: var(--accent-color-lighter);
+}
+
+.btn-danger {
+  background: var(--danger-bg);
+  color: var(--danger-color);
+}
+.btn-danger:hover {
+  background: var(--danger-bg-hover);
+}
+
+/* ---------- 7. 表單元件（原本 edit.astro 用 `input, textarea` 這種裸元素選擇器，改用 class 避免污染全站） ---------- */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background-color: #f8fafc;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.12);
+}
+
+/* ---------- 8. 白色面板（原 edit.astro 的 .form-container、[id].astro 的 .comment-form-wrapper，兩者定義幾乎一致） ---------- */
+.panel {
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  border: 1px solid var(--card-border);
+  /* 原始碼 edit.astro 的 .form-container、_id_.astro 的 .comment-form-wrapper 確認值 */
+  box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- 9. 圖示按鈕（原 about.astro 的 .social-button-card、cui.astro 的 .btn 統一於此） ---------- */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.icon-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-color);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+.icon-btn img,
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}

@@ -1,246 +1,39 @@
 ---
 // src/pages/post/index.astro
 import MainLayout from '../../layout/mainlayout.astro';
+import '../../styles/style.css';
 ---
 
 <MainLayout title="Weilin Lai - post">
-  <div class="board-container">
-    <h1 class="page-title">💬 Posts</h1>
+  <div class="list-page-container post-board">
+    <h1 class="page-title post-page-title">💬 Posts</h1>
 
-    <div id="posts-container" class="posts-list">
+    <div id="posts-container" class="list-page-grid">
       <div class="loading-text">載入貼文中，請稍候...</div>
     </div>
   </div>
 </MainLayout>
 
 <style is:global>
-  .board-container *, .board-container *::before, .board-container *::after {
-    box-sizing: border-box;
-  }
-
-  .board-container {
-    max-width: 850px; 
-    margin: 40px auto; 
-    padding: 0 24px;
-  }
-
-  .page-title {
-    font-size: 1.8rem;
-    color: #2c3e50;
-    margin-bottom: 32px;
-    font-weight: 700;
-  }
-
-  .posts-list {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .loading-text {
-    text-align: center;
-    color: #888;
-    padding: 40px 0;
-    font-size: 1.05rem;
-  }
-
-  .post-card-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-  }
-
-  .post-card { 
-    background: #ffffff; 
-    border-radius: 20px; 
-    box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06); 
-    border: 1px solid #f0ede9; 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between;
-    padding: 24px 24px 24px 32px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    position: relative;
-    overflow: hidden;
-    height: 180px;
-  }
-
-  .post-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(160, 140, 130, 0.12);
-  }
-
-  .post-card.has-image {
-    padding: 0 0 0 32px; 
-  }
-
-  .card-left {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 12px; 
-    min-width: 0;
-  }
-
-  .post-card.has-image .card-left {
-    padding: 24px 24px 24px 0;
-  }
-
-  .title-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .orange-bar {
-    width: 4px;
-    height: 22px;
-    background-color: #e67e22;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
-
-  .post-author {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0;
-    line-height: 1.2;
-  }
-
-  .meta-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .meta-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background-color: #fdf5ee; 
-    color: #b87333; 
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
-
-.post-body {
-  font-size: 1.05rem;
-  color: #475569;
-  margin: 0;
-  line-height: 1.6;
-  word-break: break-all;
-    white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis;
-}
-
+  /* 這頁的卡片內容是用 JS innerHTML 動態產生的，
+     Astro 的 scoped <style> 對動態插入的內容不會生效，所以這裡沿用 is:global。
+     容器 / 卡片 / 標題 / meta 標籤 / 箭頭等共用樣式已移至 styles/style.css，
+     這裡只留下這個頁面獨有的樣式 */
   .tag-wrapper {
     display: flex;
   }
 
-  .hash-tag {
-    background-color: #f1f5f9;
-    color: #64748b;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-
-  .card-img-wrapper {
-    width: 260px; 
-    align-self: stretch; 
-    flex-shrink: 0; 
-  }
-
-  .card-side-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    display: block;
-  }
-
-  .card-right-arrow {
-    width: 46px;
-    height: 90px; 
-    background-color: #fdf5ee; 
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 24px;
-    flex-shrink: 0; 
-    transition: background-color 0.2s;
-  }
-
-  .post-card.has-image .card-right-arrow {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-left: 0;
-    z-index: 2;
-    background-color: rgba(253, 245, 238, 0.9); 
-    box-shadow: 0 4px 12px rgba(184, 115, 51, 0.15);
-  }
-
-  .post-card:hover .card-right-arrow {
-    background-color: #fbe6d4; 
-  }
-
-  .arrow-shape {
-    border: solid #b87333;
-    border-width: 0 2.5px 2.5px 0;
-    display: inline-block;
-    padding: 4px;
-    transform: rotate(-45deg);
-  }
-
+  /* 手機版：.list-page-container / .page-title 是跟 article 列表頁共用的 class，
+     但原始碼只有「貼文列表」在手機版有縮小 margin/padding/字級，文章列表沒有，
+     所以额外加一個頁面專屬 class 才覆寫，不會動到 article 頁面 */
   @media (max-width: 768px) {
-    .board-container {
+    .post-board {
       margin: 20px auto;
       padding: 0 16px;
     }
-
-    .page-title {
+    .post-page-title {
       font-size: 1.5rem;
       margin-bottom: 20px;
-    }
-
-    .post-card.has-image {
-      flex-direction: column;
-      align-items: stretch;
-      padding: 0 0 16px 0; 
-    }
-
-    .post-card.has-image .card-left {
-      padding: 20px 20px 0 20px;
-    }
-    .card-img-wrapper {
-      width: 100% !important;
-      height: 180px; 
-      order: -1; 
-    }
-
-    .post-card.has-image .card-right-arrow {
-      position: relative;
-      right: auto;
-      top: auto;
-      transform: none;
-      margin: 12px 20px 0 auto; 
-      height: 36px;
-      border-radius: 50%; 
-      box-shadow: 0 2px 8px rgba(184, 115, 51, 0.1);
-    }
-    .post-card {
-      height: auto; 
-    }
-    .card-right-arrow {
-      height: 70px;
-      margin-left: 12px;
     }
   }
 </style>
@@ -254,9 +47,9 @@ import MainLayout from '../../layout/mainlayout.astro';
     try {
       const res = await fetch(`${API_BASE_URL}/api/posts`);
       const data = await res.json();
-      
-      const validPosts = data.success && data.posts 
-        ? data.posts.filter((post: any) => post.id) 
+
+      const validPosts = data.success && data.posts
+        ? data.posts.filter((post: any) => post.id)
         : [];
 
       if (validPosts.length > 0) {
@@ -265,42 +58,42 @@ import MainLayout from '../../layout/mainlayout.astro';
           const dateStr = post.time;
 
           const hasImg = !!post.image;
-          const cardClass = hasImg ? 'post-card has-image' : 'post-card';
-          const imgHtml = hasImg 
-            ? `<div class="card-img-wrapper"><img src="${post.image}" class="card-side-img" alt="貼文圖片" onerror="this.parentNode.style.display='none'"/></div>` 
+          const cardClass = hasImg ? 'list-card has-image' : 'list-card';
+          const imgHtml = hasImg
+            ? `<div class="list-card-img-wrapper"><img src="${post.image}" class="list-card-img" alt="貼文圖片" onerror="this.parentNode.style.display='none'"/></div>`
             : '';
 
           return `
-            <a href="/post/${post.id}" class="post-card-link">
+            <a href="/post/${post.id}" class="list-card-link">
               <div class="${cardClass}">
-                
-                <div class="card-left">
+
+                <div class="list-card-left">
                   <div class="title-wrapper">
                     <div class="orange-bar"></div>
-                    <h2 class="post-author">${post.name || '匿名訪客'}</h2>
+                    <h2 class="list-card-title">${post.name || '匿名訪客'}</h2>
                   </div>
-                  
+
                   <div class="meta-wrapper">
                     <span class="meta-pill">📅 ${dateStr}</span>
                     <span class="meta-pill"> ${post.id}</span>
                   </div>
-                  
-                  <p class="post-body">
+
+                  <p class="card-excerpt">
                     ${
-                      post.content 
-                        ? post.content.split('\n')[0] + (post.content.includes('\n') ? '...' : '') 
+                      post.content
+                        ? post.content.split('\n')[0] + (post.content.includes('\n') ? '...' : '')
                         : '點擊查看詳細內容...'
                     }
-                  </p>   
-                  
+                  </p>
+
                   <div class="tag-wrapper">
                     <span class="hash-tag"># ${post.hashtag || "posts" } </span>
                   </div>
                 </div>
-                
+
                 ${imgHtml}
-                
-                <div class="card-right-arrow">
+
+                <div class="list-card-arrow">
                   <i class="arrow-shape"></i>
                 </div>
 

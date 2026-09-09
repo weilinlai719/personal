@@ -1,41 +1,73 @@
 ---
+//src/pages/post/edit.astro
 import MainLayout from '../../layout/mainlayout.astro';
+import '../../styles/style.css';
 export const prerender = false;
 ---
 
 <style is:global>
-  h2 { color: #2c3e50; font-size: 1.5rem; margin-top: 35px; margin-bottom: 20px; font-weight: 700; }
-  
-  .form-container {
-    background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid #f0ede9;
-    padding: 24px;
-    box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .form-container h3 { margin-top: 0; margin-bottom: 24px; color: #2c3e50; font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  .form-group { margin-bottom: 20px; }
-  
-  input[type="text"], input[type="password"], textarea { 
-    width: 100%; padding: 14px 18px; border: 1px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; background-color: #fff; transition: all 0.3s ease; font-size: 1rem; color: #333;
-  }
-  input:focus, textarea:focus { border-color: #e67e22; box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1); outline: none; }
-  
-  .file-upload-wrapper { display: flex; align-items: center; gap: 15px; margin-top: 8px; }
-  .btn-file-select { background-color: #fdf5ee; color: #d35400; border: 1px dashed #e67e22; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
-  .btn-file-select:hover { background-color: #fae8d8; }
-  .upload-status { font-size: 0.9rem; color: #718096; }
-  .preview-container { margin-top: 15px; display: none; position: relative; width: fit-content; }
-  .preview-img { max-height: 160px; border-radius: 12px; border: 1px solid #e2e8f0; object-fit: cover; }
-  .btn-remove-preview { position: absolute; top: -10px; right: -10px; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
+  /* 這頁的文章管理列表是用 JS innerHTML 動態產生的，
+     Astro 的 scoped <style> 對動態插入的內容不會生效，所以這裡沿用 is:global。
+     .detail-container / .form-group / .form-input / .btn / .meta-pill / .hash-tag
+     皆已移至 styles/style.css，這裡只留下這個頁面獨有的樣式。
 
-  .btn-submit { background: #e67e22; color: white; border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: background 0.2s; }
-  .btn-submit:hover { background: #d35400; }
-  .btn-cancel { background: #a0aec0; color: white; border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1rem; margin-left: 10px; transition: background 0.2s; }
-  .btn-cancel:hover { background: #718096; }
+     原本這裡有一個裸的 `h2 { ... }` 選擇器，寫在 is:global 裡會影響「全站」所有頁面的
+     <h2>（例如 cui.astro、文章內文裡的 h2），已改成只作用在這頁自己的 .post-manage-title。 */
+
+  .panel.form-container h3 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    color: var(--text-color);
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 8px;
+  }
+
+  .upload-status {
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
+  }
+
+  .preview-container {
+    margin-top: 15px;
+    display: none;
+    position: relative;
+    width: fit-content;
+  }
+
+  .preview-img {
+    max-height: 160px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    object-fit: cover;
+  }
+
+  .btn-remove-preview {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   #posts-management-list {
     display: flex;
@@ -44,104 +76,148 @@ export const prerender = false;
     margin-top: 20px;
   }
 
-  .post-card { 
-    background: #ffffff; 
-    border-radius: 20px; 
+  .post-manage-card {
+    background: var(--card-bg);
+    border-radius: 20px;
     padding: 24px 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); 
+    box-shadow: var(--card-shadow);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    border: 1px solid #f0e6df;
-  }
-  
-  .card-main { flex: 1; padding-right: 20px; }
-  
-  .post-card .post-title { 
-    font-size: 1.4rem; 
-    font-weight: 800; 
-    color: #1a202c; 
-    display: flex; 
-    align-items: center; 
-    gap: 12px; 
-    margin: 0 0 12px 0; 
-  }
-  .post-card .post-title::before { 
-    content: ""; 
-    display: block; 
-    width: 4px; 
-    height: 20px; 
-    background-color: #e67e22; 
-    border-radius: 4px; 
+    border: 1px solid var(--card-border);
   }
 
-  .post-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-  .meta-badge { 
-    background-color: #fdf5ee; 
-    color: #d35400; 
-    padding: 4px 12px; 
-    border-radius: 8px; 
-    font-size: 0.85rem; 
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .post-summary { font-size: 1.05rem; color: #4a5568; margin: 0; line-height: 1.6; }
-  .post-img { max-width: 100%; max-height: 250px; border-radius: 12px; margin-bottom: 15px; object-fit: cover; display: block; }
-
-  .card-action-zone { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 8px; 
-    flex-shrink: 0; 
-  }
-  .btn-action { 
-    border: none; 
-    padding: 8px 16px; 
-    border-radius: 8px; 
-    font-size: 0.85rem; 
-    font-weight: 600; 
-    cursor: pointer; 
-    min-width: 70px; 
-    text-align: center; 
-    transition: all 0.2s; 
-  }
-  .btn-edit { background-color: #fdf5ee; color: #d35400; border: 1px solid #fbe5d2; }
-  .btn-edit:hover { background-color: #fae8d8; }
-  .btn-delete { background-color: #fee2e2; color: #ef4444; }
-  .btn-delete:hover { background-color: #fecaca; }
-  .detail-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 0 24px;
+  .card-main {
+    flex: 1;
+    padding-right: 20px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 12px;
+  }
+
+  .post-manage-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-color);
+    margin: 0;
+  }
+
+  .post-manage-summary {
+    font-size: 1.05rem;
+    color: var(--secondary-text-color);
+    margin: 0;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .post-manage-img {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 12px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .card-action-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* ---- Auth modal（原本整段用 inline style="..." 寫成，改用正式 class 方便維護） ---- */
+  .auth-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .auth-modal-box {
+    background: var(--card-bg);
+    padding: 32px;
+    border-radius: 20px;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  .auth-modal-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+
+  .auth-modal-title {
+    margin: 0 0 8px 0;
+    color: var(--text-color);
+    font-size: 1.3rem;
+  }
+
+  .auth-modal-desc {
+    color: var(--secondary-text-color);
+    font-size: 0.9rem;
+    margin: 0 0 20px 0;
+  }
+
+  .auth-modal-input {
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .auth-modal-error {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    display: none;
+    margin-bottom: 12px;
+  }
+
+  .auth-modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .auth-modal-actions .btn {
+    flex: 1;
+  }
+
+  .auth-modal-home-link {
+    flex: 1;
+    background: var(--muted-bg);
+    color: #475569;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    display: inline-block;
   }
 </style>
 
 <MainLayout title="文章管理後台">
 
-<div id="auth-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center;">
-  <div style="background: #ffffff; padding: 32px; border-radius: 20px; max-width: 380px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
-    <div style="font-size: 2.5rem; margin-bottom: 12px;">🔒</div>
-    <h3 style="margin: 0 0 8px 0; color: #1e293b; font-size: 1.3rem;">管理員解鎖</h3>
-    <p style="color: #64748b; font-size: 0.9rem; margin: 0 0 20px 0;">請輸入管理員密碼以進入後台</p>
-    
-    <input type="password" id="admin-pass-input" placeholder="請輸入密碼..." style="margin-bottom: 12px; text-align: center;" />
-    <div id="auth-error-msg" style="color: #ef4444; font-size: 0.85rem; display: none; margin-bottom: 12px;">❌ 密碼錯誤，請重新輸入</div>
-    
-    <div style="display: flex; gap: 10px; margin-top: 8px;">
-      <button id="btn-auth-submit" style="flex: 1; background: #e67e22; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;">解鎖進入</button>
-      <a href="/" style="flex: 1; background: #f1f5f9; color: #475569; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 600; display: inline-block;">返回首頁</a>
+<div id="auth-modal" class="auth-modal-overlay">
+  <div class="auth-modal-box">
+    <div class="auth-modal-icon">🔒</div>
+    <h3 class="auth-modal-title">管理員解鎖</h3>
+    <p class="auth-modal-desc">請輸入管理員密碼以進入後台</p>
+
+    <input type="password" id="admin-pass-input" class="form-input auth-modal-input" placeholder="請輸入密碼..." />
+    <div id="auth-error-msg" class="auth-modal-error">❌ 密碼錯誤，請重新輸入</div>
+
+    <div class="auth-modal-actions">
+      <button id="btn-auth-submit" class="btn btn-primary">解鎖進入</button>
+      <a href="/" class="auth-modal-home-link">返回首頁</a>
     </div>
   </div>
 </div>
 
 <div class="detail-container">
-  <div class="form-container">
+  <div class="panel form-container">
     <h3 id="form-title">✨ 發布新動態</h3>
     <form id="post-form">
       <input type="hidden" id="edit-id" />
@@ -151,6 +227,7 @@ export const prerender = false;
         <input 
           type="text" 
           id="post-name" 
+          class="form-input"
           value="Weilin" 
           placeholder="署名" 
           required 
@@ -158,21 +235,22 @@ export const prerender = false;
       </div>
       
       <div class="form-group">
-        <textarea id="post-content" rows="4" placeholder="內文" required></textarea>
+        <textarea id="post-content" class="form-input" rows="4" placeholder="內文" required></textarea>
       </div>
       <div class="form-group">
          <input 
           type="text" 
           id="post-hashtag" 
+          class="form-input"
           value="posts" 
           placeholder="hashtag" 
           required 
         />
       </div>
       <div class="form-group">
-        <label style="font-weight: 600; color: #4a5568; font-size: 0.95rem; display: block; margin-bottom: 8px;">分享圖片（選填）</label>
+        <label class="form-label">分享圖片（選填）</label>
         <div class="file-upload-wrapper">
-          <label for="file-input" class="btn-file-select">選擇電腦中的照片 📷</label>
+          <label for="file-input" class="btn btn-outline">選擇電腦中的照片 📷</label>
           <input type="file" id="file-input" accept="image/*" style="display: none;" />
           <span class="upload-status" id="upload-status">尚未選擇檔案</span>
         </div>
@@ -183,8 +261,8 @@ export const prerender = false;
         </div>
       </div>
 
-      <button type="submit" id="btn-submit-text" class="btn-submit">發布貼文</button>
-      <button type="button" id="btn-cancel-edit" class="btn-cancel" style="display: none;">取消修改</button>
+      <button type="submit" id="btn-submit-text" class="btn btn-primary">發布貼文</button>
+      <button type="button" id="btn-cancel-edit" class="btn btn-secondary" style="display: none;">取消修改</button>
     </form>
   </div>
 
@@ -302,47 +380,47 @@ export const prerender = false;
     });
   }
 
- if (fileInput) {
-  fileInput.addEventListener('change', async (e) => {
-    const target = e.target as HTMLInputElement;
-    if (!target.files || target.files.length === 0) return;
+  if (fileInput) {
+    fileInput.addEventListener('change', async (e) => {
+      const target = e.target as HTMLInputElement;
+      if (!target.files || target.files.length === 0) return;
 
-    const file = target.files[0];
-    if (uploadStatus) uploadStatus.innerText = '正在上傳圖片... ⏳';
+      const file = target.files[0];
+      if (uploadStatus) uploadStatus.innerText = '正在上傳圖片... ⏳';
 
-    const formData = new FormData();
-    formData.append('image', file);
+      const formData = new FormData();
+      formData.append('image', file);
 
-    const adminKey = localStorage.getItem("admin_key") || "";
+      const adminKey = localStorage.getItem("admin_key") || "";
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/upload-image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${adminKey}`
-        },
-        body: formData
-      });
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/upload-image`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${adminKey}`
+          },
+          body: formData
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (result.success && result.url) {
-        const uploadedUrl = result.url;
+        if (result.success && result.url) {
+          const uploadedUrl = result.url;
 
-        if (imageUrlInput) imageUrlInput.value = uploadedUrl;
-        if (uploadStatus) uploadStatus.innerText = '圖片上傳成功！';
-        if (formPreviewImg) formPreviewImg.src = uploadedUrl;
-        if (previewContainer) previewContainer.style.display = 'block';
-      } else {
-        alert('圖片上傳失敗');
-        if (uploadStatus) uploadStatus.innerText = '上傳失敗';
+          if (imageUrlInput) imageUrlInput.value = uploadedUrl;
+          if (uploadStatus) uploadStatus.innerText = '圖片上傳成功！';
+          if (formPreviewImg) formPreviewImg.src = uploadedUrl;
+          if (previewContainer) previewContainer.style.display = 'block';
+        } else {
+          alert('圖片上傳失敗');
+          if (uploadStatus) uploadStatus.innerText = '上傳失敗';
+        }
+      } catch (err) {
+        alert('上傳時發生連線錯誤');
+        if (uploadStatus) uploadStatus.innerText = '連線錯誤';
       }
-    } catch (err) {
-      alert('上傳時發生連線錯誤');
-      if (uploadStatus) uploadStatus.innerText = '連線錯誤';
-    }
-  });
-}
+    });
+  }
   if (btnRemoveImg) {
     btnRemoveImg.addEventListener('click', () => {
       if (imageUrlInput) imageUrlInput.value = '';
@@ -366,23 +444,26 @@ export const prerender = false;
       if (validPosts.length > 0) {
         const sortedPosts = validPosts.reverse();
         postsListContainer.innerHTML = sortedPosts.map((post: any) => {
-          const imgHtml = post.image ? `<img src="${post.image}" class="post-img" alt="貼文圖片" onerror="this.style.display='none'"/>` : '';
+          const imgHtml = post.image ? `<img src="${post.image}" class="post-manage-img" alt="貼文圖片" onerror="this.style.display='none'"/>` : '';
           
           return `
-            <div class="post-card">
+            <div class="post-manage-card">
               <div class="card-main">
-                <h2 class="post-title">${post.name}</h2>
-                <div class="post-meta">
-                  <span class="meta-badge">📅 ${post.time}</span>
-                  <span class="meta-badge">🆔 編號: ${post.id}</span>
+                <div class="title-wrapper">
+                  <div class="orange-bar"></div>
+                  <h2 class="post-manage-title">${post.name}</h2>
+                </div>
+                <div class="meta-wrapper">
+                  <span class="meta-pill">📅 ${post.time}</span>
+                  <span class="meta-pill">🆔 編號: ${post.id}</span>
                 </div>
                 ${imgHtml}
-                <div class="post-summary" style="white-space: pre-wrap;">${post.content}</div>
+                <div class="post-manage-summary">${post.content}</div>
                 <span class="hash-tag"># ${post.hashtag || "posts" } </span>
               </div>
               <div class="card-action-zone">
-                <button class="btn-action btn-edit" onclick="window.startEdit('${post.id}', '${encodeURIComponent(post.name)}', '${encodeURIComponent(post.content)}', '${post.image || ''}')">修改</button>
-                <button class="btn-action btn-delete" onclick="window.deletePost('${post.id}')">刪除</button>
+                <button class="btn btn-sm btn-outline" onclick="window.startEdit('${post.id}', '${encodeURIComponent(post.name)}', '${encodeURIComponent(post.content)}', '${post.image || ''}')">修改</button>
+                <button class="btn btn-sm btn-danger" onclick="window.deletePost('${post.id}')">刪除</button>
               </div>
             </div>
           `;

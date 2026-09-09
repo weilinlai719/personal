@@ -1,14 +1,15 @@
 ---
-// src/pages/personal/post/[id].astro
+// src/pages/post/[id].astro
+// 原路徑誤植於 src/pages/personal/post/[id].astro，且 import 路徑少算一層，
+// 已修正為正確的 src/pages/post/[id].astro（與同系列的 post/index.astro、post/edit.astro 對齊）
 import MainLayout from '../../layout/mainlayout.astro';
+import '../../styles/style.css';
 export const prerender = false;
 ---
 
 <MainLayout title="Weilin Lai - 貼文內容">
   <div class="detail-container">
-    <a href="/post" class="back-btn">
-      <span class="back-arrow">←</span> 返回列表
-    </a>
+    <a href="/post" class="back-btn">← 返回列表</a>
 
     <div id="post-container">
       <div class="loading-text">正在載入貼文內容...</div>
@@ -21,16 +22,16 @@ export const prerender = false;
         <div class="loading-text">正在載入留言...</div>
       </div>
       
-      <div class="comment-form-wrapper">
+      <div class="comment-form-wrapper panel">
         <h4 class="form-title">撰寫新留言</h4>
         <form id="comment-form" class="comment-form">
-          <div class="form-group">
-            <input type="text" id="comment-name" placeholder="署名" required />
+          <div class="comment-form-group">
+            <input type="text" id="comment-name" class="form-input" placeholder="署名" required />
           </div>
-          <div class="form-group">
-            <textarea id="comment-content" rows="3" placeholder="留言內文..." required></textarea>
+          <div class="comment-form-group">
+            <textarea id="comment-content" class="form-input" rows="3" placeholder="留言內文..." required></textarea>
           </div>
-          <button type="submit" class="submit-btn">送出留言</button>
+          <button type="submit" class="btn btn-primary">送出留言</button>
         </form>
       </div>
     </div>
@@ -38,123 +39,52 @@ export const prerender = false;
 </MainLayout>
 
 <style is:global>
-  .detail-container *, .detail-container *::before, .detail-container *::after {
-    box-sizing: border-box;
-  }
+  /* 貼文內容與留言列表都是用 JS innerHTML 動態產生的，
+     Astro 的 scoped <style> 對動態插入的內容不會生效，所以這裡沿用 is:global（與原本一致）。
+     .detail-container / .back-btn / .loading-text / .title-wrapper / .orange-bar /
+     .meta-wrapper / .meta-pill / .panel / .form-input / .btn 皆已移至 styles/style.css，
+     這裡只留下這個頁面獨有、沒有其他地方共用的樣式 */
 
-  body { 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
-    background-color: #f4f6f9;
-    color: #333; 
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  .detail-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 0 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px; 
-  }
-
-  .back-btn { 
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none; 
-    color: #b87333; 
-    font-weight: 600;
-    font-size: 1rem;
-    align-self: flex-start;
-    transition: color 0.2s;
-  }
-  .back-btn:hover {
-    color: #e67e22;
-  }
-  .back-arrow {
-    font-weight: bold;
-    font-size: 1.1rem;
-  }
-
-  .loading-text {
-    text-align: center;
-    color: #888;
-    padding: 20px 0;
-  }
-
-  .post-card { 
-    background: #ffffff; 
+  .post-detail-card {
+    background: var(--card-bg);
     border-radius: 20px;
-    box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06); 
-    border: 1px solid #f0ede9; 
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--card-border);
     padding: 32px;
     display: flex;
     flex-direction: column;
-    gap: 16px; 
+    gap: 16px;
     position: relative;
-  }
-
-  .post-author-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .orange-bar {
-    width: 4px;
-    height: 24px;
-    background-color: #e67e22;
-    border-radius: 4px;
-    flex-shrink: 0;
   }
 
   .post-author-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-color);
     margin: 0;
   }
 
-  .post-meta-wrapper { 
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .meta-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background-color: #fdf5ee; 
-    color: #b87333; 
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
-
-  .post-img {
-    max-width: 100%; 
+  .post-detail-img {
+    max-width: 100%;
     border-radius: 14px;
     margin: 4px 0;
     display: block;
-    object-fit: cover; 
+    object-fit: cover;
   }
-  .post-content-body { 
+
+  .post-content-body {
     font-size: 1.15rem;
     color: #334155;
     line-height: 1.7;
-    white-space: pre-wrap; 
+    white-space: pre-wrap;
     word-break: break-all;
     margin: 4px 0 0 0;
   }
 
-  .comment-section { 
+  .comment-section {
     margin-top: 16px;
-    border-top: 2px solid #eae6e1; 
-    padding-top: 32px; 
+    border-top: 2px solid #eae6e1;
+    padding-top: 32px;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -162,7 +92,7 @@ export const prerender = false;
 
   .section-title {
     font-size: 1.35rem;
-    color: #1e293b;
+    color: var(--text-color);
     margin: 0;
     font-weight: 700;
   }
@@ -173,30 +103,30 @@ export const prerender = false;
     gap: 16px;
   }
 
-  .comment-item { 
-    background: #ffffff; 
-    padding: 20px 24px; 
+  .comment-item {
+    background: var(--card-bg);
+    padding: 20px 24px;
     border-radius: 14px;
-    border: 1px solid #f0ede9;
-    border-left: 4px solid #ff9e68; 
-    box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
+    border: 1px solid var(--card-border);
+    border-left: 4px solid var(--accent-color);
+    box-shadow: var(--card-shadow);
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  .comment-meta-info { 
+  .comment-meta-info {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.9rem; 
-    color: #1e293b; 
-    font-weight: bold; 
+    font-size: 0.9rem;
+    color: var(--text-color);
+    font-weight: bold;
   }
 
   .comment-time {
-    font-weight: normal; 
-    color: #94a3b8; 
+    font-weight: normal;
+    color: #94a3b8;
     font-size: 0.8rem;
   }
 
@@ -207,20 +137,10 @@ export const prerender = false;
     white-space: pre-wrap;
     word-break: break-all;
   }
-  .comment-form-wrapper {
-    background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid #f0ede9;
-    padding: 24px;
-    box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
 
   .form-title {
     margin: 0;
-    color: #1e293b;
+    color: var(--text-color);
     font-size: 1.1rem;
     font-weight: 700;
   }
@@ -231,44 +151,10 @@ export const prerender = false;
     gap: 12px;
   }
 
-  .form-group { 
+  /* 這裡的欄位間距已經靠 .comment-form 的 gap 處理，
+     所以用專屬的 class，而不是共用的 .form-group（那個是給有各自 margin 的表單用） */
+  .comment-form-group {
     width: 100%;
-  }
-
-  input, textarea { 
-    width: 100%; 
-    padding: 12px 16px; 
-    border: 1px solid #cbd5e1; 
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    box-sizing: border-box;
-    background-color: #f8fafc;
-    transition: border-color 0.2s, background-color 0.2s;
-  }
-
-  input:focus, textarea:focus { 
-    outline: none; 
-    border-color: #ff6f3d; 
-    background-color: #fff;
-  }
-
-  .submit-btn { 
-    background: linear-gradient(135deg, #ff9e68, #ff6f3d); 
-    color: white; 
-    border: none;
-    padding: 12px 24px; 
-    border-radius: 10px; 
-    cursor: pointer; 
-    font-size: 1rem; 
-    font-weight: bold;
-    align-self: flex-start; 
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .submit-btn:hover { 
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 111, 61, 0.25);
   }
 </style>
 
@@ -291,17 +177,17 @@ export const prerender = false;
         const dateStr = data.post.time;
         
         const imgHtml = data.post.image 
-          ? `<img src="${data.post.image}" class="post-img" alt="貼文圖片" onerror="this.style.display='none'"/>` 
+          ? `<img src="${data.post.image}" class="post-detail-img" alt="貼文圖片" onerror="this.style.display='none'"/>` 
           : '';
 
         postContainer.innerHTML = `
-          <div class="post-card">
-            <div class="post-author-wrapper">
+          <div class="post-detail-card">
+            <div class="title-wrapper">
               <div class="orange-bar"></div>
               <h2 class="post-author-title">${data.post.name || '匿名訪客'}</h2>
             </div>
             
-            <div class="post-meta-wrapper">
+            <div class="meta-wrapper">
               <span class="meta-pill">📅 ${dateStr}</span>
               <span class="meta-pill">${data.post.id}</span>
             </div>

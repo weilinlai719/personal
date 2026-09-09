@@ -1,7 +1,7 @@
 ---
 title: "astro 教學"
 date: "2026年8月"
-subject: "# article"
+subject: "# 前端"
 ---
 ## 下載必要資料
 如果你擁有的是包含完整`package.json`的檔案，僅需執行
