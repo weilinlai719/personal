@@ -1,0 +1,77 @@
+---
+// src/pages/404.astro
+import MainLayout from '../layout/mainlayout.astro';
+import '../styles/style.css';
+---
+
+<MainLayout title="404 - 找不到頁面">
+  <div class="detail-container not-found-page">
+    <div class="not-found-code">404</div>
+    <div class="orange-bar not-found-bar"></div>
+    <h1 class="not-found-title">這裡什麼都沒有</h1>
+    <p class="not-found-desc">你要找的頁面不存在，或是已經被移動了。</p>
+
+    <div class="not-found-actions">
+      <a href="/" class="btn btn-primary">回到首頁</a>
+      <a href="/post" class="btn btn-outline">看看貼文</a>
+      <a href="/article" class="btn btn-outline">看看文章</a>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .not-found-page {
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 12px;
+  }
+
+  .not-found-code {
+    font-size: 6rem;
+    font-weight: 800;
+    color: var(--accent-color);
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+
+  .not-found-bar {
+    width: 60px;
+    height: 4px;
+    margin: 4px 0 8px 0;
+  }
+
+  .not-found-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+  }
+
+  .not-found-desc {
+    color: var(--secondary-text-color);
+    margin: 0 0 12px 0;
+  }
+
+  .not-found-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 480px) {
+    .not-found-code {
+      font-size: 4rem;
+    }
+    .not-found-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+    .not-found-actions .btn {
+      width: 100%;
+    }
+  }
+</style>
