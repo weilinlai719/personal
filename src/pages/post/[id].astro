@@ -156,6 +156,32 @@ export const prerender = false;
   .comment-form-group {
     width: 100%;
   }
+
+  /* 查無此貼文（比照 404 頁的風格） */
+  .post-not-found {
+    text-align: center;
+    padding: 48px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .post-not-found .not-found-code {
+    font-size: 4.5rem;
+    font-weight: 800;
+    color: var(--accent-color);
+    line-height: 1;
+  }
+  .post-not-found .not-found-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 4px 0 0 0;
+  }
+  .post-not-found .not-found-desc {
+    color: var(--secondary-text-color);
+    margin: 0 0 12px 0;
+  }
 </style>
 
 <script>
@@ -167,6 +193,7 @@ export const prerender = false;
   const postContainer = document.getElementById('post-container') as HTMLElement | null;
   const commentsContainer = document.getElementById('comments-container') as HTMLElement | null;
   const commentForm = document.getElementById('comment-form') as HTMLFormElement | null;
+  const commentSection = document.querySelector('.comment-section') as HTMLElement | null;
 
   async function fetchPost() {
     if (!postContainer) return;
@@ -197,11 +224,22 @@ export const prerender = false;
             <div class="post-content-body">${data.post.content || ''}</div>
           </div>
         `;
+        return true;
       } else {
-        postContainer.innerHTML = `<div class="loading-text" style="color:red;">錯誤: ${data.error}</div>`;
+        postContainer.innerHTML = `
+          <div class="post-not-found">
+            <div class="not-found-code">404</div>
+            <h2 class="not-found-title">找不到這篇貼文</h2>
+            <p class="not-found-desc">編號 ${postId} 不存在，可能已經被刪除或網址打錯了。</p>
+            <a href="/post" class="btn btn-primary">← 回到貼文列表</a>
+          </div>
+        `;
+        window.location.href = "/404/";
+        return false;
       }
     } catch (err) {
       postContainer.innerHTML = `<div class="loading-text" style="color:red;">無法連線至後端伺服器</div>`;
+      return false;
     }
   }
 
@@ -264,6 +302,14 @@ export const prerender = false;
     });
   }
 
-  fetchPost();
-  fetchComments();
+  async function init() {
+    const found = await fetchPost();
+    if (found) {
+      fetchComments();
+    } else if (commentSection) {
+      commentSection.style.display = 'none';
+    }
+  }
+
+  init();
 </script>

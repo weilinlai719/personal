@@ -5,73 +5,382 @@ import '../styles/style.css';
 ---
 
 <MainLayout title="404 - 找不到頁面">
-  <div class="detail-container not-found-page">
-    <div class="not-found-code">404</div>
-    <div class="orange-bar not-found-bar"></div>
-    <h1 class="not-found-title">這裡什麼都沒有</h1>
-    <p class="not-found-desc">你要找的頁面不存在，或是已經被移動了。</p>
+  <div class="lost-page">
+    <div class="ambient" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
 
-    <div class="not-found-actions">
-      <a href="/" class="btn btn-primary">回到首頁</a>
-      <a href="/post" class="btn btn-outline">看看貼文</a>
-      <a href="/article" class="btn btn-outline">看看文章</a>
-    </div>
+    <main class="lost-content">
+      <div class="boot" aria-live="polite">
+        <span class="boot-label">SEARCHING FOR PAGE</span>
+        <span class="boot-progress"><i></i></span>
+        <span class="boot-percent">0%</span>
+      </div>
+
+      <section class="error-card">
+        <div class="code-line">
+          <span class="code-side">ERROR</span>
+          <div class="error-number" aria-label="404">
+            <span>4</span>
+            <button class="zero" type="button" aria-label="互動的 0">
+              <span class="zero-inner"></span>
+            </button>
+            <span>4</span>
+          </div>
+          <span class="code-side">NOT FOUND</span>
+        </div>
+
+        <div class="message">
+          <p class="message-main">這裡沒有你要找的東西。</p>
+          <p class="message-sub" data-message>但也許，你只是走錯了一步。</p>
+        </div>
+
+        <div class="actions">
+          <a href="/" class="home-btn"><span>回到首頁</span><b>↗</b></a>
+          <a href="/post" class="text-btn">看看貼文</a>
+          <a href="/article" class="text-btn">看看文章</a>
+        </div>
+
+        <button class="secret" type="button">
+          <span>there is nothing here</span>
+          <b>·</b>
+        </button>
+      </section>
+    </main>
+
+    <div class="corner corner-tl">WL / 404</div>
+    <div class="corner corner-br">EST. 2026</div>
   </div>
 </MainLayout>
 
+<script>
+  const page = document.querySelector<HTMLElement>('.lost-page');
+  const zero = document.querySelector<HTMLButtonElement>('.zero');
+  const message = document.querySelector<HTMLElement>('[data-message]');
+  const secret = document.querySelector<HTMLButtonElement>('.secret');
+  const percent = document.querySelector<HTMLElement>('.boot-percent');
+  const progress = document.querySelector<HTMLElement>('.boot-progress i');
+
+  if (page && zero && message && secret && percent && progress) {
+    let mouseX = 0;
+    let mouseY = 0;
+
+    window.addEventListener('pointermove', (event) => {
+      mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
+      mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
+
+      page.style.setProperty('--mx', `${mouseX * 12}px`);
+      page.style.setProperty('--my', `${mouseY * 12}px`);
+    }, { passive: true });
+
+    // 0 像一顆小眼睛，會追蹤游標。
+    zero.addEventListener('pointermove', (event) => {
+      const rect = zero.getBoundingClientRect();
+      const x = Math.max(-7, Math.min(7, (event.clientX - (rect.left + rect.width / 2)) / 3));
+      const y = Math.max(-7, Math.min(7, (event.clientY - (rect.top + rect.height / 2)) / 3));
+      zero.style.setProperty('--eye-x', `${x}px`);
+      zero.style.setProperty('--eye-y', `${y}px`);
+    });
+
+    zero.addEventListener('pointerleave', () => {
+      zero.style.setProperty('--eye-x', '0px');
+      zero.style.setProperty('--eye-y', '0px');
+    });
+
+    // 輕微的「搜尋頁面」進場效果。
+    let value = 0;
+    const timer = window.setInterval(() => {
+      value += Math.ceil(Math.random() * 13);
+      if (value >= 100) {
+        value = 100;
+        window.clearInterval(timer);
+      }
+      percent.textContent = `${value}%`;
+      progress.style.width = `${value}%`;
+    }, 65);
+
+    secret.addEventListener('click', () => {
+      page.classList.toggle('found');
+      message.textContent = page.classList.contains('found')
+        ? '好吧，你真的找到這裡了。'
+        : '但也許，你只是走錯了一步。';
+      secret.querySelector('span')!.textContent = page.classList.contains('found')
+        ? 'okay, you found it'
+        : 'there is nothing here';
+    });
+  }
+</script>
+
 <style>
-  .not-found-page {
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    min-height: 60vh;
-    gap: 12px;
+  .lost-page {
+    --mx: 0px;
+    --my: 0px;
+    position: relative;
+    min-height: calc(100vh - 80px);
+    overflow: hidden;
+    isolation: isolate;
+    display: grid;
+    place-items: center;
+    background: #f3f3f0;
+    color: #171717;
   }
 
-  .not-found-code {
-    font-size: 6rem;
-    font-weight: 800;
-    color: var(--accent-color);
-    line-height: 1;
-    letter-spacing: -2px;
+  .lost-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    background-image: linear-gradient(rgba(0,0,0,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,.035) 1px, transparent 1px);
+    background-size: 42px 42px;
+    transform: translate3d(calc(var(--mx) * -.15), calc(var(--my) * -.15), 0);
   }
 
-  .not-found-bar {
-    width: 60px;
-    height: 4px;
-    margin: 4px 0 8px 0;
+  .ambient {
+    position: absolute;
+    width: 48vw;
+    height: 48vw;
+    max-width: 650px;
+    max-height: 650px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.95), transparent 68%);
+    transform: translate3d(var(--mx), var(--my), 0);
+    transition: transform .25s ease-out;
+    z-index: -2;
   }
 
-  .not-found-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin: 0;
+  .scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(0,0,0,.08);
+    animation: scan 5s linear infinite;
+    pointer-events: none;
   }
 
-  .not-found-desc {
-    color: var(--secondary-text-color);
-    margin: 0 0 12px 0;
+  .lost-content {
+    width: min(900px, 90vw);
+    padding: 5rem 0;
   }
 
-  .not-found-actions {
+  .boot {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    align-items: center;
     gap: 12px;
-    margin-top: 8px;
+    width: min(460px, 100%);
+    margin: 0 auto 4rem;
+    color: #777;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: .13em;
   }
 
-  @media (max-width: 480px) {
-    .not-found-code {
-      font-size: 4rem;
-    }
-    .not-found-actions {
-      flex-direction: column;
-      width: 100%;
-    }
-    .not-found-actions .btn {
-      width: 100%;
-    }
+  .boot-progress {
+    flex: 1;
+    height: 2px;
+    overflow: hidden;
+    background: #ddd;
+  }
+
+  .boot-progress i {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: #171717;
+    transition: width .08s linear;
+  }
+
+  .boot-percent {
+    width: 32px;
+    text-align: right;
+  }
+
+  .error-card {
+    text-align: center;
+  }
+
+  .code-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+  }
+
+  .code-side {
+    color: #aaa;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 9px;
+    letter-spacing: .22em;
+  }
+
+  .error-number {
+    display: flex;
+    align-items: center;
+    color: #111;
+    font-size: clamp(8rem, 22vw, 14rem);
+    font-weight: 800;
+    line-height: .72;
+    letter-spacing: -.09em;
+  }
+
+  .zero {
+    position: relative;
+    width: clamp(5rem, 13vw, 8.2rem);
+    height: clamp(7rem, 16vw, 10.5rem);
+    margin: 0 .12em;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: crosshair;
+  }
+
+  .zero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: clamp(14px, 2vw, 22px) solid #111;
+    border-radius: 50%;
+    transform: rotate(-7deg);
+    transition: transform .2s ease;
+  }
+
+  .zero-inner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 50%;
+    left: 50%;
+    margin: -5px;
+    border-radius: 50%;
+    background: #111;
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0));
+    transition: transform .08s linear;
+  }
+
+  .zero:hover::before {
+    transform: rotate(-7deg) scale(1.04);
+  }
+
+  .message {
+    margin-top: 3.3rem;
+  }
+
+  .message-main {
+    margin: 0;
+    font-size: clamp(1.25rem, 3vw, 1.7rem);
+    font-weight: 650;
+    letter-spacing: -.025em;
+  }
+
+  .message-sub {
+    margin: .65rem 0 0;
+    color: #888;
+    font-size: .9rem;
+    transition: opacity .2s ease;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin-top: 2.2rem;
+  }
+
+  .actions a { text-decoration: none; }
+
+  .home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 17px 12px 20px;
+    border-radius: 999px;
+    background: #111;
+    color: #fff;
+    font-size: .84rem;
+    transition: transform .25s ease, gap .25s ease;
+  }
+
+  .home-btn b { font-size: 1rem; font-weight: 400; }
+  .home-btn:hover { transform: translateY(-4px); gap: 24px; }
+
+  .text-btn {
+    position: relative;
+    color: #666;
+    font-size: .84rem;
+  }
+
+  .text-btn::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -5px;
+    left: 0;
+    height: 1px;
+    background: #111;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform .25s ease;
+  }
+
+  .text-btn:hover { color: #111; }
+  .text-btn:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  .secret {
+    margin-top: 4rem;
+    border: 0;
+    background: none;
+    color: #c2c2be;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 9px;
+    letter-spacing: .12em;
+    cursor: pointer;
+    transition: color .25s ease;
+  }
+
+  .secret b { margin-left: 5px; }
+  .secret:hover { color: #777; }
+
+  .corner {
+    position: absolute;
+    color: #aaa;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 8px;
+    letter-spacing: .14em;
+  }
+
+  .corner-tl { top: 24px; left: 28px; }
+  .corner-br { right: 28px; bottom: 24px; }
+
+  .found .zero::before { animation: found .55s ease; }
+  .found .message-main { text-decoration: line-through; text-decoration-thickness: 1px; }
+
+  @keyframes found {
+    0% { transform: rotate(-7deg) scale(1); }
+    35% { transform: rotate(7deg) scale(1.12); }
+    100% { transform: rotate(-7deg) scale(1); }
+  }
+
+  @keyframes scan {
+    from { transform: translateY(-10px); }
+    to { transform: translateY(100vh); }
+  }
+
+  @media (max-width: 650px) {
+    .lost-page { min-height: calc(100vh - 64px); }
+    .lost-content { padding: 3rem 0; }
+    .boot { margin-bottom: 3rem; }
+    .code-line { gap: 10px; }
+    .code-side { display: none; }
+    .message { margin-top: 2.4rem; }
+    .actions { gap: 18px; flex-wrap: wrap; }
+    .corner { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scanline, .found .zero::before { animation: none; }
+    .ambient, .zero-inner { transition: none; }
   }
 </style>
