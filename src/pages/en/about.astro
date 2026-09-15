@@ -1,9 +1,9 @@
 ---
-// src/pages/about.astro （中文版，網址 /about）
-import MainLayout from '../layout/mainlayout.astro';
-import { useTranslations } from '../i18n/utils';
+// src/pages/en/about.astro （英文版，網址 /en/about）
+import MainLayout from '../../layout/mainlayout.astro';
+import { useTranslations } from '../../i18n/utils';
 
-const t = useTranslations('zh');
+const t = useTranslations('en');
 ---
 
 <MainLayout title={t('about.pageTitle')}>
@@ -13,12 +13,12 @@ const t = useTranslations('zh');
             <div class="avatar-flip-inner">
                 <img 
                   src="/images/avatar.jpg" 
-                  alt="Weilin Lai 正面" 
+                  alt="Weilin Lai" 
                   class="about-avatar avatar-front" 
                 />
                 <img 
                   src="/images/avatar1.jpg" 
-                  alt="Weilin Lai 反面" 
+                  alt="Weilin Lai (flipped)" 
                   class="about-avatar avatar-back" 
                 />
             </div>
@@ -26,7 +26,7 @@ const t = useTranslations('zh');
 
         <div class="about-info-text">
             <h1 class="author-name">Weilin Lai</h1>
-            <p class="author-subtitle">學生 / developer</p>
+            <p class="author-subtitle">Student / developer</p>
             <p class="author-subtitle">-116GAST-</p>
 
             <div class="about-languages" style="margin-top: 0rem;">
@@ -36,8 +36,8 @@ const t = useTranslations('zh');
             </div>
             
             <div class="author-bio">
-                <p>摸過：API、後端、web、.Net、開源函式庫、GUI(擱置中)；沒有摸過，但想碰：AI、algorithm、資安、無人機、賽車(台大方程式車隊)、火箭(臺灣盃火箭競賽)</p>
-                <p>誰知道以後會發生甚麼事呢，努力就對了!</p>
+                <p>Worked with: APIs, backend, web, .NET, open-source libraries, GUI (on hold); haven't touched yet but want to: AI, algorithms, cybersecurity, drones, racing (NTU Formula Racing Team), rockets (Taiwan Rocket Competition)</p>
+                <p>Who knows what's coming next — just gotta keep pushing forward!</p>
             </div>
         </div>
 
@@ -297,7 +297,7 @@ const t = useTranslations('zh');
                     await navigator.clipboard.writeText(discordId);
                     
                     const originalText = 'Discord';
-                    discordText.textContent = '已複製 ID !';
+                    discordText.textContent = 'Copied!';
                     discordText.style.color = '#10b981'; 
                     
                     setTimeout(() => {
@@ -305,7 +305,7 @@ const t = useTranslations('zh');
                         discordText.style.color = ''; 
                     }, 2000);
                 } catch (err) {
-                    alert('複製失敗，請手動複製 ID: ' + discordId);
+                    alert('Copy failed, please copy manually: ' + discordId);
                 }
             });
         }

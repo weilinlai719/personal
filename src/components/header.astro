@@ -1,18 +1,23 @@
 ---
 // src/components/header.astro
-const pathname = Astro.url.pathname;
+import { getLangFromUrl, useTranslations, getLocalizedPath, getLangSwitchHref } from '../i18n/utils';
 
+const pathname = Astro.url.pathname;
 const isAbout = pathname.includes('/about');
 const ispost = pathname.includes('/post');
 const isarticle = pathname.includes('/article');
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const otherLang = lang === 'zh' ? 'en' : 'zh';
 ---
 
 <header class="navbar">
   <div class="nav-container">
     <div class="nav-logo">
-      <a href="/" class="logo-text">Weilin Lai</a>
+      <a href={getLocalizedPath(lang, '/')} class="logo-text">Weilin Lai</a>
     </div>
-         
+
     <button class="menu-toggle" id="menuToggle" aria-label="切換選單">
       <span class="hamburger-bar"></span>
       <span class="hamburger-bar"></span>
@@ -21,47 +26,53 @@ const isarticle = pathname.includes('/article');
 
     <nav class="nav-menu" id="navMenu">
       <div class="nav-links">
-        
-        <a href="/post/" class:list={['nav-item', 'nav-link', { active: ispost }]}>
-          Posts
+        <a href={getLocalizedPath(lang, '/post/')} class:list={['nav-item', 'nav-link', { active: ispost }]}>
+          {t('nav.posts')}
         </a>
-     
-        
-        <a href="/article/" class:list={['nav-item', 'nav-link', { active: isarticle }]}>
-          article
+        <a href={getLocalizedPath(lang, '/article/')} class:list={['nav-item', 'nav-link', { active: isarticle }]}>
+          {t('nav.article')}
         </a>
 
         <div class="nav-item dropdown">
           <button class="dropdown-trigger" id="projectsTrigger">
-            projects
+            {t('nav.projects')}
             <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </button>
-          
+
           <div class="dropdown-content">
             <a href="https://weilinlai719.github.io/luckydraw" class="dropdown-link" target="_blank" rel="noopener noreferrer">
-              <span class="link-title">🎁 抽獎器</span>
+              <span class="link-title">{t('nav.projects.lottery')}</span>
             </a>
             <a href="https://weilinlai719.github.io/earth-science-explore/" class="dropdown-link" target="_blank" rel="noopener noreferrer">
-              <span class="link-title">🌎 地科探究</span>
+              <span class="link-title">{t('nav.projects.earthscience')}</span>
             </a>
-            <a href="/projects/cui/" class="dropdown-link" rel="noopener noreferrer">
-              <span class="link-title">開源專案：CUI</span>
+            <a href={getLocalizedPath(lang, '/projects/cui/')} class="dropdown-link" rel="noopener noreferrer">
+              <span class="link-title">{t('nav.projects.cui')}</span>
             </a>
           </div>
         </div>
 
-        <a href="/about/" class:list={['nav-item', 'nav-link', { active: isAbout }]}>
-          about
+        <a href={getLocalizedPath(lang, '/about/')} class:list={['nav-item', 'nav-link', { active: isAbout }]}>
+          {t('nav.about')}
         </a>
-        
+
+        <!-- 語言切換：貼文頁目前沒有英文版，getLangSwitchHref 會自動導去該語言的首頁 -->
+        <a
+          href={getLangSwitchHref(Astro.url, otherLang)}
+          class="nav-item nav-link lang-switch"
+          id="langSwitchLink"
+          data-target-lang={otherLang}
+        >
+          🌐 {otherLang === 'en' ? 'EN' : '中文'}
+        </a>
       </div>
     </nav>
   </div>
 </header>
 
-<style> 
+<style>
   .navbar {
     background: var(--header-bg, rgba(255, 255, 255, 0.65));
     backdrop-filter: blur(10px);
@@ -95,12 +106,12 @@ const isarticle = pathname.includes('/article');
     font-size: 1.1rem;
   }
 
-  .nav-links { 
-    display: flex; 
+  .nav-links {
+    display: flex;
     gap: 10px;
     align-items: center;
   }
-  
+
   .nav-item {
     text-decoration: none;
     color: var(--secondary-text-color, #6f6f6f);
@@ -121,14 +132,20 @@ const isarticle = pathname.includes('/article');
     color: inherit;
   }
 
-  .nav-item.active, .nav-link.active { 
+  .nav-item.active, .nav-link.active {
     color: var(--text-color, #121213);
     font-weight: 500;
   }
 
-  .nav-item:hover { 
+  .nav-item:hover {
     color: var(--text-color, #000000);
     background: var(--shadow-color2, rgba(0,0,0,0.05));
+  }
+
+  .lang-switch {
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--shadow-color2, #e5e7eb);
   }
 
   .dropdown-trigger {
@@ -219,14 +236,10 @@ const isarticle = pathname.includes('/article');
     transform: translateY(-6.5px) rotate(-45deg);
   }
 
-  /* =======================================================
-     💻 電腦版 (min-width: 769px)
-     ======================================================= */
   @media screen and (min-width: 769px) {
     .dropdown {
       position: relative;
     }
-    
     .dropdown-content {
       top: 100%;
       left: 50%;
@@ -236,26 +249,20 @@ const isarticle = pathname.includes('/article');
       flex-direction: column;
       gap: 2px;
     }
-
     .dropdown:hover .dropdown-content {
       opacity: 1;
       visibility: visible;
       transform: translateX(-50%) translateY(4px);
     }
-
     .dropdown:hover .chevron-icon {
       transform: rotate(180deg);
     }
   }
 
-  /* =======================================================
-     📱 手機版  (max-width: 768px)
-     ======================================================= */
   @media screen and (max-width: 768px) {
     .menu-toggle {
       display: flex;
     }
-
     .nav-menu {
       position: absolute;
       top: 4rem;
@@ -267,24 +274,20 @@ const isarticle = pathname.includes('/article');
       border-bottom: 1px solid var(--shadow-color2, #e5e7eb);
       padding: 5px 20px 24px 20px;
       border-radius: 12px;
-
       display: none;
       flex-direction: column;
       z-index: 1500;
       max-height: calc(100vh - 4rem);
       overflow-y: auto;
     }
-
     .nav-menu.is-active {
       display: flex !important;
     }
-
     .nav-links {
       flex-direction: column;
       align-items: stretch;
       gap: 10px;
     }
-
     .nav-item {
       width: 100%;
       box-sizing: border-box;
@@ -292,14 +295,11 @@ const isarticle = pathname.includes('/article');
       padding: 14px 18px;
       font-size: 1.05rem;
     }
-
     .dropdown {
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      
     }
-
     .dropdown-content {
       position: static;
       width: 100%;
@@ -310,22 +310,18 @@ const isarticle = pathname.includes('/article');
       padding: 4px 0 4px 14px;
       margin-top: 6px;
       border-left: 2px solid #e5e7eb;
-
       display: none;
       flex-direction: column;
       gap: 6px;
       transform: none;
     }
-
     .dropdown-content.is-active {
       display: flex !important;
     }
-
     .dropdown-link {
       background-color: var(--shadow-color2, rgba(0, 0, 0, 0.02));
       padding: 12px 16px;
     }
-
     .dropdown-trigger.is-active .chevron-icon {
       transform: rotate(180deg);
     }
@@ -333,29 +329,24 @@ const isarticle = pathname.includes('/article');
 </style>
 
 <script>
-  
   function toggleMobileMenu(e: Event) {
     e.stopPropagation();
     const menuToggle = document.getElementById('menuToggle');
     const navMenu = document.getElementById('navMenu');
-    
     menuToggle?.classList.toggle('is-active');
     navMenu?.classList.toggle('is-active');
   }
 
   function handleDropdownToggle(e: Event) {
-    if (window.innerWidth > 768) return; 
-
+    if (window.innerWidth > 768) return;
     e.preventDefault();
     e.stopPropagation();
-
     const currentTrigger = e.currentTarget as HTMLElement;
     const dropdownContainer = currentTrigger.closest('.dropdown');
     const currentContent = dropdownContainer?.querySelector('.dropdown-content') as HTMLElement | null;
 
     if (currentContent) {
       const isCurrentlyActive = currentContent.classList.contains('is-active');
-
       document.querySelectorAll('.dropdown-content').forEach((c) => {
         if (c !== currentContent) c.classList.remove('is-active');
       });
@@ -383,6 +374,22 @@ const isarticle = pathname.includes('/article');
     }
   }
 
+  // 使用者手動點了語言切換鈕，記住這個選擇，
+  // 之後 mainlayout.astro 裡的自動偵測腳本就不會再蓋過使用者自己選的語言。
+  function handleLangSwitchClick() {
+    const link = document.getElementById('langSwitchLink');
+    link?.addEventListener('click', () => {
+      const targetLang = link.getAttribute('data-target-lang');
+      if (targetLang) {
+        try {
+          localStorage.setItem('lang-pref', targetLang);
+        } catch {
+          // localStorage 被封鎖也沒關係，語言切換連結本身還是能正常導頁
+        }
+      }
+    });
+  }
+
   function initNavigationSystem() {
     const menuToggle = document.getElementById('menuToggle');
     const dropdownTriggers = document.querySelectorAll('.dropdown-trigger');
@@ -399,6 +406,8 @@ const isarticle = pathname.includes('/article');
 
     document.removeEventListener('click', closeAllMenusSafely);
     document.addEventListener('click', closeAllMenusSafely);
+
+    handleLangSwitchClick();
   }
 
   window.addEventListener('resize', () => {

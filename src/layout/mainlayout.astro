@@ -2,40 +2,84 @@
 // src/layout/mainlayout.astro
 import Header from '../components/header.astro';
 import Footer from '../components/footer.astro';
+import { getLangFromUrl } from '../i18n/utils';
+
 const { title = "weilinlai的網站" } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
 ---
-<html lang="zh-TW">
+
+<html lang={lang === 'en' ? 'en' : 'zh-TW'}>
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    <link rel="icon" href="/images/circle-crop.png" type="image/x-icon"  /> 
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <link rel="icon" href="/images/circle-crop.png" type="image/x-icon" />
+
+  <!--
+    語言自動偵測：
+    - 第一次造訪、還沒有存過語言偏好 -> 看瀏覽器語言是不是英文，是的話導去 /en
+      （如果使用者是直接點 /en 開頭的連結進來的，尊重這個選擇，不會硬導回中文）
+    - 之後每次造訪，只要偏好跟目前網址對不上，就導去偏好的語言版本
+      （所以在 header 手動切換一次語言之後，之後都會記得）
+    這段一定要放在 <head> 裡同步執行（is:inline），才能在畫面畫出來「之前」就導頁，
+    不然會先閃一下錯誤語言的版本。
+  -->
+  <script is:inline>
+    (function () {
+      try {
+        var path = window.location.pathname;
+        var onEnPath = path === '/en' || path.indexOf('/en/') === 0;
+        var pref = localStorage.getItem('lang-pref');
+
+        if (!pref) {
+          if (onEnPath) {
+            localStorage.setItem('lang-pref', 'en');
+          } else {
+            var browserLang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
+            if (browserLang.indexOf('en') === 0) {
+              localStorage.setItem('lang-pref', 'en');
+              window.location.replace('/en' + path + window.location.search + window.location.hash);
+            } else {
+              localStorage.setItem('lang-pref', 'zh');
+            }
+          }
+        } else if (pref === 'en' && !onEnPath) {
+          window.location.replace('/en' + path + window.location.search + window.location.hash);
+        } else if (pref === 'zh' && onEnPath) {
+          var stripped = path.replace(/^\/en(\/|$)/, '/');
+          window.location.replace(stripped + window.location.search + window.location.hash);
+        }
+      } catch (e) {
+        // localStorage 被封鎖就不做自動偵測，直接顯示預設語言（中文），不影響其他功能
+      }
+    })();
+  </script>
 </head>
 <body>
-    <Header />
-    <main class="main-container">
-        <slot />
-    </main>  
-    <Footer />
+  <Header />
+  <main class="main-container">
+    <slot />
+  </main>
+  <Footer />
 </body>
 </html>
 
-<style is:global>   
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f4f6f9;
-        color: #333;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-    .main-container {
-        flex: 1;
-        width: 100%;
-    }
+<style is:global>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .main-container {
+    flex: 1;
+    width: 100%;
+  }
 </style>

@@ -1,124 +1,128 @@
 ---
 // src/components/footer.astro
----
-<footer class="footer">
-    <p class="footertext">
-      © 2026
-      <a href="https://github.com/weilinlai719" target="_blank">weilinlai</a>.
-      All Rights Reserved.
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
 
-    &emsp;瀏覽人數: <span id="footer-visitor-count">載入中...</span>人
-    </p>
-    <div class="footertext">
-        <span>網頁已運行：</span>
-        &nbsp;<span id="runtime-years">0</span> 年 
-        &nbsp;<span id="runtime-days">0</span> 天 
-        &nbsp;<span id="runtime-hours">0</span> 小時 
-        &nbsp;<span id="runtime-minutes">0</span> 分 
-        &nbsp;<span id="runtime-seconds">0</span> 秒
-    </div>
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<footer class="footer">
+  <p class="footertext">
+    © 2026
+    <a href="https://github.com/weilinlai719" target="_blank">weilinlai</a>.
+    {t('footer.rights')}
+    &emsp;{t('footer.visitors')}: <span id="footer-visitor-count">{lang === 'zh' ? '載入中...' : 'loading...'}</span>{t('footer.visitorsUnit')}
+  </p>
+  <div class="footertext">
+    <span>{t('footer.runtime')}</span>
+    &nbsp;<span id="runtime-years">0</span> {t('footer.years')}
+    &nbsp;<span id="runtime-days">0</span> {t('footer.days')}
+    &nbsp;<span id="runtime-hours">0</span> {t('footer.hours')}
+    &nbsp;<span id="runtime-minutes">0</span> {t('footer.minutes')}
+    &nbsp;<span id="runtime-seconds">0</span> {t('footer.seconds')}
+  </div>
 </footer>
 
 <style>
-    .footer { 
-        text-align: center;
-        width: 100%;
-        padding: 2rem 0; 
-        margin-top: auto;  
-        border-top: 1px solid var(--shadow-color2);
-    }
-    .footertext { 
-        color: var(--secondary-text-color); 
-        font-size: 0.85rem; 
-    }
-    .footertext a { 
-        color: var(--text-color); 
-        text-decoration: none; 
-        font-weight: 500; 
-    }
-    .footertext a:hover { 
-        text-decoration: underline; 
-    }
-    #footer-text-count {
-        font-weight: bold;
-        color: var(--text-color);
-        margin: 0 4px;
-    }
+  .footer {
+    text-align: center;
+    width: 100%;
+    padding: 2rem 0;
+    margin-top: auto;
+    border-top: 1px solid var(--shadow-color2);
+  }
+
+  .footertext {
+    color: var(--secondary-text-color);
+    font-size: 0.85rem;
+  }
+
+  .footertext a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .footertext a:hover {
+    text-decoration: underline;
+  }
+
+  #footer-text-count {
+    font-weight: bold;
+    color: var(--text-color);
+    margin: 0 4px;
+  }
 </style>
 
 <script>
-    const API_BASE_URL = 'https://words7000.onrender.com';
-    async function getBrowserFingerprint() {
-        const baseData = navigator.userAgent + 
-                         navigator.language + 
-                         screen.width + 'x' + screen.height + 
-                         screen.colorDepth + 
-                         new Date().getTimezoneOffset();
-        
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-            ctx.textBaseline = 'top';
-            ctx.font = '14px Arial';
-            ctx.fillText('WeilinLai' + baseData, 2, 2);
-        }
-        const canvasData = canvas.toDataURL();
-        
-        const msgBuffer = new TextEncoder().encode(baseData + canvasData);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const API_BASE_URL = 'https://words7000.onrender.com';
+
+  async function getBrowserFingerprint() {
+    const baseData = navigator.userAgent +
+      navigator.language +
+      screen.width + 'x' + screen.height +
+      screen.colorDepth +
+      new Date().getTimezoneOffset();
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillText('WeilinLai' + baseData, 2, 2);
     }
+    const canvasData = canvas.toDataURL();
 
-    async function recordAndFetchVisitorCount() {
-        try {
-            const fingerprint = await getBrowserFingerprint();
-            
-            const visitorData = {
-                screenResolution: `${window.screen.width}x${window.screen.height}`,
-                language: navigator.language || navigator.language,
-                url: window.location.href,
-                fingerprint: fingerprint
-            };
+    const msgBuffer = new TextEncoder().encode(baseData + canvasData);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
 
-            const res = await fetch(`${API_BASE_URL}/api/visit`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(visitorData)
-            });
+  async function recordAndFetchVisitorCount() {
+    try {
+      const fingerprint = await getBrowserFingerprint();
+      const visitorData = {
+        screenResolution: `${window.screen.width}x${window.screen.height}`,
+        language: navigator.language || navigator.language,
+        url: window.location.href,
+        fingerprint: fingerprint
+      };
 
-            if (!res.ok) return;
+      const res = await fetch(`${API_BASE_URL}/api/visit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(visitorData)
+      });
 
-            const data = await res.json();
-            if (data.success) {
-                const countSpan = document.getElementById('footer-visitor-count');
-                if (countSpan) {
-                    countSpan.innerText = data.count;
-                }
-            }
-        } catch (error) {
-            console.error('無法記錄或獲取訪客人數:', error);
-            const countSpan = document.getElementById('footer-visitor-count');
-            if (countSpan) {
-                countSpan.innerText = '-';
-            }
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.success) {
+        const countSpan = document.getElementById('footer-visitor-count');
+        if (countSpan) {
+          countSpan.innerText = data.count;
         }
+      }
+    } catch (error) {
+      console.error('無法記錄或獲取訪客人數:', error);
+      const countSpan = document.getElementById('footer-visitor-count');
+      if (countSpan) {
+        countSpan.innerText = '-';
+      }
     }
+  }
 
-    function updateRuntime() {
+  function updateRuntime() {
     const startTime = new Date('2026-01-01T00:00:00').getTime();
     const now = new Date().getTime();
     const difference = now - startTime;
 
-
-    // 計算 天、時、分、秒
     const years = Math.floor(difference / (1000 * 60 * 60 * 24 * 365));
     const days = Math.floor((difference / (1000 * 60 * 60 * 24)) % 365);
     const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((difference / 1000 / 60) % 60);
     const seconds = Math.floor((difference / 1000) % 60);
 
-    // 更新 DOM 內容
     const yearsEl = document.getElementById('runtime-years');
     const daysEl = document.getElementById('runtime-days');
     const hoursEl = document.getElementById('runtime-hours');
@@ -134,6 +138,5 @@
 
   updateRuntime();
   setInterval(updateRuntime, 1000);
-
-    window.addEventListener('DOMContentLoaded', recordAndFetchVisitorCount);
+  window.addEventListener('DOMContentLoaded', recordAndFetchVisitorCount);
 </script>

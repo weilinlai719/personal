@@ -1,13 +1,14 @@
----// src/pages/404.astro
-import MainLayout from '../layout/mainlayout.astro';
-import '../styles/style.css';
-import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/utils';
+---
+// src/pages/en/404.astro （英文版，網址 /en/404）
+import MainLayout from '../../layout/mainlayout.astro';
+import '../../styles/style.css';
+import { useTranslations, getLocalizedPath } from '../../i18n/utils';
 
-const lang = getLangFromUrl(Astro.url);
+const lang = 'en' as const;
 const t = useTranslations(lang);
 ---
 
-<MainLayout title="404 - 找不到頁面">
+<MainLayout title="404 - Page Not Found">
   <div class="lost-page">
     <div class="ambient" aria-hidden="true"></div>
     <div class="scanline" aria-hidden="true"></div>
@@ -33,14 +34,14 @@ const t = useTranslations(lang);
         </div>
 
         <div class="message">
-          <p class="message-main">這裡沒有你要找的東西。</p>
-          <p class="message-sub" data-message>但也許，你只是走錯了一步。</p>
+          <p class="message-main">The page you are looking for does not exist.</p>
+          <p class="message-sub" data-message>But maybe, you just took a wrong turn.</p>
         </div>
 
         <div class="actions">
-          <a href="/" class="home-btn"><span>回到首頁</span><b>↗</b></a>
-          <a href="/post" class="text-btn">看看貼文</a>
-          <a href="/article" class="text-btn">看看文章</a>
+          <a href="/" class="home-btn"><span>Go back to the homepage</span><b>↗</b></a>
+          <a href="/post" class="text-btn">View Posts</a>
+          <a href="/article" class="text-btn">View Articles</a>
         </div>
 
         <button class="secret" type="button">

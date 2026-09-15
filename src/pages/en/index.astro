@@ -1,9 +1,9 @@
 ---
-// src/pages/index.astro （中文版，網址 /）
-import MainLayout from '../layout/mainlayout.astro';
-import { useTranslations } from '../i18n/utils';
+// src/pages/en/index.astro （英文版，網址 /en）
+import MainLayout from '../../layout/mainlayout.astro';
+import { useTranslations } from '../../i18n/utils';
 
-const t = useTranslations('zh');
+const t = useTranslations('en');
 ---
 
 <MainLayout title={t('home.pageTitle')}>
@@ -16,7 +16,7 @@ const t = useTranslations('zh');
           <h1 class="title-text">Welcome!</h1>
           <div class="game-message" aria-hidden="true"></div>
         </div>
-        <a class="explore" href="/about" aria-label={t('home.exploreAria')}>
+        <a class="explore" href="/en/about" aria-label={t('home.exploreAria')}>
           <span>{t('home.explore')}</span>
           <span class="arrow" aria-hidden="true">→</span>
         </a>

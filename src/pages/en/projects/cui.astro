@@ -1,9 +1,9 @@
 ---
-// src/pages/projects/cui.astro （中文版，網址 /projects/cui）
-import MainLayout from '../../layout/mainlayout.astro';
-import { useTranslations } from '../../i18n/utils';
+// src/pages/en/projects/cui.astro （英文版，網址 /en/projects/cui）
+import MainLayout from '../../../layout/mainlayout.astro';
+import { useTranslations } from '../../../i18n/utils';
 
-const t = useTranslations('zh');
+const t = useTranslations('en');
 ---
 <MainLayout title={t('cui.pageTitle')}>
 
@@ -11,47 +11,48 @@ const t = useTranslations('zh');
     <header class="project-header">
       <div class="project-badge">Project</div>
       <h1 class="project-title">CUI</h1>
-      <p class="project-subtitle">用 C 語言編輯成的輕量化 UI 庫</p>
+      <p class="project-subtitle">A lightweight UI library written in C</p>
 
       <div class="project-links">
         <a href="https://github.com/cji-3/CUI" target="_blank" rel="noopener noreferrer" class="btn">
           <img src="/icon/github.svg" class="social-icon" alt="GitHub" />
-                <span class="social-text">GitHub詳細內容</span>
+                <span class="social-text">View on GitHub</span>
         </a>
         <a href="https://discord.gg/QvqhQyJDbB" target="_blank" rel="noopener noreferrer" class="btn">
           <img src="/icon/discord.svg" class="social-icon" alt="Discord" />
-                <span class="social-text discord-text">加入我們</span>
+                <span class="social-text discord-text">Join us</span>
         </a>
       </div>
     </header>
 
     <section class="project-card">
-      <h2>專案簡介</h2>
+      <h2>Overview</h2>
       <p>
-        <strong>CUI</strong> 是一個採用SDL開發的輕量化 C 語言使用者介面庫，
-        由兩位高中生共同開發，旨在提供簡單易用的 UI 元件，方便開發者快速構建圖形化應用程式，並精進後端開發能力。
+        <strong>CUI</strong> is a lightweight C user-interface library built on SDL,
+        co-developed by two high school students. It aims to provide simple, easy-to-use UI
+        components so developers can quickly build graphical applications while sharpening their backend skills.
       </p>
 
-      <h2>專案架構</h2>
+      <h2>Architecture</h2>
       <div class="component-grid">
         <div class="comp-group">
-          <h3>1. 顯示元件</h3>
+          <h3>1. Display components</h3>
           <p>Label, Image, Rect/Panel, Divider</p>
         </div>
         <div class="comp-group">
-          <h3>2. 互動元件</h3>
+          <h3>2. Interactive components</h3>
           <p>Button, IconButton, Toggle, Checkbox, Slider, ProgressBar</p>
         </div>
         <div class="comp-group">
-          <h3>3. 文字輸入</h3>
+          <h3>3. Text input</h3>
           <p>TextBox, TextArea, PasswordBox</p>
         </div>
         <div class="comp-group">
-          <h3>4. 佈局容器</h3>
+          <h3>4. Layout containers</h3>
           <p>Ctnr, VBox, HBox, Grid, ScrollView</p>
         </div>
         <div class="comp-group">
-          <h3>5. 高階元件</h3>
+          <h3>5. High-level components</h3>
           <p>Window/Modal, Menu, Dropdown, Tooltip, MessageBox</p>
         </div>
       </div>
