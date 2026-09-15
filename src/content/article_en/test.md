@@ -12,7 +12,7 @@ subject: '# test'
 ###### H6 Heading
 
 ## Text Emphasis
-This is a paragraph of text that includes *italics*, **bold**, and ~~strikethrough~~ created using the tilde symbol. You can also use _underline_ or __double underline__ to achieve the same emphasis.
+This is a paragraph of text that includes *italics*, **bold**, and ~~strikethrough~~ created using the tilde symbol. You can also use _underscores_ or __double underscores__ to achieve the same emphasis.
 
 ## List Test
 1. First ordered list item
@@ -28,7 +28,7 @@ This is a [link](https://www.google.com "Google's homepage") with a title.
 ![Image alt text](https://raw.githubusercontent.com/adam-p/markdown-here/master/src/common/images/icon48.png "Logo caption")
 
 ## Code Blocks
-This is an inline `code` test.
+This is a test of the in-line `code`.
 
 ```javascript
 // JavaScript 語法高亮測試
@@ -47,7 +47,7 @@ printf(%d,5);
 ```
 Quote:
 
-> In emails or articles, quoted text is a convenient way to simulate a reply.
+> In emails or articles, quoted text can conveniently simulate a reply.
 > This line is also part of the same quote block.
 > 
 > Even if this line is very long, it can still be quoted properly, and you can *include* other **Markdown** syntax within the quoted text.

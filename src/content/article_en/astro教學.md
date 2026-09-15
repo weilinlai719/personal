@@ -23,13 +23,13 @@ to launch the `localhost:4321` webpage.
 ## Components
 ### components
 #### header
-Manages the `header` block; as long as you set this up correctly, the main visual layout should be fine.
+Manages the `header` block; as long as you get this right, the main visual layout should be fine.
 #### footer
-You can place runtime information, copyright notices, and other elements here.
+You can place elements such as runtime information and copyright notices here.
 #### others
 You can create components such as pop-ups and tables, allowing you to reuse the same elements across different pages.
 ### mainlayout
-By including `footer` and `header`, eliminating the need to reference them later in `pages`; you can also integrate `title` into `mainlayout` for easier maintenance.
+By including `footer` and `header`, eliminating the need to reference them later in `pages`; you can also integrate `title` into `mainlayout` for easier maintenance
 ```astro
 ---
 // src/layout/mainlayout.astro
@@ -53,7 +53,7 @@ const { title = "weilinlai的網站" } = Astro.props;  //給後續不同頁面�
 </body>
 </html>
 ```
-Additionally, global variables can be placed here; remember to enable them.
+Additionally, global `style` can be placed here; remember to enable `is:global`.
 ### pages
 With `mainlayout` in place, all you need to do in `pages` is call `mainlayout`!
 ```astro
@@ -102,7 +102,7 @@ npm run build
 npm run preview
 ```
 ### Deployment
-If you use GitHub Actions, `git- push` it will run automatically.
+If you use GitHub Actions, `git- push` will run automatically.
 If you use Vercel, log in or sign up, select a repo, choose the language `astro`...
 
 ## Summary
