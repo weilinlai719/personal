@@ -139,4 +139,9 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vercel
 .vercel/output
+<<<<<<< HEAD
 .env*
+=======
+.env*
+scripts/
+>>>>>>> 0500f71be87be5fcab7dbf81876c4d11fac584a9
