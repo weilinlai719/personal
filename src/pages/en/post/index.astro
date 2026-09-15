@@ -1,0 +1,108 @@
+---
+// src/pages/en/post/index.astro
+import MainLayout from '../../../layout/mainlayout.astro';
+import '../../../styles/style.css';
+---
+
+<MainLayout title="Weilin Lai - post">
+  <div class="list-page-container post-board">
+    <h1 class="page-title post-page-title">💬 Posts</h1>
+
+    <div id="posts-container" class="list-page-grid">
+      <div class="loading-text">Loading posts, please wait...</div>
+    </div>
+  </div>
+</MainLayout>
+
+<style is:global>
+
+  .tag-wrapper {
+    display: flex;
+  }
+
+  @media (max-width: 768px) {
+    .post-board {
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+    .post-page-title {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+  }
+</style>
+
+<script>
+  const API_BASE_URL = 'https://words7000.onrender.com';
+  const postsContainer = document.getElementById('posts-container') as HTMLElement | null;
+
+  async function fetchAllPosts() {
+    if (!postsContainer) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/posts`);
+      const data = await res.json();
+
+      const validPosts = data.success && data.posts
+        ? data.posts.filter((post: any) => post.id)
+        : [];
+
+      if (validPosts.length > 0) {
+        const reversedPosts = validPosts.reverse();
+        postsContainer.innerHTML = reversedPosts.map((post: any) => {
+          const dateStr = post.time;
+
+          const hasImg = !!post.image;
+          const cardClass = hasImg ? 'list-card has-image' : 'list-card';
+          const imgHtml = hasImg
+            ? `<div class="list-card-img-wrapper"><img src="${post.image}" class="list-card-img" alt="貼文圖片" onerror="this.parentNode.style.display='none'"/></div>`
+            : '';
+
+          return `
+            <a href="/post/${post.id}" class="list-card-link">
+              <div class="${cardClass}">
+
+                <div class="list-card-left">
+                  <div class="title-wrapper">
+                    <div class="orange-bar"></div>
+                    <h2 class="list-card-title">${post.name || 'Anonymous Visitor'}</h2>
+                  </div>
+
+                  <div class="meta-wrapper">
+                    <span class="meta-pill">📅 ${dateStr}</span>
+                    <span class="meta-pill"> ${post.id}</span>
+                  </div>
+
+                  <p class="card-excerpt">
+                    ${
+                      post.content
+                        ? post.content.split('\n')[0] + (post.content.includes('\n') ? '...' : '')
+                        : 'click to view details...'
+                    }
+                  </p>
+
+                  <div class="tag-wrapper">
+                    <span class="hash-tag"># ${post.hashtag || "posts" } </span>
+                  </div>
+                </div>
+
+                ${imgHtml}
+
+                <div class="list-card-arrow">
+                  <i class="arrow-shape"></i>
+                </div>
+
+              </div>
+            </a>
+          `;
+        }).join('');
+      } else {
+        postsContainer.innerHTML = `<div class="loading-text">目前尚未有任何動態</div>`;
+      }
+    } catch (err) {
+      postsContainer.innerHTML = `<div class="loading-text" style="color: #ef4444;">無法連線至伺服器，請稍後再試。</div>`;
+      console.error('Fetch posts error:', err);
+    }
+}
+
+  fetchAllPosts();
+</script>

@@ -15,15 +15,7 @@ const lang = getLangFromUrl(Astro.url);
   <title>{title}</title>
   <link rel="icon" href="/images/circle-crop.png" type="image/x-icon" />
 
-  <!--
-    語言自動偵測：
-    - 第一次造訪、還沒有存過語言偏好 -> 看瀏覽器語言是不是英文，是的話導去 /en
-      （如果使用者是直接點 /en 開頭的連結進來的，尊重這個選擇，不會硬導回中文）
-    - 之後每次造訪，只要偏好跟目前網址對不上，就導去偏好的語言版本
-      （所以在 header 手動切換一次語言之後，之後都會記得）
-    這段一定要放在 <head> 裡同步執行（is:inline），才能在畫面畫出來「之前」就導頁，
-    不然會先閃一下錯誤語言的版本。
-  -->
+
   <script is:inline>
     (function () {
       try {

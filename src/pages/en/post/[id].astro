@@ -1,35 +1,35 @@
 ---
 // src/pages/post/[id].astro
-import MainLayout from '../../layout/mainlayout.astro';
-import '../../styles/style.css';
+import MainLayout from '../../../layout/mainlayout.astro';
+import '../../../styles/style.css';
 export const prerender = false;
 ---
 
-<MainLayout title="Weilin Lai - 貼文內容">
+<MainLayout title="Weilin Lai - Post Details">
   <div class="detail-container">
-    <a href="/post" class="back-btn">← 返回列表</a>
+    <a href="/post" class="back-btn">← back to list</a>
 
     <div id="post-container">
-      <div class="loading-text">正在載入貼文內容...</div>
+      <div class="loading-text">Loading post content...</div>
     </div>
 
     <div class="comment-section">
-      <h3 class="section-title">💬 留言回覆</h3>
+      <h3 class="section-title">💬 Comments</h3>
       
       <div id="comments-container" class="comments-list">
-        <div class="loading-text">正在載入留言...</div>
+        <div class="loading-text">Loading comments...</div>
       </div>
       
       <div class="comment-form-wrapper panel">
-        <h4 class="form-title">撰寫新留言</h4>
+        <h4 class="form-title">Write a Comment</h4>
         <form id="comment-form" class="comment-form">
           <div class="comment-form-group">
-            <input type="text" id="comment-name" class="form-input" placeholder="署名" required />
+            <input type="text" id="comment-name" class="form-input" placeholder="Name" required />
           </div>
           <div class="comment-form-group">
-            <textarea id="comment-content" class="form-input" rows="3" placeholder="留言內文..." required></textarea>
+            <textarea id="comment-content" class="form-input" rows="3" placeholder="Comment..." required></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">送出留言</button>
+          <button type="submit" class="btn btn-primary">Submit Comment</button>
         </form>
       </div>
     </div>
@@ -223,7 +223,7 @@ export const prerender = false;
           return `
             <div class="comment-item">
               <div class="comment-meta-info">
-                <span>👤 ${c.name || '匿名'}</span> 
+                <span>👤 ${c.name || 'Anonymous'}</span> 
                 <span class="comment-time">${commentDate}</span>
               </div>
               <p class="comment-text">${c.content || ''}</p>
@@ -231,10 +231,10 @@ export const prerender = false;
           `;
         }).join('');
       } else {
-        commentsContainer.innerHTML = `<div class="loading-text" style="color:#888;">目前暫無留言</div>`;
+        commentsContainer.innerHTML = `<div class="loading-text" style="color:#888;">Currently no comments</div>`;
       }
     } catch (err) {
-      commentsContainer.innerHTML = `<div class="loading-text" style="color:red;">留言載入失敗</div>`;
+      commentsContainer.innerHTML = `<div class="loading-text" style="color:red;">Failed to load comments</div>`;
     }
   }
 
@@ -259,14 +259,14 @@ export const prerender = false;
         });
         const data = await res.json();
         if (data.success) {
-          alert('🎉 留言成功！');
+          alert('🎉 Comment submitted successfully!');
           contentInput.value = ''; 
           fetchComments(); 
         } else {
-          alert('❌ 留言失敗: ' + data.error);
+          alert('❌ Failed to submit comment: ' + data.error);
         }
       } catch (err) {
-        alert('❌ 連線失敗，請稍後再試');
+        alert('❌ Failed to connect to the server, please try again later');
       }
     });
   }

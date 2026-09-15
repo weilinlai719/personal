@@ -49,11 +49,6 @@ export function swapLang(url: URL, targetLang: Lang): string {
  */
 export function getLangSwitchHref(url: URL, targetLang: Lang): string {
   const pathWithoutLangPrefix = url.pathname.replace(/^\/en(\/|$)/, '/');
-  const isPostPage = pathWithoutLangPrefix.startsWith('/post');
-
-  if (isPostPage) {
-    return getLocalizedPath(targetLang, '/');
-  }
 
   return swapLang(url, targetLang);
 }
