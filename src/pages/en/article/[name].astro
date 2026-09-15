@@ -1,21 +1,19 @@
 ---
-// src/pages/article/[name].astro （中文版，網址 /article/xxx）
-// 注意：這份範例省略了程式碼區塊「複製按鈕」的 <script> 跟相關樣式，
-// 只是為了讓這份 i18n 範例簡短好讀。實際部署時，把上一輪
-// 已經還原好的那份 [name].astro 裡的 copy-btn / code-lang 相關
-// script 跟 style 貼回來即可，不影響這裡示範的語言切換邏輯。
-import MainLayout from '../../layout/mainlayout.astro';
-import '../../styles/style.css';
-import '../../styles/article.css';
+// src/pages/en/article/[name].astro （英文版，網址 /en/article/xxx）
+// 讀 article_en（DeepL 自動翻譯出來的），跟中文版邏輯完全一樣，
+// 差異只有 collection 名稱、t('en')、語言切換連結指回中文版。
+import MainLayout from '../../../layout/mainlayout.astro';
+import '../../../styles/style.css';
+import '../../../styles/article.css';
 import { getEntry, render } from 'astro:content';
-import { useTranslations } from '../../i18n/utils';
+import { useTranslations } from '../../../i18n/utils';
 
 export const prerender = false;
-const t = useTranslations('zh');
+const t = useTranslations('en');
 
 const { name } = Astro.params;
 if (!name) return Astro.redirect('/404');
-const entry = await getEntry('article', name);
+const entry = await getEntry('article_en', name);
 if (!entry) return Astro.redirect('/404');
 const { Content } = await render(entry);
 const { title, date, subject } = entry.data;
@@ -24,7 +22,7 @@ const { title, date, subject } = entry.data;
 <MainLayout title={`Weilin Lai - ${title}`}>
   <div class="list-page-container">
     <div class="article-detail-topbar">
-      <a href="/article/" class="article-back-btn">{t('article.backToList')}</a>
+      <a href="/en/article/" class="article-back-btn">{t('article.backToList')}</a>
     </div>
     <article class="article-post-card">
       <header class="article-detail-header">
@@ -43,4 +41,3 @@ const { title, date, subject } = entry.data;
     </article>
   </div>
 </MainLayout>
-

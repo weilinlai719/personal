@@ -1,24 +1,24 @@
 ---
-// src/pages/article/index.astro  （中文版，預設語言，無前綴）
-import MainLayout from '../../layout/mainlayout.astro';
-import '../../styles/style.css';
+// src/pages/en/article/index.astro 
+import MainLayout from '../../../layout/mainlayout.astro';
+import '../../../styles/style.css';
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
-import { useTranslations } from '../../i18n/utils';
+import { useTranslations } from '../../../i18n/utils';
 
-const t = useTranslations('zh');
+const t = useTranslations('en');
 
-const allArticles = await getCollection('article');
+const allArticles = await getCollection('article_en');
 allArticles.sort((a, b) => (b.data.date || '').localeCompare(a.data.date || ''));
 ---
 
-<MainLayout title="Weilin Lai - 文章">
+<MainLayout title="Weilin Lai - Articles">
   <div class="list-page-container">
     <h1 class="page-title">{t('article.pageTitle')}</h1>
 
     <div class="list-page-grid">
-      {allArticles.map((article: CollectionEntry<'article'>) => (
-        <a href={`/article/${article.id}/`} class="list-card-link">
+      {allArticles.map((article: CollectionEntry<'article_en'>) => (
+        <a href={`/en/article/${article.id}/`} class="list-card-link">
           <div class="list-card">
             <div class="list-card-left">
               <div class="title-wrapper">
@@ -33,7 +33,7 @@ allArticles.sort((a, b) => (b.data.date || '').localeCompare(a.data.date || ''))
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                   </svg>
-                  {article.data.subject || '# 文章'}
+                  {article.data.subject || '# Articles'}
                 </span>
               </div>
 

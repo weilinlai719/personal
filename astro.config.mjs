@@ -8,5 +8,14 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()]
+  },
+    i18n: {
+    locales: ['zh', 'en'],
+    defaultLocale: 'zh',
+    routing: {
+      // false = 預設語言（中文）不加前綴：/about
+      // 英文才加前綴：/en/about
+      prefixDefaultLocale: false,
+    },
   }
 });
