@@ -1,6 +1,6 @@
 ---
 title: astro Tutorial
-date: 2026年8月
+date: Aug 2026
 subject: '# Front End'
 ---
 ## Downloading the Necessary Files

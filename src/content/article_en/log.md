@@ -1,6 +1,6 @@
 ---
 title: Log
-date: 2026年7月
+date: July 2026
 subject: '# Website Announcement'
 ---
 

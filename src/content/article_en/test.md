@@ -1,6 +1,6 @@
 ---
 title: Markdown Test
-date: 1989年6月
+date: June 1989
 subject: '# test'
 ---
 
