@@ -1,6 +1,6 @@
 ---
 title: "astro 教學"
-date: "2026年8月"
+date: 2026-8
 subject: "# 前端"
 ---
 ## 下載必要資料
