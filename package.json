@@ -13,7 +13,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "translate": "node scripts/translate-articles.mjs"
+    "translate": "node translate/translate-articles.mjs"
   },
   "devDependencies": {
     "dotenv": "^17.4.2",
