@@ -11,6 +11,8 @@ subject: '# Website Announcement'
 **July 2026**  Added `article`; articles are written here, and `Mark Down` documents are used for writing.\
 **July 2026**  Updated the layout.\
 **August 2026**  Added a visitor count feature.\
-**August 2026**  Improved the `Mark Down` styling function.
+**August 2026**  Improved the `Mark Down` styling function.\
+**September 2026** Refactor UI.\
+**September 2026** Added new language support, including Chinese and English.
 
 > ...Work in progress
