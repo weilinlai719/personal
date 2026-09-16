@@ -2,76 +2,48 @@
 // src/layout/mainlayout.astro
 import Header from '../components/header.astro';
 import Footer from '../components/footer.astro';
-import { getLangFromUrl } from '../i18n/utils';
-
+// 全域載入共用色票 / 樣式變數（style.css 的 :root）。
+// 原本只有部分頁面（post、article、404...）各自 import 這份檔案，
+// 導致 --text-color、--secondary-text-color、--accent-color 等變數
+// 在「沒有 import 的頁面」（about、index、cui...）裡是 undefined，
+// header/footer/內文就會退回各自元件寫死的 fallback 色號，
+// 造成同一顆 Logo、同一段導覽列文字在不同頁面顯示出兩種深淺不同的顏色。
+// 在 layout 統一 import 一次，確保全站顏色是同一份設定來源。
+import '../styles/style.css';
 const { title = "weilinlai的網站" } = Astro.props;
-const lang = getLangFromUrl(Astro.url);
 ---
-
-<html lang={lang === 'en' ? 'en' : 'zh-TW'}>
+<html lang="zh-TW">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title}</title>
-  <link rel="icon" href="/images/circle-crop.png" type="image/x-icon" />
-
-
-  <script is:inline>
-    (function () {
-      try {
-        var path = window.location.pathname;
-        var onEnPath = path === '/en' || path.indexOf('/en/') === 0;
-        var pref = localStorage.getItem('lang-pref');
-
-        if (!pref) {
-          if (onEnPath) {
-            localStorage.setItem('lang-pref', 'en');
-          } else {
-            var browserLang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
-            if (browserLang.indexOf('en') === 0) {
-              localStorage.setItem('lang-pref', 'en');
-              window.location.replace('/en' + path + window.location.search + window.location.hash);
-            } else {
-              localStorage.setItem('lang-pref', 'zh');
-            }
-          }
-        } else if (pref === 'en' && !onEnPath) {
-          window.location.replace('/en' + path + window.location.search + window.location.hash);
-        } else if (pref === 'zh' && onEnPath) {
-          var stripped = path.replace(/^\/en(\/|$)/, '/');
-          window.location.replace(stripped + window.location.search + window.location.hash);
-        }
-      } catch (e) {
-        // localStorage 被封鎖就不做自動偵測，直接顯示預設語言（中文），不影響其他功能
-      }
-    })();
-  </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="icon" href="/images/circle-crop.png" type="image/x-icon"  /> 
 </head>
 <body>
-  <Header />
-  <main class="main-container">
-    <slot />
-  </main>
-  <Footer />
+    <Header />
+    <main class="main-container">
+        <slot />
+    </main>  
+    <Footer />
 </body>
 </html>
 
-<style is:global>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f6f9;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  .main-container {
-    flex: 1;
-    width: 100%;
-  }
+<style is:global>   
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    .main-container {
+        flex: 1;
+        width: 100%;
+    }
 </style>

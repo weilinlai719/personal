@@ -1,106 +1,174 @@
-.article-detail-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-  }
+/* src/styles/article.css
+   文章詳細頁（src/pages/article/[name].astro）專用樣式。
 
-  .article-back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    color: #6f6f6f;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-  .article-back-btn:hover {
-    color: #171717;
-  }
+   這裡原本是寫在 [name].astro 的 <style is:global> 裡，並且刻意用了一套
+   自己的顏色（例如強調色 #ff7a00、meta 標籤用灰底灰字 #f5f5f7/#64748b、
+   連結用 GitHub 藍 #0366d6），跟文章列表頁、貼文詳細頁等其他頁面共用的
+   強調色（--accent-color）和 meta 標籤樣式不一致，就是造成
+   「文章列表 → 文章內文」點進去顏色會跳掉的主因之一。
 
-  .article-lang-switch {
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--accent-color);
-    border: 1px solid var(--accent-color);
-    border-radius: 6px;
-    padding: 2px 8px;
-    transition: background-color 0.2s, color 0.2s;
-  }
-  .article-lang-switch:hover {
-    background-color: var(--accent-color);
-    color: #fff;
-  }
+   這次把顏色全部改用 style.css 的共用 CSS variables，讓文章詳細頁跟其他
+   頁面共用同一份色票；版面結構、字級、間距等完全不動。
 
-  .article-post-card {
-    background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid #f0ede9;
-    padding: 32px;
-    box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
-  }
+   仍然獨立成一份全域 CSS 檔案（而不是併回 [name].astro 的 scoped style）
+   是因為 <Content /> 渲染出的 markdown 內容不是這個元件自己畫的 DOM，
+   Astro scoped style 的隔離屬性套不到它身上。 */
 
-  .article-detail-title-wrapper {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
+.article-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--accent-color-dark);
+  font-weight: 500;
+  margin-bottom: 24px;
+  transition: color 0.2s;
+}
+.article-back-btn:hover {
+  color: var(--accent-color);
+}
 
-  .article-detail-orange-bar {
-    width: 4px;
-    height: 32px;
-    background-color: #ff7a00;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
+.article-post-card {
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  border: 1px solid var(--card-border);
+  padding: 32px;
+  box-shadow: var(--card-shadow);
+}
 
-  .article-detail-title {
-    font-size: 1.8rem;
-    color: #2c3e50;
-    margin: 0;
-    font-weight: 700;
-    line-height: 1.4;
-  }
+.article-detail-title-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
 
-  .article-detail-meta-wrapper {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 32px;
-  }
+.article-detail-orange-bar {
+  width: 4px;
+  height: 32px;
+  background-color: var(--accent-color);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
 
-  .article-detail-meta-pill {
-    background: #f5f5f7;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    color: #64748b;
-  }
+.article-detail-title {
+  font-size: 1.8rem;
+  color: var(--text-color);
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.4;
+}
 
-  .md-content {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-    color: #24292e;
-    word-wrap: break-word;
-  }
-  .md-content p, .md-content blockquote, .md-content ul, .md-content ol, .md-content pre, .md-content table {
-    margin-top: 0;
-    margin-bottom: 16px;
-  }
-  .md-content h1, .md-content h2, .md-content h3, .md-content h4, .md-content h5, .md-content h6 {
-    margin-top: 24px;
-    margin-bottom: 16px;
-    font-weight: 600;
-    line-height: 1.25;
-  }
-  .md-content h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-  .md-content h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-  .md-content h3 { font-size: 1.25em; }
-  .md-content a { color: #0366d6; text-decoration: none; }
-  .md-content a:hover { text-decoration: underline; }
-  .md-content code, .md-content pre { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 85%; }
-  .md-content code { background-color: rgba(27,31,35,0.05); padding: 0.2em 0.4em; border-radius: 3px; }
-  .md-content pre { background-color: #f6f8fa; padding: 16px; overflow: auto; border-radius: 6px; }
-  .md-content pre code { background: transparent; padding: 0; font-size: 100%; }
-  .md-content img { max-width: 100%; }
+.article-detail-meta-wrapper {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+/* 原本是灰底灰字（跟文章列表頁的 meta-pill 不一致），
+   這裡改用跟 .meta-pill（style.css）相同的強調色調 */
+.article-detail-meta-pill {
+  background: var(--accent-color-light);
+  color: var(--accent-color-dark);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+/* ---- markdown 內文樣式 ---- */
+.md-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  word-wrap: break-word;
+}
+
+.md-content p, .md-content blockquote, .md-content ul, .md-content ol, .md-content pre, .md-content table {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.md-content h1, .md-content h2, .md-content h3, .md-content h4, .md-content h5, .md-content h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.md-content h1 { font-size: 2em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3em; }
+.md-content h2 { font-size: 1.5em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3em; }
+.md-content h3 { font-size: 1.25em; }
+.md-content h4 { font-size: 1em; }
+.md-content h5 { font-size: 0.875em; }
+.md-content h6 { font-size: 0.85em; color: var(--secondary-text-color); }
+
+/* 原本連結是 GitHub 慣用藍 #0366d6，跟站內黑白灰主題不搭，改用深灰藍強調色 */
+.md-content a { color: var(--accent-color-dark); text-decoration: none; }
+.md-content a:hover { text-decoration: underline; }
+.md-content strong { font-weight: 600; }
+.md-content hr { height: 0.25em; padding: 0; margin: 24px 0; background-color: var(--border-color); border: 0; }
+
+.md-content ul { list-style-type: disc; padding-left: 2em; }
+.md-content ol { list-style-type: decimal; padding-left: 2em; }
+.md-content ul ul { list-style-type: circle; }
+.md-content ol ol { list-style-type: lower-alpha; }
+.md-content li + li { margin-top: 0.25em; }
+
+.md-content blockquote { border-left: 0.25em solid var(--border-color); padding: 0 1em; color: var(--secondary-text-color); }
+.md-content blockquote > :first-child { margin-top: 0; }
+.md-content blockquote > :last-child { margin-bottom: 0; }
+
+.md-content table { display: block; width: 100%; overflow: auto; border-collapse: collapse; }
+.md-content table th { font-weight: 600; }
+.md-content table th, .md-content table td { border: 1px solid var(--border-color); padding: 6px 13px; }
+.md-content table tr { background-color: var(--card-bg); border-top: 1px solid var(--border-color); }
+.md-content table tr:nth-child(2n) { background-color: var(--muted-bg); }
+
+.md-content img { max-width: 100%; box-sizing: content-box; background-color: var(--card-bg); }
+.md-content code, .md-content pre { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 85%; }
+.md-content code { background-color: rgba(27,31,35,0.05); padding: 0.2em 0.4em; border-radius: 3px; }
+.md-content pre {
+  background-color: #f6f8fa;
+  padding: 16px;
+  padding-top: 36px;
+  overflow: auto;
+  border-radius: 6px;
+  position: relative;
+}
+.md-content pre code { background: transparent; padding: 0; font-size: 100%; white-space: pre; word-break: normal; border: 0; }
+
+/* 複製按鈕與語言標籤：實際渲染時貼在 Shiki github-dark 語法高亮的深色
+   背景（inline style 帶的 #24292e）上，這組顏色是配合那個深色背景設計的，
+   維持原樣、不跟著品牌橘調整，避免對比度或可讀性跑掉 */
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: rgba(27,31,35,0.05);
+  color: #f6f8fa;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+  border: none;
+  outline: none;
+}
+.md-content pre:hover .copy-btn { opacity: 1; }
+.copy-btn:hover { background-color: #f3f4f6; color: #24292e; }
+.copy-btn.copied { color: #1a7f37; border-color: #1a7f37; }
+
+.code-lang {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 12px;
+  font-family: -apple-system, sans-serif;
+  font-weight: 600;
+  color: #f0f6fc;
+  text-transform: lowercase;
+  user-select: none;
+}

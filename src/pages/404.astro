@@ -1,10 +1,7 @@
----// src/pages/404.astro
+---
+// src/pages/404.astro
 import MainLayout from '../layout/mainlayout.astro';
 import '../styles/style.css';
-import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/utils';
-
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
 ---
 
 <MainLayout title="404 - 找不到頁面">
@@ -114,6 +111,9 @@ const t = useTranslations(lang);
 </script>
 
 <style>
+  /* 顏色統一改用 style.css 的共用變數（--text-color / --secondary-text-color /
+     --accent-color 等），讓 404 頁跟全站共用同一份低彩度黑白灰＋深藍灰配色，
+     不再是自成一格的獨立配色。版面結構、動畫與互動邏輯完全不變，只調整顏色。 */
   .lost-page {
     --mx: 0px;
     --my: 0px;
@@ -123,8 +123,8 @@ const t = useTranslations(lang);
     isolation: isolate;
     display: grid;
     place-items: center;
-    background: #f3f3f0;
-    color: #171717;
+    background: #f4f6f9;
+    color: var(--text-color, #1e293b);
   }
 
   .lost-page::before {
@@ -173,7 +173,7 @@ const t = useTranslations(lang);
     gap: 12px;
     width: min(460px, 100%);
     margin: 0 auto 4rem;
-    color: #777;
+    color: var(--secondary-text-color, #64748b);
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 10px;
     letter-spacing: .13em;
@@ -190,7 +190,7 @@ const t = useTranslations(lang);
     display: block;
     width: 0;
     height: 100%;
-    background: #171717;
+    background: var(--accent-color, #334155);
     transition: width .08s linear;
   }
 
@@ -220,7 +220,7 @@ const t = useTranslations(lang);
   .error-number {
     display: flex;
     align-items: center;
-    color: #111;
+    color: var(--text-color, #1e293b);
     font-size: clamp(8rem, 22vw, 14rem);
     font-weight: 800;
     line-height: .72;
@@ -243,7 +243,7 @@ const t = useTranslations(lang);
     content: '';
     position: absolute;
     inset: 0;
-    border: clamp(14px, 2vw, 22px) solid #111;
+    border: clamp(14px, 2vw, 22px) solid var(--accent-color, #334155);
     border-radius: 50%;
     transform: rotate(-7deg);
     transition: transform .2s ease;
@@ -257,7 +257,7 @@ const t = useTranslations(lang);
     left: 50%;
     margin: -5px;
     border-radius: 50%;
-    background: #111;
+    background: var(--accent-color-dark, #0f172a);
     transform: translate(var(--eye-x, 0), var(--eye-y, 0));
     transition: transform .08s linear;
   }
@@ -279,7 +279,7 @@ const t = useTranslations(lang);
 
   .message-sub {
     margin: .65rem 0 0;
-    color: #888;
+    color: var(--secondary-text-color, #64748b);
     font-size: .9rem;
     transition: opacity .2s ease;
   }
@@ -300,7 +300,7 @@ const t = useTranslations(lang);
     gap: 18px;
     padding: 12px 17px 12px 20px;
     border-radius: 999px;
-    background: #111;
+    background: var(--accent-color, #334155);
     color: #fff;
     font-size: .84rem;
     transition: transform .25s ease, gap .25s ease;
@@ -311,7 +311,7 @@ const t = useTranslations(lang);
 
   .text-btn {
     position: relative;
-    color: #666;
+    color: var(--secondary-text-color, #64748b);
     font-size: .84rem;
   }
 
@@ -322,13 +322,13 @@ const t = useTranslations(lang);
     bottom: -5px;
     left: 0;
     height: 1px;
-    background: #111;
+    background: var(--accent-color, #334155);
     transform: scaleX(0);
     transform-origin: right;
     transition: transform .25s ease;
   }
 
-  .text-btn:hover { color: #111; }
+  .text-btn:hover { color: var(--text-color, #1e293b); }
   .text-btn:hover::after { transform: scaleX(1); transform-origin: left; }
 
   .secret {
@@ -344,7 +344,7 @@ const t = useTranslations(lang);
   }
 
   .secret b { margin-left: 5px; }
-  .secret:hover { color: #777; }
+  .secret:hover { color: var(--secondary-text-color, #64748b); }
 
   .corner {
     position: absolute;

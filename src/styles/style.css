@@ -16,7 +16,11 @@ body {
   margin: 0;
 }
 
-/* ---------- 1. 全站色票 / 設計變數 ---------- */
+/* ---------- 1. 全站色票 / 設計變數 ----------
+   這份檔案現在由 mainlayout.astro 全域 import，因此這裡定義的變數
+   在「每一個頁面」都保證存在，不會因為某頁沒有各自 import 這份檔案
+   而落到各元件自己寫死的 fallback 值，導致同一種顏色在不同頁面
+   （例如 header/footer 的文字色）出現兩種色號、造成整站風格不一致。 */
 :root {
   /* 文字色 */
   --text-color: #1e293b;
@@ -31,13 +35,19 @@ body {
   --card-border: #f0ede9;
   --card-radius: 16px;
   --card-radius-lg: 20px;
+  /* 卡片陰影：post/[id].astro 的 .post-detail-card / .comment-item、
+     post/edit.astro 的 .post-manage-card 都是直接引用 var(--card-shadow)
+     且沒有提供 fallback，但這裡先前一直沒有定義這個變數，等於這三處的
+     box-shadow 實際上完全沒有生效。這裡補上定義，讓卡片陰影跟其餘頁面
+     （.panel、.list-card 等）風格一致。 */
+  --card-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 
-  /* 主題橘色（原本散落 #e67e22 / #ff6f3d / #fe9f73 / #ff9e68 等多種色號，統一如下） */
-  --accent-color: #e67e22;
-  --accent-color-dark: #b87333;   /* meta pill 文字、back-btn 文字 */
-  --accent-color-strong: #d35400; /* 按鈕 hover 等更深的強調色 */
-  --accent-color-light: #fdf5ee;  /* 淺色底（meta pill、次要按鈕底） */
-  --accent-color-lighter: #fbe6d4;
+  /* 主要強調色：黑白灰 + 深藍灰（原本是品牌橘 #e67e22，改成低彩度的深灰藍調） */
+  --accent-color: #334155;
+  --accent-color-dark: #0f172a;   /* meta pill 文字、back-btn 文字 */
+  --accent-color-strong: #020617; /* 按鈕 hover 等更深的強調色 */
+  --accent-color-light: #f1f5f9;  /* 淺色底（meta pill、次要按鈕底） */
+  --accent-color-lighter: #e2e8f0;
 
   /* 中性底色（hashtag 等） */
   --muted-bg: #f1f5f9;
@@ -195,7 +205,7 @@ body {
   border-radius: var(--card-radius-lg);
   border: 1px solid var(--card-border);
   /* 原始碼 post/index.astro 確認值，跟通用的 --card-shadow 變數不同，故寫死 */
-  box-shadow: 0 8px 24px rgba(160, 140, 130, 0.06);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -210,7 +220,7 @@ body {
 
 .list-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(160, 140, 130, 0.12);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
 }
 
 .list-card-left {
@@ -264,8 +274,8 @@ body {
   transform: translateY(-50%);
   margin-left: 0;
   z-index: 2;
-  background-color: rgba(253, 245, 238, 0.9);
-  box-shadow: 0 4px 12px rgba(184, 115, 51, 0.15);
+  background-color: rgba(241, 245, 249, 0.9);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 
 .arrow-shape {
@@ -298,7 +308,7 @@ body {
     margin: 12px 20px 0 auto;
     height: 36px;
     border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(184, 115, 51, 0.1);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
   }
   /* 原始碼不分有無圖片，所有 .list-card 手機版都 reset 成 auto 高度 */
   .list-card {
@@ -396,7 +406,7 @@ body {
   outline: none;
   border-color: var(--accent-color);
   background-color: #fff;
-  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.12);
+  box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.15);
 }
 
 /* ---------- 8. 白色面板（原 edit.astro 的 .form-container、[id].astro 的 .comment-form-wrapper，兩者定義幾乎一致） ---------- */
@@ -405,7 +415,7 @@ body {
   border-radius: var(--card-radius);
   border: 1px solid var(--card-border);
   /* 原始碼 edit.astro 的 .form-container、_id_.astro 的 .comment-form-wrapper 確認值 */
-  box-shadow: 0 4px 12px rgba(160, 140, 130, 0.03);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
   padding: 24px;
   display: flex;
   flex-direction: column;
