@@ -61,12 +61,15 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
         id="langSwitchLink"
         data-target-lang={otherLang}
       >
-        <img 
-          src={otherLang === 'en' ? '/icon/en.svg' : '/icon/zh.svg'} 
-          alt="lang icon" 
-          class="lang-icon-img" 
-        />
-        <span class="lang-text">{otherLang === 'en' ? 'EN' : '中文'}</span>
+        <span class:list={['lang-switch-inner', { 'is-swapped': lang === 'en' }]} id="langSwitchInner">
+          <img 
+            src={otherLang === 'en' ? '/icon/en.svg' : '/icon/zh.svg'} 
+            alt="lang icon" 
+            class="lang-icon-img" 
+            draggable="false"
+          />
+          <span class="lang-text">{otherLang === 'en' ? 'EN' : '中文'}</span>
+        </span>
       </a>
 
       <button class="menu-toggle" id="menuToggle" aria-label="切換選單">
@@ -271,12 +274,46 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     color: #1a202c;
   }
 
+  .lang-switch-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
   .lang-icon-img {
     width: 16px;
     height: 16px;
     object-fit: contain;
     display: block;
     flex-shrink: 0;
+    order: 0;
+    cursor: grab;
+    touch-action: none;
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  /* 拖曳中的暫時外觀：淡成米白色的小圓底，放開後就消失，不影響平常樣子 */
+  .lang-icon-img.is-dragging {
+    cursor: grabbing;
+    background: #f7efe0;
+    border-radius: 50%;
+    padding: 3px;
+    margin: -3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .lang-text {
+    order: 1;
+  }
+
+  /* 點擊時 icon 與文字交換位置：order 改變的瞬間先由 JS 用 transform 做 FLIP 動畫 */
+  .lang-switch-inner.is-swapped .lang-icon-img {
+    order: 1;
+  }
+
+  .lang-switch-inner.is-swapped .lang-text {
+    order: 0;
   }
 
   .menu-toggle {
@@ -453,20 +490,192 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     }
   }
 
+  // 使用 FLIP 技巧，讓 icon 與文字在切換 order 的瞬間，
+  // 用 transform 從舊位置「滑」到新位置，而不是直接跳過去。
+  // onMidSwap：在量測完舊位置、換 order 之前執行——用來即時換掉 icon 圖片與文字內容，
+  // 讓「換位置」跟「換內容」同時發生，而不用等 reload 才看得到正確語言。
+  function animateLangSwitchSwap(inner: HTMLElement, onMidSwap?: () => void) {
+    const icon = inner.querySelector('.lang-icon-img') as HTMLElement | null;
+    const text = inner.querySelector('.lang-text') as HTMLElement | null;
+    if (!icon || !text) {
+      onMidSwap?.();
+      inner.classList.toggle('is-swapped');
+      return;
+    }
+
+    // First：記錄交換前的位置
+    const iconFirst = icon.getBoundingClientRect();
+    const textFirst = text.getBoundingClientRect();
+
+    // 換內容：icon src + 文字（文字寬度可能因此改變，例如 EN <-> 中文）
+    onMidSwap?.();
+
+    // Last：交換 order，取得交換後的位置
+    inner.classList.toggle('is-swapped');
+    const iconLast = icon.getBoundingClientRect();
+    const textLast = text.getBoundingClientRect();
+
+    // Invert：用 transform 讓元素瞬間「假裝」還在原位
+    const iconDeltaX = iconFirst.left - iconLast.left;
+    const textDeltaX = textFirst.left - textLast.left;
+
+    [icon, text].forEach((el) => {
+      el.style.transition = 'none';
+    });
+    icon.style.transform = `translateX(${iconDeltaX}px)`;
+    text.style.transform = `translateX(${textDeltaX}px)`;
+
+    // 強制 reflow，確保上面的 transform 先被套用
+    void inner.offsetWidth;
+
+    // Play：換回 transition，並把 transform 歸零，讓它動畫滑回真正的位置
+    requestAnimationFrame(() => {
+      [icon, text].forEach((el) => {
+        el.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        el.style.transform = '';
+      });
+    });
+  }
+
+  // 把 icon 圖片與文字換成「導頁過去之後那頁應該顯示的下一個切換目標」，
+  // 這樣使用者不用等 reload，點下去/拖過去的當下畫面就已經是對的。
+  function swapLangSwitchContent(link: HTMLAnchorElement, inner: HTMLElement) {
+    const icon = inner.querySelector('.lang-icon-img') as HTMLImageElement | null;
+    const text = inner.querySelector('.lang-text') as HTMLElement | null;
+    const targetLang = link.getAttribute('data-target-lang'); // 現在要前往的語言
+    if (!icon || !text || !targetLang) return;
+
+    // 到了新頁面之後，「下一個切換目標」會變成現在正要離開的這個語言
+    const nextDisplayLang = targetLang === 'en' ? 'zh' : 'en';
+    icon.src = nextDisplayLang === 'en' ? '/icon/en.svg' : '/icon/zh.svg';
+    text.textContent = nextDisplayLang === 'en' ? 'EN' : '中文';
+    link.setAttribute('data-target-lang', nextDisplayLang);
+  }
+
+  // 拖曳流程如果已經自己完成一次切換，緊接著瀏覽器補上的那個 click 事件
+  // 就不用再處理一次（不然會重複存 localStorage、重複動畫、重複導頁）
+  let suppressLangClick = false;
+
+  // 真正「確定要切換」時共用的收尾流程：存偏好、換內容 + 播放交換動畫、動畫結束後才導頁。
+  // 點擊路徑跟拖曳路徑都會走到這裡，行為保證一致。
+  function completeLangSwitch(link: HTMLAnchorElement, inner: HTMLElement) {
+    const targetLang = link.getAttribute('data-target-lang'); // 存 localStorage 用，要在內容被換掉之前先讀
+    if (targetLang) {
+      try {
+        localStorage.setItem('lang-pref', targetLang);
+      } catch {
+        // localStorage 被封鎖也沒關係，語言切換連結本身還是能正常導頁
+      }
+    }
+    const href = link.getAttribute('href');
+    animateLangSwitchSwap(inner, () => swapLangSwitchContent(link, inner));
+    window.setTimeout(() => {
+      if (href) window.location.href = href;
+    }, 350);
+  }
+
   // 使用者手動點了語言切換鈕，記住這個選擇，
   // 之後 mainlayout.astro 裡的自動偵測腳本就不會再蓋過使用者自己選的語言。
+  function onLangSwitchClick(e: MouseEvent) {
+    if (suppressLangClick) {
+      // 這個 click 是拖曳放開之後瀏覽器順便補的，剛才拖曳流程已經處理過了
+      e.preventDefault();
+      suppressLangClick = false;
+      return;
+    }
+
+    const link = e.currentTarget as HTMLAnchorElement;
+    const inner = document.getElementById('langSwitchInner');
+    if (inner) {
+      // 先播放 icon / 文字交換動畫，動畫結束後再真正導頁
+      e.preventDefault();
+      completeLangSwitch(link, inner);
+    }
+  }
+
   function handleLangSwitchClick() {
-    const link = document.getElementById('langSwitchLink');
-    link?.addEventListener('click', () => {
-      const targetLang = link.getAttribute('data-target-lang');
-      if (targetLang) {
-        try {
-          localStorage.setItem('lang-pref', targetLang);
-        } catch {
-          // localStorage 被封鎖也沒關係，語言切換連結本身還是能正常導頁
-        }
-      }
+    const link = document.getElementById('langSwitchLink') as HTMLAnchorElement | null;
+    if (!link) return;
+    // 先移除舊的監聽器，避免每次 astro:page-load 都重複綁定，
+    // 導致動畫被觸發兩次而互相抵銷（視覺上像沒交換，但網址照樣跳轉）。
+    link.removeEventListener('click', onLangSwitchClick);
+    link.addEventListener('click', onLangSwitchClick);
+  }
+
+  /**
+   * 手動拖曳 icon：
+   * - 抓著 icon 拖曳時會淡成米白色圓底，即時跟著手指/滑鼠移動；
+   * - 放開時如果已經拖過 icon 可移動範圍的一半，就當作「確定要切換」，
+   *   走跟點擊一樣的 completeLangSwitch（存偏好 → 換內容 → 播放交換動畫 → 動畫播完才導頁）；
+   * - 沒拖過一半就彈回原本位置，語言不變、也不會導頁。
+   */
+  function initLangDrag() {
+    const link = document.getElementById('langSwitchLink') as HTMLAnchorElement | null;
+    const inner = document.getElementById('langSwitchInner') as HTMLElement | null;
+    const icon = inner?.querySelector('.lang-icon-img') as HTMLElement | null;
+    if (!link || !inner || !icon) return;
+    if (icon.dataset.dragBound === '1') return; // 避免每次 astro:page-load 重複綁定
+    icon.dataset.dragBound = '1';
+
+    let dragging = false;
+    let startClientX = 0;
+    let startLeft = 0; // icon 拖曳開始時，相對 inner 容器左緣的距離
+    let maxTravel = 0; // icon 在 inner 容器內最多能移動的距離
+
+    function measure() {
+      const innerRect = inner!.getBoundingClientRect();
+      const iconRect = icon!.getBoundingClientRect();
+      startLeft = iconRect.left - innerRect.left;
+      maxTravel = Math.max(0, innerRect.width - iconRect.width);
+    }
+
+    icon.addEventListener('pointerdown', (e: PointerEvent) => {
+      dragging = true;
+      icon.setPointerCapture(e.pointerId);
+      icon.classList.add('is-dragging');
+      icon.style.transition = 'none';
+      startClientX = e.clientX;
+      measure();
     });
+
+    icon.addEventListener('pointermove', (e: PointerEvent) => {
+      if (!dragging) return;
+      const delta = e.clientX - startClientX;
+      const minDelta = -startLeft;
+      const maxDelta = maxTravel - startLeft;
+      const clamped = Math.max(minDelta, Math.min(maxDelta, delta));
+      icon.style.transform = `translateX(${clamped}px)`;
+    });
+
+    function endDrag(e: PointerEvent) {
+      if (!dragging) return;
+      dragging = false;
+      icon!.classList.remove('is-dragging');
+      icon!.releasePointerCapture(e.pointerId);
+
+      const delta = e.clientX - startClientX;
+      const minDelta = -startLeft;
+      const maxDelta = maxTravel - startLeft;
+      const clamped = Math.max(minDelta, Math.min(maxDelta, delta));
+      const finalLeft = startLeft + clamped;
+
+      const crossedToRightHalf = maxTravel > 0 && finalLeft > maxTravel / 2;
+      const alreadySwapped = inner!.classList.contains('is-swapped');
+      // icon 現在停在跟目前 order 不同的那一半，代表使用者真的把它拖過去了
+      const shouldSwitch = crossedToRightHalf !== alreadySwapped;
+
+      if (shouldSwitch) {
+        suppressLangClick = true;
+        completeLangSwitch(link!, inner!);
+      } else {
+        // 沒拖過半：讓 icon 彈回原本位置，語言不變、不導頁
+        icon!.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        icon!.style.transform = '';
+      }
+    }
+
+    icon.addEventListener('pointerup', endDrag);
+    icon.addEventListener('pointercancel', endDrag);
   }
 
   function initNavigationSystem() {
@@ -487,6 +696,7 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     document.addEventListener('click', closeAllMenusSafely);
 
     handleLangSwitchClick();
+    initLangDrag();
   }
 
   window.addEventListener('resize', () => {
