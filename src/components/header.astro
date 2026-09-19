@@ -293,14 +293,13 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     user-select: none;
   }
 
-  /* 拖曳中的暫時外觀：淡成米白色的小圓底，放開後就消失，不影響平常樣子 */
+  /* 拖曳中的暫時外觀：淡成米白色的小圓底，放開後就消失，不影響平常樣子。
+     用 box-shadow 而不是 padding/margin，因為 box-shadow 不佔版面空間、
+     不會影響 flex 排版計算，也就不會干擾拖曳時的位置量測。 */
   .lang-icon-img.is-dragging {
     cursor: grabbing;
-    background: #f7efe0;
     border-radius: 50%;
-    padding: 3px;
-    margin: -3px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 0 4px #f7efe0, 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
   .lang-text {
@@ -620,31 +619,56 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     let dragging = false;
     let startClientX = 0;
     let startLeft = 0; // icon 拖曳開始時，相對 inner 容器左緣的距離
-    let maxTravel = 0; // icon 在 inner 容器內最多能移動的距離
+    let maxTravel = 0; // icon 在 inner 容器內，真正有效的可移動距離（0 ~ maxTravel）
 
     function measure() {
       const innerRect = inner!.getBoundingClientRect();
       const iconRect = icon!.getBoundingClientRect();
       startLeft = iconRect.left - innerRect.left;
       maxTravel = Math.max(0, innerRect.width - iconRect.width);
+      console.log('[langDrag] measure', {
+        isSwapped: inner!.classList.contains('is-swapped'),
+        innerLeft: innerRect.left,
+        innerWidth: innerRect.width,
+        iconLeft: iconRect.left,
+        iconWidth: iconRect.width,
+        startLeft,
+        maxTravel,
+      });
+    }
+
+    // 貼著邊界繼續拖時的橡皮筋阻力：超出範圍越多，視覺上移動得越少，
+    // 讓兩個方向拖起來都「有感覺」，而不是貼邊之後完全死掉不動。
+    function rubberBand(overflow: number, resistance = 28) {
+      return (overflow * resistance) / (overflow + resistance);
     }
 
     icon.addEventListener('pointerdown', (e: PointerEvent) => {
       dragging = true;
+      // 一定要先量測，此時 icon 還沒被套上 is-dragging 的 padding/margin，
+      // 量到的才是乾淨、左右對稱的正常位置。
+      measure();
       icon.setPointerCapture(e.pointerId);
       icon.classList.add('is-dragging');
       icon.style.transition = 'none';
       startClientX = e.clientX;
-      measure();
     });
 
     icon.addEventListener('pointermove', (e: PointerEvent) => {
       if (!dragging) return;
       const delta = e.clientX - startClientX;
-      const minDelta = -startLeft;
-      const maxDelta = maxTravel - startLeft;
-      const clamped = Math.max(minDelta, Math.min(maxDelta, delta));
-      icon.style.transform = `translateX(${clamped}px)`;
+      const rawPos = startLeft + delta; // 還沒套用橡皮筋前，理論上的絕對位置
+
+      let visualPos: number;
+      if (rawPos < 0) {
+        visualPos = -rubberBand(-rawPos);
+      } else if (rawPos > maxTravel) {
+        visualPos = maxTravel + rubberBand(rawPos - maxTravel);
+      } else {
+        visualPos = rawPos;
+      }
+
+      icon.style.transform = `translateX(${visualPos - startLeft}px)`;
     });
 
     function endDrag(e: PointerEvent) {
@@ -654,21 +678,38 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
       icon!.releasePointerCapture(e.pointerId);
 
       const delta = e.clientX - startClientX;
-      const minDelta = -startLeft;
-      const maxDelta = maxTravel - startLeft;
-      const clamped = Math.max(minDelta, Math.min(maxDelta, delta));
-      const finalLeft = startLeft + clamped;
+      const rawPos = startLeft + delta;
+      // 判斷是否切換一律用「真正有效範圍內」夾出來的位置，橡皮筋多拖出去的部分不算數
+      const trueClamped = Math.max(0, Math.min(maxTravel, rawPos));
 
-      const crossedToRightHalf = maxTravel > 0 && finalLeft > maxTravel / 2;
+      const crossedToRightHalf = maxTravel > 0 && trueClamped > maxTravel / 2;
       const alreadySwapped = inner!.classList.contains('is-swapped');
       // icon 現在停在跟目前 order 不同的那一半，代表使用者真的把它拖過去了
       const shouldSwitch = crossedToRightHalf !== alreadySwapped;
 
-      if (shouldSwitch) {
+      console.log('[langDrag] endDrag', {
+        delta,
+        rawPos,
+        trueClamped,
+        maxTravel,
+        startLeft,
+        crossedToRightHalf,
+        alreadySwapped,
+        shouldSwitch,
+      });
+
+      // 只要這次放開前真的有拖動過（不是單純點一下），
+      // 接下來瀏覽器在同一個 <a> 上補發的 click 一律吃掉——
+      // 不然「拖過半又反悔拖回去」放開後，還是會被那個補發的 click 當成一般點擊誤切語言。
+      const wasDragged = Math.abs(delta) > 3;
+      if (wasDragged) {
         suppressLangClick = true;
+      }
+
+      if (shouldSwitch) {
         completeLangSwitch(link!, inner!);
       } else {
-        // 沒拖過半：讓 icon 彈回原本位置，語言不變、不導頁
+        // 沒拖過半，或是拖過半又反悔拖回去了：讓 icon 彈回原本位置，語言不變、不導頁
         icon!.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
         icon!.style.transform = '';
       }
