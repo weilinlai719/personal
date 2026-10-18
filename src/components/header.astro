@@ -57,18 +57,23 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     <div class="nav-actions">
       <a
         href={getLangSwitchHref(Astro.url, otherLang)}
-        class="lang-switch"
+        class:list={['lang-switch', { 'is-en': lang === 'en' }]}
         id="langSwitchLink"
         data-target-lang={otherLang}
+        draggable="false"
+        aria-label={lang === 'zh' ? '切換語言：中文 / English' : 'Switch language: 中文 / English'}
+        title="中文 / EN"
       >
-        <span class:list={['lang-switch-inner', { 'is-swapped': lang === 'en' }]} id="langSwitchInner">
-          <img 
-            src={otherLang === 'en' ? '/icon/en.svg' : '/icon/zh.svg'} 
-            alt="lang icon" 
-            class="lang-icon-img" 
+        <span class="lang-label lang-label-zh" aria-hidden="true">中</span>
+        <span class="lang-label lang-label-en" aria-hidden="true">EN</span>
+        <span class="lang-knob" id="langKnob">
+          <img
+            src={lang === 'en' ? '/icon/en.svg' : '/icon/zh.svg'}
+            alt=""
+            class="lang-icon-img"
+            id="langKnobIcon"
             draggable="false"
           />
-          <span class="lang-text">{otherLang === 'en' ? 'EN' : '中文'}</span>
         </span>
       </a>
 
@@ -247,37 +252,98 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     z-index: 2000;
   }
 
+  /* ---- 語言切換開關 ----
+     左 = 中文、右 = EN。圓形把手停在「目前頁面語言」那一側，把手裡是該語言的旗幟圖示；
+     被把手蓋住的那個文字隱藏，露出來的是「按下去會切到的語言」。
+     尺寸全部集中在這幾個變數，--sw-travel = 內寬 - 把手 - 兩側留白（JS 也讀這個值）。 */
   .lang-switch {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    height: 34px;
-    padding: 0 12px;
+    --sw-w: 72px;
+    --sw-knob: 26px;
+    --sw-pad: 3px;
+    --sw-travel: 40px; /* (72 - 2 邊框) - 26 - 3*2 */
+    position: relative;
+    display: block;
+    flex-shrink: 0;
+    width: var(--sw-w);
+    height: calc(var(--sw-knob) + var(--sw-pad) * 2 + 2px);
     box-sizing: border-box;
     border-radius: 999px;
     background-color: #f0f2f5;
-    color: #4a5568;
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-    line-height: 1;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(0, 0, 0, 0.04);
-    transition: all 0.25s ease;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    cursor: pointer;
     user-select: none;
-    white-space: nowrap;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.3s ease;
   }
 
   .lang-switch:hover {
     background-color: #e4e7eb;
-    color: #1a202c;
   }
 
-  .lang-switch-inner {
-    display: inline-flex;
+  .lang-switch.is-en {
+    background-color: var(--accent-color-light, #fdf5ee);
+  }
+
+  .lang-switch.is-en:hover {
+    background-color: var(--accent-color-lighter, #fbe6d4);
+  }
+
+  .lang-switch:focus-visible {
+    outline: 2px solid var(--accent-color, #e67e22);
+    outline-offset: 2px;
+  }
+
+  /* 兩端的文字：寬度跟把手一樣，所以把手停在哪一側就剛好蓋住那一側的字 */
+  .lang-label {
+    position: absolute;
+    top: var(--sw-pad);
+    width: var(--sw-knob);
+    height: var(--sw-knob);
+    line-height: var(--sw-knob);
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #8a94a6;
+    pointer-events: none;
+  }
+  .lang-label-zh { left: var(--sw-pad); }
+  .lang-label-en { right: var(--sw-pad); }
+
+  .lang-switch.is-en .lang-label {
+    color: var(--accent-color-dark, #b87333);
+  }
+
+  .lang-knob {
+    position: absolute;
+    top: var(--sw-pad);
+    left: var(--sw-pad);
+    z-index: 2;
+    display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    width: var(--sw-knob);
+    height: var(--sw-knob);
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+    cursor: grab;
+    touch-action: none;
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .lang-switch.is-en .lang-knob {
+    transform: translateX(var(--sw-travel));
+  }
+
+  /* 拖曳中：把手淡成米白色。用 box-shadow 而不是 padding/margin，不影響排版 */
+  .lang-knob.is-dragging {
+    cursor: grabbing;
+    background: #f7efe0;
+    box-shadow: 0 0 0 3px rgba(247, 239, 224, 0.9), 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 
   .lang-icon-img {
@@ -285,34 +351,9 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     height: 16px;
     object-fit: contain;
     display: block;
-    flex-shrink: 0;
-    order: 0;
-    cursor: grab;
-    touch-action: none;
+    pointer-events: none; /* 讓 pointer 事件由把手本身接收 */
     -webkit-user-drag: none;
     user-select: none;
-  }
-
-  /* 拖曳中的暫時外觀：淡成米白色的小圓底，放開後就消失，不影響平常樣子。
-     用 box-shadow 而不是 padding/margin，因為 box-shadow 不佔版面空間、
-     不會影響 flex 排版計算，也就不會干擾拖曳時的位置量測。 */
-  .lang-icon-img.is-dragging {
-    cursor: grabbing;
-    border-radius: 50%;
-    box-shadow: 0 0 0 4px #f7efe0, 0 2px 6px rgba(0, 0, 0, 0.15);
-  }
-
-  .lang-text {
-    order: 1;
-  }
-
-  /* 點擊時 icon 與文字交換位置：order 改變的瞬間先由 JS 用 transform 做 FLIP 動畫 */
-  .lang-switch-inner.is-swapped .lang-icon-img {
-    order: 1;
-  }
-
-  .lang-switch-inner.is-swapped .lang-text {
-    order: 0;
   }
 
   .menu-toggle {
@@ -439,6 +480,9 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     }
     .lang-switch {
       margin: 0;
+      --sw-w: 78px;
+      --sw-knob: 24px;
+      --sw-travel: 46px; /* (78 - 2 邊框) - 24 - 3*2 */
     }
   }
 </style>
@@ -489,234 +533,170 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     }
   }
 
-  // 使用 FLIP 技巧，讓 icon 與文字在切換 order 的瞬間，
-  // 用 transform 從舊位置「滑」到新位置，而不是直接跳過去。
-  // onMidSwap：在量測完舊位置、換 order 之前執行——用來即時換掉 icon 圖片與文字內容，
-  // 讓「換位置」跟「換內容」同時發生，而不用等 reload 才看得到正確語言。
-  function animateLangSwitchSwap(inner: HTMLElement, onMidSwap?: () => void) {
-    const icon = inner.querySelector('.lang-icon-img') as HTMLElement | null;
-    const text = inner.querySelector('.lang-text') as HTMLElement | null;
-    if (!icon || !text) {
-      onMidSwap?.();
-      inner.classList.toggle('is-swapped');
-      return;
-    }
+  // ---- 語言切換開關 ----
+  // 左 = 中文、右 = EN；把手停在「目前頁面語言」那一側，旗幟圖示在把手裡。
+  // 兩種觸發共用同一個收尾流程 completeLangSwitch：
+  //   1) 點整個開關  2) 拖曳把手，過半放開才切換，沒過半就彈回原位。
+  // 一定等動畫播完，才存 localStorage 並用原本的 href（getLangSwitchHref）導頁。
+  const LANG_ICON = { zh: '/icon/zh.svg', en: '/icon/en.svg' } as const;
+  const SWITCH_ANIM_MS = 350; // 比 CSS 的 0.3s 多一點，確保動畫真的播完才導頁
 
-    // First：記錄交換前的位置
-    const iconFirst = icon.getBoundingClientRect();
-    const textFirst = text.getBoundingClientRect();
-
-    // 換內容：icon src + 文字（文字寬度可能因此改變，例如 EN <-> 中文）
-    onMidSwap?.();
-
-    // Last：交換 order，取得交換後的位置
-    inner.classList.toggle('is-swapped');
-    const iconLast = icon.getBoundingClientRect();
-    const textLast = text.getBoundingClientRect();
-
-    // Invert：用 transform 讓元素瞬間「假裝」還在原位
-    const iconDeltaX = iconFirst.left - iconLast.left;
-    const textDeltaX = textFirst.left - textLast.left;
-
-    [icon, text].forEach((el) => {
-      el.style.transition = 'none';
-    });
-    icon.style.transform = `translateX(${iconDeltaX}px)`;
-    text.style.transform = `translateX(${textDeltaX}px)`;
-
-    // 強制 reflow，確保上面的 transform 先被套用
-    void inner.offsetWidth;
-
-    // Play：換回 transition，並把 transform 歸零，讓它動畫滑回真正的位置
-    requestAnimationFrame(() => {
-      [icon, text].forEach((el) => {
-        el.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        el.style.transform = '';
-      });
-    });
-  }
-
-  // 把 icon 圖片與文字換成「導頁過去之後那頁應該顯示的下一個切換目標」，
-  // 這樣使用者不用等 reload，點下去/拖過去的當下畫面就已經是對的。
-  function swapLangSwitchContent(link: HTMLAnchorElement, inner: HTMLElement) {
-    const icon = inner.querySelector('.lang-icon-img') as HTMLImageElement | null;
-    const text = inner.querySelector('.lang-text') as HTMLElement | null;
-    const targetLang = link.getAttribute('data-target-lang'); // 現在要前往的語言
-    if (!icon || !text || !targetLang) return;
-
-    // 到了新頁面之後，「下一個切換目標」會變成現在正要離開的這個語言
-    const nextDisplayLang = targetLang === 'en' ? 'zh' : 'en';
-    icon.src = nextDisplayLang === 'en' ? '/icon/en.svg' : '/icon/zh.svg';
-    text.textContent = nextDisplayLang === 'en' ? 'EN' : '中文';
-    link.setAttribute('data-target-lang', nextDisplayLang);
-  }
-
-  // 拖曳流程如果已經自己完成一次切換，緊接著瀏覽器補上的那個 click 事件
-  // 就不用再處理一次（不然會重複存 localStorage、重複動畫、重複導頁）
+  // 拖曳之後，瀏覽器會在同一個元素上補發 click；那一次要吃掉，否則會重複切換
   let suppressLangClick = false;
+  // 已經在播切換動畫 / 準備導頁時，不接受第二次觸發
+  let isLangSwitching = false;
 
-  // 真正「確定要切換」時共用的收尾流程：存偏好、換內容 + 播放交換動畫、動畫結束後才導頁。
-  // 點擊路徑跟拖曳路徑都會走到這裡，行為保證一致。
-  function completeLangSwitch(link: HTMLAnchorElement, inner: HTMLElement) {
-    const targetLang = link.getAttribute('data-target-lang'); // 存 localStorage 用，要在內容被換掉之前先讀
-    if (targetLang) {
-      try {
-        localStorage.setItem('lang-pref', targetLang);
-      } catch {
-        // localStorage 被封鎖也沒關係，語言切換連結本身還是能正常導頁
-      }
-    }
-    const href = link.getAttribute('href');
-    animateLangSwitchSwap(inner, () => swapLangSwitchContent(link, inner));
-    window.setTimeout(() => {
-      if (href) window.location.href = href;
-    }, 350);
+  function getSwitchTravel(link: HTMLElement): number {
+    const v = parseFloat(getComputedStyle(link).getPropertyValue('--sw-travel'));
+    return Number.isFinite(v) ? v : 0;
   }
 
-  // 使用者手動點了語言切換鈕，記住這個選擇，
-  // 之後 mainlayout.astro 裡的自動偵測腳本就不會再蓋過使用者自己選的語言。
+  function setKnobIcon(side: 'left' | 'right') {
+    const icon = document.getElementById('langKnobIcon') as HTMLImageElement | null;
+    if (!icon) return;
+    const src = side === 'right' ? LANG_ICON.en : LANG_ICON.zh;
+    if (!icon.src.endsWith(src)) icon.src = src;
+  }
+
+  function completeLangSwitch(link: HTMLAnchorElement, knob: HTMLElement) {
+    if (isLangSwitching) return;
+    isLangSwitching = true;
+
+    const targetLang = link.getAttribute('data-target-lang');
+    const href = link.getAttribute('href');
+    const toRight = !link.classList.contains('is-en'); // 目前在左 → 滑到右；反之亦然
+
+    knob.classList.remove('is-dragging');
+    knob.style.transition = ''; // 用 CSS 預設的彈性動畫
+    knob.style.transform = `translateX(${toRight ? getSwitchTravel(link) : 0}px)`;
+    link.classList.toggle('is-en', toRight);
+
+    // 滑到一半時換成目標語言的旗幟
+    window.setTimeout(() => setKnobIcon(toRight ? 'right' : 'left'), SWITCH_ANIM_MS / 2);
+
+    // 動畫播完才存偏好並導頁
+    window.setTimeout(() => {
+      if (targetLang) {
+        try {
+          localStorage.setItem('lang-pref', targetLang);
+        } catch {
+          // localStorage 被封鎖也沒關係，連結本身還是能正常導頁
+        }
+      }
+      if (href) window.location.href = href;
+    }, SWITCH_ANIM_MS);
+  }
+
   function onLangSwitchClick(e: MouseEvent) {
     if (suppressLangClick) {
-      // 這個 click 是拖曳放開之後瀏覽器順便補的，剛才拖曳流程已經處理過了
       e.preventDefault();
       suppressLangClick = false;
       return;
     }
-
     const link = e.currentTarget as HTMLAnchorElement;
-    const inner = document.getElementById('langSwitchInner');
-    if (inner) {
-      // 先播放 icon / 文字交換動畫，動畫結束後再真正導頁
-      e.preventDefault();
-      completeLangSwitch(link, inner);
+    const knob = document.getElementById('langKnob');
+    if (knob) {
+      e.preventDefault(); // 先播動畫，動畫結束後再導頁
+      completeLangSwitch(link, knob);
     }
   }
 
   function handleLangSwitchClick() {
     const link = document.getElementById('langSwitchLink') as HTMLAnchorElement | null;
     if (!link) return;
-    // 先移除舊的監聽器，避免每次 astro:page-load 都重複綁定，
-    // 導致動畫被觸發兩次而互相抵銷（視覺上像沒交換，但網址照樣跳轉）。
+    // 先移除再綁定，避免每次 astro:page-load 重複綁定造成動畫被觸發兩次
     link.removeEventListener('click', onLangSwitchClick);
     link.addEventListener('click', onLangSwitchClick);
   }
 
-  /**
-   * 手動拖曳 icon：
-   * - 抓著 icon 拖曳時會淡成米白色圓底，即時跟著手指/滑鼠移動；
-   * - 放開時如果已經拖過 icon 可移動範圍的一半，就當作「確定要切換」，
-   *   走跟點擊一樣的 completeLangSwitch（存偏好 → 換內容 → 播放交換動畫 → 動畫播完才導頁）；
-   * - 沒拖過一半就彈回原本位置，語言不變、也不會導頁。
-   */
+  // 超出範圍繼續拖時的橡皮筋阻力
+  function rubberBand(overflow: number, resistance = 28) {
+    return (overflow * resistance) / (overflow + resistance);
+  }
+
   function initLangDrag() {
     const link = document.getElementById('langSwitchLink') as HTMLAnchorElement | null;
-    const inner = document.getElementById('langSwitchInner') as HTMLElement | null;
-    const icon = inner?.querySelector('.lang-icon-img') as HTMLElement | null;
-    if (!link || !inner || !icon) return;
-    if (icon.dataset.dragBound === '1') return; // 避免每次 astro:page-load 重複綁定
-    icon.dataset.dragBound = '1';
+    const knob = document.getElementById('langKnob') as HTMLElement | null;
+    if (!link || !knob) return;
+    if (knob.dataset.dragBound === '1') return; // 避免重複綁定
+    knob.dataset.dragBound = '1';
 
     let dragging = false;
-    let startClientX = 0;
-    let startLeft = 0; // icon 拖曳開始時，相對 inner 容器左緣的距離
-    let maxTravel = 0; // icon 在 inner 容器內，真正有效的可移動距離（0 ~ maxTravel）
+    let moved = false;
+    let startX = 0;
+    let startPos = 0; // 把手拖曳開始時的位置（0 = 左端，travel = 右端）
+    let travel = 0;
 
-    function measure() {
-      const innerRect = inner!.getBoundingClientRect();
-      const iconRect = icon!.getBoundingClientRect();
-      startLeft = iconRect.left - innerRect.left;
-      maxTravel = Math.max(0, innerRect.width - iconRect.width);
-      console.log('[langDrag] measure', {
-        isSwapped: inner!.classList.contains('is-swapped'),
-        innerLeft: innerRect.left,
-        innerWidth: innerRect.width,
-        iconLeft: iconRect.left,
-        iconWidth: iconRect.width,
-        startLeft,
-        maxTravel,
-      });
-    }
-
-    // 貼著邊界繼續拖時的橡皮筋阻力：超出範圍越多，視覺上移動得越少，
-    // 讓兩個方向拖起來都「有感覺」，而不是貼邊之後完全死掉不動。
-    function rubberBand(overflow: number, resistance = 28) {
-      return (overflow * resistance) / (overflow + resistance);
-    }
-
-    icon.addEventListener('pointerdown', (e: PointerEvent) => {
+    knob.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (isLangSwitching) return;
       dragging = true;
-      // 一定要先量測，此時 icon 還沒被套上 is-dragging 的 padding/margin，
-      // 量到的才是乾淨、左右對稱的正常位置。
-      measure();
-      icon.setPointerCapture(e.pointerId);
-      icon.classList.add('is-dragging');
-      icon.style.transition = 'none';
-      startClientX = e.clientX;
+      moved = false;
+      travel = getSwitchTravel(link);
+      startPos = link.classList.contains('is-en') ? travel : 0;
+      startX = e.clientX;
+      knob.setPointerCapture(e.pointerId);
+      knob.classList.add('is-dragging');
+      knob.style.transition = 'none'; // 拖曳時要即時跟手，不能有動畫延遲
     });
 
-    icon.addEventListener('pointermove', (e: PointerEvent) => {
+    knob.addEventListener('pointermove', (e: PointerEvent) => {
       if (!dragging) return;
-      const delta = e.clientX - startClientX;
-      const rawPos = startLeft + delta; // 還沒套用橡皮筋前，理論上的絕對位置
+      const delta = e.clientX - startX;
+      if (Math.abs(delta) > 3) moved = true;
 
-      let visualPos: number;
-      if (rawPos < 0) {
-        visualPos = -rubberBand(-rawPos);
-      } else if (rawPos > maxTravel) {
-        visualPos = maxTravel + rubberBand(rawPos - maxTravel);
-      } else {
-        visualPos = rawPos;
-      }
+      const rawPos = startPos + delta;
+      let visualPos = rawPos;
+      if (rawPos < 0) visualPos = -rubberBand(-rawPos);
+      else if (rawPos > travel) visualPos = travel + rubberBand(rawPos - travel);
 
-      icon.style.transform = `translateX(${visualPos - startLeft}px)`;
+      knob.style.transform = `translateX(${visualPos}px)`;
+      // 隨位置即時換圖：過半就變成 EN 的旗幟，沒過半是中文的旗幟
+      setKnobIcon(rawPos > travel / 2 ? 'right' : 'left');
     });
 
-    function endDrag(e: PointerEvent) {
+    function endDrag(e: PointerEvent, cancelled: boolean) {
       if (!dragging) return;
       dragging = false;
-      icon!.classList.remove('is-dragging');
-      icon!.releasePointerCapture(e.pointerId);
+      knob!.classList.remove('is-dragging');
+      if (knob!.hasPointerCapture(e.pointerId)) knob!.releasePointerCapture(e.pointerId);
 
-      const delta = e.clientX - startClientX;
-      const rawPos = startLeft + delta;
-      // 判斷是否切換一律用「真正有效範圍內」夾出來的位置，橡皮筋多拖出去的部分不算數
-      const trueClamped = Math.max(0, Math.min(maxTravel, rawPos));
-
-      const crossedToRightHalf = maxTravel > 0 && trueClamped > maxTravel / 2;
-      const alreadySwapped = inner!.classList.contains('is-swapped');
-      // icon 現在停在跟目前 order 不同的那一半，代表使用者真的把它拖過去了
-      const shouldSwitch = crossedToRightHalf !== alreadySwapped;
-
-      console.log('[langDrag] endDrag', {
-        delta,
-        rawPos,
-        trueClamped,
-        maxTravel,
-        startLeft,
-        crossedToRightHalf,
-        alreadySwapped,
-        shouldSwitch,
-      });
-
-      // 只要這次放開前真的有拖動過（不是單純點一下），
-      // 接下來瀏覽器在同一個 <a> 上補發的 click 一律吃掉——
-      // 不然「拖過半又反悔拖回去」放開後，還是會被那個補發的 click 當成一般點擊誤切語言。
-      const wasDragged = Math.abs(delta) > 3;
-      if (wasDragged) {
-        suppressLangClick = true;
+      // 單純點一下（沒拖動）：交給後面的 click 事件處理，這裡只還原樣式
+      if (!moved) {
+        knob!.style.transition = '';
+        knob!.style.transform = '';
+        return;
       }
 
-      if (shouldSwitch) {
-        completeLangSwitch(link!, inner!);
+      // 拖動過：pointerup 之後瀏覽器會立刻補發 click，吃掉那一次；
+      // click 是同步補發的，所以下一個 tick 就解除，避免 pointercancel 時旗標卡住
+      if (!cancelled) {
+        suppressLangClick = true;
+        window.setTimeout(() => {
+          suppressLangClick = false;
+        }, 0);
+      }
+
+      const rawPos = startPos + (e.clientX - startX);
+      const clamped = Math.max(0, Math.min(travel, rawPos)); // 橡皮筋多拖的部分不算數
+      const finalRight = clamped > travel / 2;
+      const currentRight = link!.classList.contains('is-en');
+
+      if (!cancelled && finalRight !== currentRight) {
+        completeLangSwitch(link!, knob!);
       } else {
-        // 沒拖過半，或是拖過半又反悔拖回去了：讓 icon 彈回原本位置，語言不變、不導頁
-        icon!.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        icon!.style.transform = '';
+        // 沒過半（或被中斷）：彈回原位，語言不變、不導頁
+        knob!.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        knob!.style.transform = `translateX(${startPos}px)`;
+        setKnobIcon(currentRight ? 'right' : 'left');
+        window.setTimeout(() => {
+          knob!.style.transition = '';
+          knob!.style.transform = '';
+        }, 260);
       }
     }
 
-    icon.addEventListener('pointerup', endDrag);
-    icon.addEventListener('pointercancel', endDrag);
+    knob.addEventListener('pointerup', (e: PointerEvent) => endDrag(e, false));
+    knob.addEventListener('pointercancel', (e: PointerEvent) => endDrag(e, true));
   }
 
   function initNavigationSystem() {

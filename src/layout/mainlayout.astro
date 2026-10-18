@@ -1,6 +1,7 @@
 ---
 // src/layout/mainlayout.astro
 import Header from '../components/header.astro';
+import GsatBanner from '../components/gsat-banner.astro';
 import Footer from '../components/footer.astro';
 // 全域載入共用色票 / 樣式變數（style.css 的 :root）。
 // 原本只有部分頁面（post、article、404...）各自 import 這份檔案，
@@ -21,6 +22,7 @@ const { title = "weilinlai的網站" } = Astro.props;
 </head>
 <body>
     <Header />
+    <GsatBanner />
     <main class="main-container">
         <slot />
     </main>  

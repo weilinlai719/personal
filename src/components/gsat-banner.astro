@@ -1,0 +1,275 @@
+---
+// src/components/gsat-banner.astro
+// 倒數橫幅（可關閉）。要新增 / 修改活動，只需要改下面的 EVENTS 與 DISMISS_MINUTES，其他都不用動。
+//
+// ── 每個活動的欄位 ─────────────────────────────────────────
+//   label     橫幅左邊的標題
+//   start     活動開始時間（ISO 格式，記得加 +08:00）
+//   end       活動結束時間
+//   until     這個活動「顯示到什麼時候」；過了之後換成下一個活動，沒有下一個就整個隱藏
+//   before    開始前顯示的文字，{days} 會換成剩餘天數
+//   tomorrow  開始前一天顯示的文字（可省略，省略就用 before）
+//   during    活動進行中顯示的文字
+//   after     活動結束後、until 之前顯示的文字，{until} 會換成 until 的日期
+//
+// ── 規則 ──────────────────────────────────────────────────
+//   1. EVENTS 請依時間「由早到晚」排列。
+//   2. 每個活動的 until 要 >= end，且不要晚於下一個活動的 start。
+//   3. 最後一個活動的 until 一過，橫幅就會自動消失。
+const EVENTS = [
+  {
+    label: '📚 116 學測倒數',  // 來源：大考中心 116 學年度考試簡章
+    start: '2027-01-22T00:00:00+08:00',
+    end: '2027-01-25T00:00:00+08:00',
+    until: '2027-02-25T00:00:00+08:00',
+    before: '還有 <strong class="gsat-days">{days}</strong> 天',
+    tomorrow: '明天就是學測！',
+    during: '學測進行中，加油！💪',
+    after: '學測已結束，放榜日期：{until}',
+  },
+  {
+    label: '📝 個人申請 一階志願填報',
+    start: '2027-03-23T00:00:00+08:00',
+    end: '2027-03-25T00:00:00+08:00',
+    until: '2027-03-25T00:00:00+08:00',
+    before: '還有 <strong class="gsat-days">{days}</strong> 天',
+    during: '志願填報進行中（至 3/24）！',
+    after: '',
+  },
+  {
+    label: '📣 個人申請 一階篩選放榜',
+    start: '2027-03-30T00:00:00+08:00',
+    end: '2027-03-31T00:00:00+08:00',
+    until: '2027-03-31T00:00:00+08:00',
+    before: '還有 <strong class="gsat-days">{days}</strong> 天',
+    tomorrow: '明天上午 9 時放榜！',
+    during: '今天上午 9 時放榜！',
+    after: '',
+  },
+  {
+    label: '📤 個人申請 二階審查資料上傳',  // 截止日依各校系規定，這裡先抓到甄試開始前
+    start: '2027-05-04T00:00:00+08:00',
+    end: '2027-05-13T00:00:00+08:00',
+    until: '2027-05-13T00:00:00+08:00',
+    before: '還有 <strong class="gsat-days">{days}</strong> 天',
+    during: '上傳進行中，請依各校系規定截止日完成！',
+    after: '',
+  },
+  {
+    label: '🎤 個人申請 二階指定項目甄試',
+    start: '2027-05-13T00:00:00+08:00',
+    end: '2027-05-31T00:00:00+08:00',
+    until: '2027-05-31T00:00:00+08:00',
+    before: '還有 <strong class="gsat-days">{days}</strong> 天',
+    during: '甄試進行中（5/13～5/30），加油！',
+    after: '',
+  },
+  {
+    label: '✅ 個人申請 登記就讀志願序',
+    start: '2027-06-03T00:00:00+08:00',
+    end: '2027-06-05T00:00:00+08:00',
+    until: '2027-06-05T00:00:00+08:00',
+    before: '還有 <strong class="gsat-days">{days}</strong> 天',
+    during: '登記中（至 6/4），別忘了！',
+    after: '',
+  },
+  {
+    label: '🎉 統一分發放榜',
+    start: '2027-06-10T00:00:00+08:00',
+    end: '2027-06-11T00:00:00+08:00',
+    until: '2027-06-11T00:00:00+08:00',
+    before: '還有 <strong class="gsat-days">{days}</strong> 天',
+    tomorrow: '明天上午 9 時放榜！',
+    during: '今天上午 9 時放榜！',
+    after: '',
+  },
+];
+
+// 按 ✕ 之後隱藏幾分鐘（測試用 5，正式上線可改成 1440 = 一天）
+const DISMISS_MINUTES = 5;
+---
+
+<div
+  class="gsat-banner"
+  id="gsat-banner"
+  data-events={JSON.stringify(EVENTS)}
+  data-dismiss-minutes={DISMISS_MINUTES}
+  hidden
+>
+  <p class="gsat-text">
+    <span class="gsat-label" id="gsat-label"></span>
+    <span class="gsat-count" id="gsat-count"></span>
+  </p>
+  <button type="button" class="gsat-close" id="gsat-close" aria-label="關閉橫幅">✕</button>
+</div>
+
+<script is:inline>
+  (function () {
+    var banner = document.getElementById('gsat-banner');
+    if (!banner) return;
+    var now = Date.now();
+    var events = JSON.parse(banner.dataset.events || '[]');
+    if (!events.length) return;
+
+    // 最後一個活動的 until 已過 → 不顯示
+    var lastUntil = new Date(events[events.length - 1].until).getTime();
+    if (now >= lastUntil) return;
+
+    // 剛按過 ✕ 的一段時間內不顯示
+    try {
+      var dismissedAt = localStorage.getItem('gsat-banner-dismissed');
+      if (dismissedAt) {
+        var minutes = (now - parseInt(dismissedAt, 10)) / 60000;
+        if (minutes < Number(banner.dataset.dismissMinutes)) return;
+      }
+    } catch (e) {}
+
+    banner.hidden = false;
+  })();
+</script>
+
+<script>
+  type GsatEvent = {
+    label: string;
+    start: string;
+    end: string;
+    until: string;
+    before: string;
+    tomorrow?: string;
+    during: string;
+    after: string;
+  };
+
+  const banner = document.getElementById('gsat-banner');
+  const labelEl = document.getElementById('gsat-label');
+  const countEl = document.getElementById('gsat-count');
+  const closeBtn = document.getElementById('gsat-close');
+
+  if (banner && labelEl && countEl && closeBtn) {
+    const events: GsatEvent[] = JSON.parse(banner.dataset.events || '[]');
+
+    const render = () => {
+      const now = Date.now();
+
+      // 找第一個「還沒過 until」的活動；全部都過了就隱藏
+      const ev = events.find((e) => now < new Date(e.until).getTime());
+      if (!ev) {
+        banner.hidden = true;
+        return;
+      }
+
+      const start = new Date(ev.start).getTime();
+      const end = new Date(ev.end).getTime();
+      const untilText = new Date(ev.until).toLocaleDateString('zh-TW');
+
+      let text: string;
+      if (now >= end) {
+        text = ev.after;
+      } else if (now >= start) {
+        text = ev.during;
+      } else {
+        const days = Math.ceil((start - now) / 86400000);
+        text = days === 1 && ev.tomorrow ? ev.tomorrow : ev.before;
+        text = text.replace('{days}', String(days));
+      }
+
+      labelEl.textContent = ev.label;
+      countEl.innerHTML = text.replace('{until}', untilText);
+    };
+
+    render();
+    setInterval(render, 60 * 1000);
+
+    closeBtn.addEventListener('click', () => {
+      banner.hidden = true;
+      try {
+        localStorage.setItem('gsat-banner-dismissed', Date.now().toString());
+      } catch (e) {}
+    });
+  }
+</script>
+
+<style>
+  /* 這個元件自給自足：顏色都有 fallback，沒載入 style.css 的頁面（about、index）也正常 */
+  /* 懸浮在 header 正下方、蓋在頁面內容上方。
+     header 是 z-index: 1000、高度 4rem，所以這裡用 fixed + top: 4rem，
+     z-index 取 900：比頁面內容高、比 header（含下拉選單、手機選單）低。 */
+  .gsat-banner {
+    position: fixed;
+    top: calc(4rem + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    padding: 0.5rem 2.6rem 0.5rem 1.1rem;
+    background: var(--accent-color-light, #fdf5ee);
+    border: 1px solid var(--accent-color-lighter, #fbe6d4);
+    border-radius: 999px;
+    box-shadow: 0 6px 18px rgba(160, 140, 130, 0.18);
+    color: var(--accent-color-dark, #b87333);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .gsat-banner[hidden] {
+    display: none;
+  }
+
+  .gsat-text {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .gsat-label {
+    font-weight: 600;
+  }
+
+  .gsat-days {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--accent-color, #e67e22);
+    font-variant-numeric: tabular-nums;
+    padding: 0 0.1rem;
+  }
+
+  .gsat-close {
+    position: absolute;
+    top: 50%;
+    right: 0.4rem;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 0.85rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.65;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+  }
+
+  .gsat-close:hover,
+  .gsat-close:focus-visible {
+    opacity: 1;
+    background: rgba(184, 115, 51, 0.12);
+  }
+
+  @media (max-width: 600px) {
+    .gsat-banner {
+      font-size: 0.82rem;
+      padding: 0.4rem 2.4rem 0.4rem 0.9rem;
+    }
+  }
+</style>
