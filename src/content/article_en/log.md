@@ -13,6 +13,6 @@ subject: '# Website Announcement'
 **August 2026**  Added a visitor count feature.\
 **August 2026**  Improved the `Mark Down` styling function.\
 **September 2026** Refactor UI.\
-**September 2026** Added new language support, including Chinese and English.
-
+**September 2026** Added new language support, including Chinese and English.\
+**October 2026** Permanent domain
 > ...Work in progress
