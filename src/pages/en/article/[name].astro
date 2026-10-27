@@ -12,9 +12,9 @@ export const prerender = false;
 const t = useTranslations('en');
 
 const { name } = Astro.params;
-if (!name) return Astro.redirect('/404');
+if (!name) return Astro.redirect('en/404');
 const entry = await getEntry('article_en', name);
-if (!entry) return Astro.redirect('/404');
+if (!entry) return Astro.redirect('en/404');
 const { Content } = await render(entry);
 const { title, date, subject } = entry.data;
 ---
