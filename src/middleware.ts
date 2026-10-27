@@ -15,5 +15,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
+    const response = await next();
+
+  // 英文路徑找不到頁面 → 顯示英文版 404（保留 404 狀態碼）
+  if (
+    response.status === 404 &&
+    url.pathname.startsWith("/en/") &&
+    !url.pathname.startsWith("/en/404")
+  ) {
+    const en404 = await context.rewrite("/en/404");
+    return new Response(en404.body, { status: 404, headers: en404.headers });
+  }
   return next();
 });
