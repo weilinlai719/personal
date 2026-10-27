@@ -1,9 +1,8 @@
 ---
-// src/pages/post/[id].astro
+// src/pages/en/post/[id].astro
 import MainLayout from '../../../layout/mainlayout.astro';
 import '../../../styles/style.css';
 export const prerender = false;
-window.location.href = "/en/404/";
 ---
 
 <MainLayout title="Weilin Lai - Post Details">
@@ -198,13 +197,13 @@ window.location.href = "/en/404/";
       } else {
         postContainer.innerHTML = `
           <div class="post-not-found">
-            <div class="not-found-code">404</div>
+            <div class="not-found-code">en/404</div>
             <h2 class="not-found-title">Post Not Found</h2>
             <p class="not-found-desc">Post with ID ${postId} does not exist, or it may have been deleted or the URL is incorrect.</p>
             <a href="/post" class="btn btn-primary">← Back to Post List</a>
           </div>
         `;
-        window.location.href = "/404/";
+        window.location.href = "/en/404/";
         return false;
       }
     } catch (err) {
