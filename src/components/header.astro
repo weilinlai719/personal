@@ -530,6 +530,34 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
 </style>
 
 <script>
+
+// ---- 進站時依 lang-pref 自動導向 ----
+function applyLangPreference() {
+  try {
+    // 同一個分頁只檢查一次（sessionStorage 關掉分頁才會重置）
+    if (sessionStorage.getItem('lang-checked')) return;
+    sessionStorage.setItem('lang-checked', '1');
+
+    const pref = localStorage.getItem('lang-pref');
+    const isEnPath = location.pathname === '/en' || location.pathname.startsWith('/en/');
+    const currentLang = isEnPath ? 'en' : 'zh';
+
+    if (pref && pref !== currentLang) {
+      const link = document.getElementById('langSwitchLink') as HTMLAnchorElement | null;
+      // 直接用語言切換鈕算好的網址，保留原本的頁面路徑
+      if (link && link.dataset.targetLang === pref) {
+        location.replace(link.href);
+      }
+    }
+  } catch {
+    // localStorage / sessionStorage 被封鎖就算了
+  }
+}
+
+applyLangPreference();
+
+
+
  function setMenuOpen(open: boolean) {
   document.getElementById('menuToggle')?.classList.toggle('is-active', open);
   document.getElementById('navMenu')?.classList.toggle('is-active', open);
