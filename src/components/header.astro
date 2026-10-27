@@ -84,9 +84,12 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
       </button>
     </div>
   </div>
+<div class="nav-overlay" id="navOverlay"></div>
 </header>
 
 <style>
+  .nav-overlay { display: none; }
+
   .navbar {
     background: var(--header-bg, rgba(255, 255, 255, 0.65));
     backdrop-filter: blur(10px);
@@ -412,127 +415,194 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
   }
 
   @media screen and (max-width: 768px) {
-    .menu-toggle {
-      display: flex;
-    }
-    /* 取消桌面版的 flex 佈局 */
-    .nav-menu {
-      position: absolute;
-      top: 4rem;
-      left: 0;
-      right: 0;
-      background: var(--header-bg, rgba(255, 255, 255, 0.85));
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      border-bottom: 1px solid var(--shadow-color2, #e5e7eb);
-      padding: 5px 20px 24px 20px;
-      border-radius: 12px;
-      display: none; /* 預設隱藏 */
-      flex-direction: column;
-      z-index: 1500;
-      max-height: calc(100vh - 4rem);
-      overflow-y: auto;
-    }
-    .nav-menu.is-active {
-      display: flex !important;
-    }
-    .nav-links {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-    }
-    .nav-item {
-      width: 100%;
-      box-sizing: border-box;
-      justify-content: space-between;
-      padding: 14px 18px;
-      font-size: 1.05rem;
-    }
-    .dropdown {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .dropdown-content {
-      position: static;
-      width: 100%;
-      opacity: 1;
-      visibility: visible;
-      box-shadow: none;
-      border: none;
-      padding: 4px 0 4px 14px;
-      margin-top: 6px;
-      border-left: 2px solid #e5e7eb;
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-      transform: none;
-    }
-    .dropdown-content.is-active {
-      display: flex !important;
-    }
-    .dropdown-link {
-      background-color: var(--shadow-color2, rgba(0, 0, 0, 0.02));
-      padding: 12px 16px;
-    }
-    .dropdown-trigger.is-active .chevron-icon {
-      transform: rotate(180deg);
-    }
-    .lang-switch {
-      margin: 0;
-      --sw-w: 78px;
-      --sw-knob: 24px;
-      --sw-travel: 46px; /* (78 - 2 邊框) - 24 - 3*2 */
-    }
+  .menu-toggle {
+    display: flex;
   }
+
+  /* 關鍵：navbar 本身有 backdrop-filter，會讓裡面的 position: fixed
+     變成「相對於 navbar」而不是整個視窗，側欄就會被卡在 4rem 高裡。
+     所以手機版把背景和模糊搬到 ::before，navbar 本身不再有 filter。 */
+  .navbar {
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .navbar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--header-bg, rgba(255, 255, 255, 0.65));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* 遮罩 */
+  .nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1400;
+    background: rgba(15, 23, 42, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .nav-overlay.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* 側欄：從右邊滑入 */
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(80vw, 320px);
+    margin: 0;
+    padding: calc(4rem + 8px) 16px 24px;
+    background: #ffffff;
+    border-left: 1px solid var(--shadow-color2, #e5e7eb);
+    box-shadow: -12px 0 30px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 1500;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+  }
+  .nav-menu.is-active {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .nav-item {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: space-between;
+    padding: 14px 18px;
+    font-size: 1.05rem;
+  }
+  .dropdown {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dropdown-content {
+    position: static;
+    width: 100%;
+    opacity: 1;
+    visibility: visible;
+    box-shadow: none;
+    border: none;
+    padding: 4px 0 4px 14px;
+    margin-top: 6px;
+    border-left: 2px solid #e5e7eb;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    transform: none;
+  }
+  .dropdown-content.is-active {
+    display: flex !important;
+  }
+  .dropdown-link {
+    background-color: var(--shadow-color2, rgba(0, 0, 0, 0.02));
+    padding: 12px 16px;
+  }
+  .dropdown-trigger.is-active .chevron-icon {
+    transform: rotate(180deg);
+  }
+  .lang-switch {
+    margin: 0;
+    --sw-w: 78px;
+    --sw-knob: 24px;
+    --sw-travel: 46px;
+  }
+}
 </style>
 
 <script>
-  function toggleMobileMenu(e: Event) {
-    e.stopPropagation();
-    const menuToggle = document.getElementById('menuToggle');
-    const navMenu = document.getElementById('navMenu');
-    menuToggle?.classList.toggle('is-active');
-    navMenu?.classList.toggle('is-active');
+ function setMenuOpen(open: boolean) {
+  document.getElementById('menuToggle')?.classList.toggle('is-active', open);
+  document.getElementById('navMenu')?.classList.toggle('is-active', open);
+  document.getElementById('navOverlay')?.classList.toggle('is-active', open);
+  document.body.style.overflow = open ? 'hidden' : ''; // 側欄開著時鎖住背景捲動
+  if (!open) {
+    document.querySelectorAll('.dropdown-content').forEach((c) => c.classList.remove('is-active'));
+    document.querySelectorAll('.dropdown-trigger').forEach((t) => t.classList.remove('is-active'));
   }
+}
 
-  function handleDropdownToggle(e: Event) {
-    if (window.innerWidth > 768) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const currentTrigger = e.currentTarget as HTMLElement;
-    const dropdownContainer = currentTrigger.closest('.dropdown');
-    const currentContent = dropdownContainer?.querySelector('.dropdown-content') as HTMLElement | null;
+function toggleMobileMenu(e: Event) {
+  e.stopPropagation();
+  const isOpen = document.getElementById('navMenu')?.classList.contains('is-active');
+  setMenuOpen(!isOpen);
+}
+function handleDropdownToggle(e: Event) {
+  if (window.innerWidth > 768) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const currentTrigger = e.currentTarget as HTMLElement;
+  const dropdownContainer = currentTrigger.closest('.dropdown');
+  const currentContent = dropdownContainer?.querySelector('.dropdown-content') as HTMLElement | null;
 
-    if (currentContent) {
-      const isCurrentlyActive = currentContent.classList.contains('is-active');
-      document.querySelectorAll('.dropdown-content').forEach((c) => {
-        if (c !== currentContent) c.classList.remove('is-active');
-      });
-      document.querySelectorAll('.dropdown-trigger').forEach((t) => {
-        if (t !== currentTrigger) t.classList.remove('is-active');
-      });
+  if (currentContent) {
+    const isCurrentlyActive = currentContent.classList.contains('is-active');
+    document.querySelectorAll('.dropdown-content').forEach((c) => {
+      if (c !== currentContent) c.classList.remove('is-active');
+    });
+    document.querySelectorAll('.dropdown-trigger').forEach((t) => {
+      if (t !== currentTrigger) t.classList.remove('is-active');
+    });
 
-      if (isCurrentlyActive) {
-        currentContent.classList.remove('is-active');
-        currentTrigger.classList.remove('is-active');
-      } else {
-        currentContent.classList.add('is-active');
-        currentTrigger.classList.add('is-active');
-      }
+    if (isCurrentlyActive) {
+      currentContent.classList.remove('is-active');
+      currentTrigger.classList.remove('is-active');
+    } else {
+      currentContent.classList.add('is-active');
+      currentTrigger.classList.add('is-active');
     }
   }
+}
+function closeAllMenusSafely(e: MouseEvent) {
+  const target = e.target as HTMLElement;
+  if (!target.closest('.nav-container')) setMenuOpen(false);
+}
 
-  function closeAllMenusSafely(e: MouseEvent) {
-    const target = e.target as HTMLElement;
-    if (!target.closest('.nav-container')) {
-      document.getElementById('menuToggle')?.classList.remove('is-active');
-      document.getElementById('navMenu')?.classList.remove('is-active');
-      document.querySelectorAll('.dropdown-content').forEach((c) => c.classList.remove('is-active'));
-      document.querySelectorAll('.dropdown-trigger').forEach((t) => t.classList.remove('is-active'));
-    }
-  }
+function onEscClose(e: KeyboardEvent) {
+  if (e.key === 'Escape') setMenuOpen(false);
+}
 
+
+const NAV_CLOSE_ANIM_MS = 320; // 略大於側欄 CSS 的 0.3s，確保收完才導頁
+
+function onNavLinkClick(e: MouseEvent) {
+  // 側欄沒開（桌面版）就維持原本的導頁行為
+  if (!document.getElementById('navMenu')?.classList.contains('is-active')) return;
+
+  setMenuOpen(false);
+
+  // 首頁的 3D warp 自己會延遲 500ms 才導頁，這裡不插手，只負責收側欄
+  if (document.querySelector('.home')) return;
+
+  const link = e.currentTarget as HTMLAnchorElement;
+  // 新分頁 / Ctrl、Cmd、Shift 點擊：不攔截，維持瀏覽器預設行為
+  if (link.target === '_blank' || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+
+  e.preventDefault();
+  const href = link.href;
+  window.setTimeout(() => {
+    window.location.href = href;
+  }, NAV_CLOSE_ANIM_MS);
+}
   // ---- 語言切換開關 ----
   // 左 = 中文、右 = EN；把手停在「目前頁面語言」那一側，旗幟圖示在把手裡。
   // 兩種觸發共用同一個收尾流程 completeLangSwitch：
@@ -715,19 +785,19 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
 
     document.removeEventListener('click', closeAllMenusSafely);
     document.addEventListener('click', closeAllMenusSafely);
-
+    document.removeEventListener('keydown', onEscClose);
+    document.addEventListener('keydown', onEscClose);
+    document.querySelectorAll<HTMLAnchorElement>('.nav-menu a, #langSwitchLink').forEach((link) => {
+        link.removeEventListener('click', onNavLinkClick);
+        link.addEventListener('click', onNavLinkClick);
+    });
     handleLangSwitchClick();
     initLangDrag();
   }
 
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-      document.getElementById('menuToggle')?.classList.remove('is-active');
-      document.getElementById('navMenu')?.classList.remove('is-active');
-      document.querySelectorAll('.dropdown-content').forEach((c) => c.classList.remove('is-active'));
-      document.querySelectorAll('.dropdown-trigger').forEach((t) => t.classList.remove('is-active'));
-    }
-  });
+  if (window.innerWidth > 768) setMenuOpen(false);
+});
 
   initNavigationSystem();
   document.addEventListener('astro:page-load', initNavigationSystem);
