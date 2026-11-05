@@ -210,6 +210,7 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
   .chevron-icon {
     width: 14px;
     height: 14px;
+    flex-shrink: 0;
     fill: currentColor;
     transition: transform 0.3s ease;
   }
@@ -484,39 +485,75 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     gap: 6px;
   }
   .nav-item {
-    width: 100%;
-    box-sizing: border-box;
-    justify-content: space-between;
-    padding: 14px 18px;
-    font-size: 1.05rem;
-  }
+  justify-content: center;
+  text-align: center;
+}
+.nav-item:hover {
+  background: transparent;   /* 手機點擊後 hover 會卡住變灰 */
+}
+
+
   .dropdown {
     display: flex;
     flex-direction: column;
     align-items: stretch;
   }
-  .dropdown-content {
-    position: static;
-    width: 100%;
-    opacity: 1;
-    visibility: visible;
-    box-shadow: none;
-    border: none;
-    padding: 4px 0 4px 14px;
-    margin-top: 6px;
-    border-left: 2px solid #e5e7eb;
-    display: none;
-    flex-direction: column;
-    gap: 6px;
-    transform: none;
+ .nav-item:hover,
+.nav-item.dropdown:hover {
+  background: transparent;
+}
+
+.dropdown-content {
+  position: static;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  /* 收起狀態：高度 0 + 透明 + 稍微往上 */
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition:
+    max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    margin-top 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    visibility 0.25s;
+}
+.dropdown-content.is-active {
+  max-height: 300px;   /* 只要大於子選單實際高度即可 */
+  margin-top: 6px;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.dropdown-link {
+  background-color: var(--shadow-color2, rgba(0, 0, 0, 0.03));
+  padding: 12px 18px;
+  text-align: center;
   }
-  .dropdown-content.is-active {
-    display: flex !important;
-  }
-  .dropdown-link {
-    background-color: var(--shadow-color2, rgba(0, 0, 0, 0.02));
-    padding: 12px 16px;
-  }
+  .nav-item,
+.dropdown-link {
+  justify-content: center;
+  text-align: center;
+}
+.dropdown-trigger {
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  padding-left: 20px;
+  height: auto;        /* 取消桌面版的 height: 100%，不要被子選單的高度拉高 */
+  flex-shrink: 0;  
+}
   .dropdown-trigger.is-active .chevron-icon {
     transform: rotate(180deg);
   }
