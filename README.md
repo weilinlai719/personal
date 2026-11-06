@@ -1,4 +1,4 @@
-# weilinlai.duckdns.org
+# WeilinLai personal website 
 
 Weilin Lai 的個人網站，一位就讀高中、目標開發者的學生所建，內容涵蓋生活/課業紀錄、技術文章與自製專案展示，並附有自建的文章管理後台。
 
