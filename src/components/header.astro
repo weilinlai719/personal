@@ -44,6 +44,9 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
             <a href={getLocalizedPath(lang, '/projects/cui/')} class="dropdown-link" rel="noopener noreferrer">
               <span class="link-title">{t('nav.projects.cui')}</span>
             </a>
+            <a href={getLocalizedPath(lang, 'https://words7000.onrender.com')} class="dropdown-link" rel="noopener noreferrer">
+              <span class="link-title">{t('nav.projects.words7000')}</span>
+            </a>
           </div>
         </div>
 
@@ -530,7 +533,7 @@ const otherLang = lang === 'zh' ? 'en' : 'zh';
     visibility 0.25s;
 }
 .dropdown-content.is-active {
-  max-height: 300px;   /* 只要大於子選單實際高度即可 */
+  max-height: 400px;   /* 只要大於子選單實際高度即可 */
   margin-top: 6px;
   opacity: 1;
   visibility: visible;
