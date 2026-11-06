@@ -76,7 +76,7 @@ export const ui = {
     'nav.projects.lottery': '🎁 Lucky Draw',
     'nav.projects.earthscience': '🌎 Earth Science Explore',
     'nav.projects.cui': 'Open Source: CUI',
-    'nav.projects.words7000': 'line bot for 7000 vocabulary',
+    'nav.projects.words7000': '7000 vocabularies linebot',
 
     'footer.rights': 'All Rights Reserved.',
     'footer.visitors': 'Visitors',
