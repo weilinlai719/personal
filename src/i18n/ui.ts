@@ -33,6 +33,7 @@ export const ui = {
     'nav.projects.lottery': '🎁 抽獎器',
     'nav.projects.earthscience': '🌎 地科探究',
     'nav.projects.cui': '開源專案：CUI',
+    'nav.project.words7000': 'line七千單機器人',
 
     'footer.rights': '保留所有權利。',
     'footer.visitors': '瀏覽人數',
@@ -75,6 +76,7 @@ export const ui = {
     'nav.projects.lottery': '🎁 Lucky Draw',
     'nav.projects.earthscience': '🌎 Earth Science Explore',
     'nav.projects.cui': 'Open Source: CUI',
+    'nav.project.words7000': 'line bot for 7000 vocabulary',
 
     'footer.rights': 'All Rights Reserved.',
     'footer.visitors': 'Visitors',
